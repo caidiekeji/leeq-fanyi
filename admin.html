@@ -950,6 +950,7 @@
         return showToast('该提供商暂无可用模型', 'error');
       }
       const resultEl = document.getElementById(`testResult-${providerId}`);
+      if (!resultEl) return;
       resultEl.textContent = '测试中 0/' + prov.models.length;
       let tested = 0;
       let successCount = 0;
@@ -967,25 +968,17 @@
           if (testData.code === 200) {
             model.testResult = { latency: testData.data.latency, tokens: testData.data.tokens };
             successCount++;
-            const itemEl = document.getElementById(`model-item-${providerId}-${model.id.replace(/[^a-z0-9]/gi, '-')}`);
-            if (itemEl) {
-              const existingSpeed = itemEl.querySelector('.model-speed');
-              if (existingSpeed) existingSpeed.remove();
-              const speedSpan = document.createElement('span');
-              speedSpan.className = 'model-speed';
-              speedSpan.textContent = `${testData.data.latency}ms`;
-              itemEl.appendChild(speedSpan);
-            }
           }
-        } catch (e) { tested++; }
-        resultEl.textContent = `测试中 ${tested}/${total}`;
+          resultEl.textContent = `测试中 ${tested}/${total}`;
+        } catch (e) { tested++; resultEl.textContent = `测试中 ${tested}/${total}`; }
         if (i < total - 1) await new Promise(r => setTimeout(r, 1800));
       }
+      renderProviders(currentProviders);
       const testedModels = prov.models.filter(m => m.testResult);
       const avgLatency = testedModels.length > 0
         ? Math.round(testedModels.reduce((s, m) => s + m.testResult.latency, 0) / testedModels.length)
         : 0;
-      resultEl.textContent = avgLatency > 0 ? `平均 ${avgLatency}ms (${testedModels.length}/${total})` : `失败 (0/${total})`;
+      document.getElementById(`testResult-${providerId}`).textContent = avgLatency > 0 ? `平均 ${avgLatency}ms (${testedModels.length}/${total})` : `失败 (0/${total})`;
       showToast(`测试完成，${testedModels.length}/${total} 个模型通过`, testedModels.length > 0 ? 'success' : 'error');
     }
 
