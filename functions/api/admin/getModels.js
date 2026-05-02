@@ -36,9 +36,7 @@ async function fetchModels(provider, apiKey, customEndpoint) {
     headers['x-api-key'] = apiKey;
     headers['anthropic-version'] = '2023-06-01';
   } else if (provider === 'baidu') {
-    const tokenRes = await fetch(`${endpoint.baseUrl}/oauth/2.0/token?grant_type=client_credentials&client_id=${apiKey}&client_secret=${apiKey}`, { method: 'POST' });
-    const tokenData = await tokenRes.json();
-    return { models: [], error: '百度文心需要获取 access_token' };
+    return { models: [], error: '百度文心需要获取 access_token，请手动配置模型' };
   } else {
     headers['Authorization'] = `Bearer ${apiKey}`;
   }
@@ -47,18 +45,22 @@ async function fetchModels(provider, apiKey, customEndpoint) {
     const url = `${endpoint.baseUrl}${endpoint.listPath}`;
     const res = await fetch(url, { headers });
     if (!res.ok) {
-      return { models: [], error: `获取失败: ${res.status}` };
+      const errText = await res.text().catch(() => '');
+      return { models: [], error: `获取失败 (${res.status}): ${errText.slice(0, 100)}` };
     }
     
     const data = await res.json();
     let models = [];
     
     if (provider === 'gemini') {
-      models = data.models?.map(m => ({ id: m.name.replace('models/', ''), name: m.name.replace('models/', '') })) || [];
+      models = (data.models || []).map(m => ({ 
+        id: m.name?.replace('models/', '') || '', 
+        name: m.displayName || m.name?.replace('models/', '') || '' 
+      })).filter(m => m.id);
     } else if (data.data && Array.isArray(data.data)) {
-      models = data.data.map(m => ({ id: m.id, name: m.id })).filter(m => m.id.includes('chat') || m.id.includes('instruct') || m.id.includes('gpt') || m.id.includes('claude') || m.id.includes('gemini') || m.id.includes('qwen') || m.id.includes('glm') || m.id.includes('moonshot'));
+      models = data.data.map(m => ({ id: m.id, name: m.id })).filter(m => m.id);
     } else if (data.models && Array.isArray(data.models)) {
-      models = data.models.map(m => ({ id: m.id || m.model, name: m.id || m.model }));
+      models = data.models.map(m => ({ id: m.id || m.model || '', name: m.id || m.model || '' })).filter(m => m.id);
     }
     
     return { models: models.slice(0, 50), error: null };
