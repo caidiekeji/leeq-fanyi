@@ -1,0 +1,9 @@
+name = "llm-translator"
+compatibility_date = "2026-05-02"
+
+[ai]
+binding = "AI"
+
+[[kv_namespaces]]
+binding = "SETTINGS"
+id = "48c17da1e51d42948df2f90b2e8875e2"
