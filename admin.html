@@ -798,13 +798,15 @@
       list.innerHTML = '';
       let hasModels = false;
       Object.entries(providers).forEach(([provId, prov]) => {
-        if (!prov.models || prov.models.length === 0) return;
+        const hasProvModels = prov.models && prov.models.length > 0;
+        if (!hasProvModels) return;
         hasModels = true;
         list.innerHTML += `<div class="provider-group">
           <div class="provider-group-header">
             <strong>${prov.name}</strong>
             <div style="display:flex;align-items:center;gap:12px">
               <span id="testResult-${provId}" style="font-size:12px;color:var(--text-muted)"></span>
+              <button class="btn btn-default btn-sm" onclick="handleFetchModels('${provId}')">刷新模型</button>
               <button class="btn btn-primary btn-sm" onclick="handleTestAllModels('${provId}')">一键测速</button>
               <label class="provider-toggle">
                 <input type="checkbox" class="provider-enable-cb" data-provider="${provId}" ${prov.enabled ? 'checked' : ''}>
@@ -826,8 +828,27 @@
         });
         list.innerHTML += `</div></div>`;
       });
+
       if (!hasModels) {
-        list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><p>请先在 API 管理中保存 API Key 获取模型</p></div>';
+        let noModelHtml = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><p>暂无已获取的模型</p>';
+        noModelHtml += '<p style="font-size:13px;color:var(--text-muted);margin-top:8px">请先在 API 管理中保存 API Key，然后在此处点击下方按钮获取模型列表</p></div>';
+
+        const keysWithNoModels = Object.entries(currentProviders).filter(([, p]) => !p.models || p.models.length === 0);
+        if (keysWithNoModels.length > 0) {
+          noModelHtml = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><p>以下提供商已配置 API Key，可获取模型：</p>';
+          noModelHtml += '<div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">';
+          keysWithNoModels.forEach(([provId, prov]) => {
+            if (prov.name && provId !== 'cloudflare') {
+              noModelHtml += `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--bg-secondary);border-radius:8px;border:1px solid var(--border-default)">
+                <span><strong>${prov.name}</strong><span style="margin-left:8px;font-size:12px;color:var(--text-muted)">(${provId})</span></span>
+                <button class="btn btn-primary btn-sm" onclick="handleFetchModels('${provId}')">获取模型</button>
+              </div>`;
+            }
+          });
+          noModelHtml += '</div></div>';
+        }
+
+        list.innerHTML = noModelHtml;
       }
     }
 
@@ -855,8 +876,7 @@
             <span class="key-list-item-mask">${keyData.apiKey || '未设置'}</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span class="tag ${hasModels ? 'tag-success' : 'tag-default'}">${hasModels ? '已获取 ' + currentProviders[provider].models.length + ' 个模型' : '未获取模型'}</span>
-            <button class="btn btn-primary btn-sm" onclick="handleFetchModels('${provider}')">获取模型</button>
+            <span class="tag ${hasModels ? 'tag-success' : 'tag-default'}">${hasModels ? '已获取 ' + currentProviders[provider].models.length + ' 个模型' : '待获取模型'}</span>
             <button class="btn btn-danger btn-sm" onclick="handleDeleteApiKey('${provider}')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
             </button>
