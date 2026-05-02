@@ -148,7 +148,7 @@ async function translateWithExternal(text, sourceLang, targetLang, provider, mod
   const baseUrl = customEndpoint || prov?.baseUrl;
   if (!baseUrl) throw new Error('未配置 API 端点');
 
-  const systemPrompt = getTranslatePrompt(promptTemplates, sourceLangName, targetLangName);
+  const systemPrompt = getTranslatePrompt(promptTemplates, sourceLangName, targetLangName, mode);
 
   const messages = [
     { role: 'system', content: systemPrompt },
@@ -165,7 +165,8 @@ async function translateWithExternal(text, sourceLang, targetLang, provider, mod
   const body = {
     model: model || prov?.defaultModel || 'gpt-4o-mini',
     messages,
-    max_tokens: 4096
+    max_tokens: 4096,
+    temperature: 0.3
   };
 
   const endpoint = provider === 'anthropic'
@@ -244,7 +245,7 @@ export async function onRequestPost(context) {
     const promptTemplates = config.promptTemplates || {};
 
     // 翻译缓存：尝试从缓存获取
-    const cacheHash = simpleHash(text.trim().toLowerCase() + '|' + srcLang + '|' + targetLang);
+    const cacheHash = simpleHash(text.trim().toLowerCase() + '|' + srcLang + '|' + targetLang + '|' + (mode || ''));
     try {
       const cacheKey = `cache:translate:${cacheHash}`;
       const cached = await env.SETTINGS.get(cacheKey);
