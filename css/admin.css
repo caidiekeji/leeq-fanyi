@@ -429,6 +429,46 @@
   font-size: 13px;
 }
 
+/* SEO Form */
+.seo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Stats Overview */
+.stats-overview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 16px 12px;
+  background: var(--admin-input-bg);
+  border: 1px solid var(--admin-card-border);
+  border-radius: var(--admin-radius-sm);
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--admin-primary);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--admin-text-tertiary);
+}
+
+.stats-chart {
+  padding: 8px 0;
+}
+
 /* Providers List */
 .providers-list {
   display: flex;

@@ -81,6 +81,28 @@
 
         <section class="admin-card full-width">
           <div class="admin-card-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <h2 class="admin-card-title">SEO 设置</h2>
+          </div>
+          <div class="seo-form">
+            <div class="form-row-sm">
+              <label class="form-label-sm">网站标题</label>
+              <input id="seoTitle" class="form-input-sm" placeholder="LeeQ 翻译">
+            </div>
+            <div class="form-row-sm">
+              <label class="form-label-sm">网站描述</label>
+              <textarea id="seoDescription" class="form-textarea" rows="2" placeholder="基于大语言模型的多语言翻译工具"></textarea>
+            </div>
+            <div class="form-row-sm">
+              <label class="form-label-sm">关键词</label>
+              <input id="seoKeywords" class="form-input-sm" placeholder="翻译,多语言,LLM">
+            </div>
+            <button class="btn-sm btn-primary" onclick="handleSaveSeo()">保存 SEO 设置</button>
+          </div>
+        </section>
+
+        <section class="admin-card full-width">
+          <div class="admin-card-header">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <h2 class="admin-card-title">API Key 管理</h2>
           </div>
@@ -121,6 +143,24 @@
             </div>
             <div id="savedKeysList" class="saved-keys-list"></div>
           </div>
+        </section>
+
+        <section class="admin-card">
+          <div class="admin-card-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            <h2 class="admin-card-title">访问统计</h2>
+          </div>
+          <div class="stats-overview">
+            <div class="stat-item">
+              <div class="stat-value" id="todayUnique">0</div>
+              <div class="stat-label">今日独立访客</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="todayTotal">0</div>
+              <div class="stat-label">今日总访问</div>
+            </div>
+          </div>
+          <div id="statsChart" class="stats-chart"></div>
         </section>
 
         <section class="admin-card full-width">
@@ -250,7 +290,7 @@
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('adminPage').style.display = '';
       populateDefaultProviderOptions();
-      await Promise.all([loadConfig(), loadApiKeys()]);
+      await Promise.all([loadConfig(), loadApiKeys(), loadSeo(), loadStats()]);
     }
 
     async function loadConfig() {
@@ -264,7 +304,7 @@
           const savedProvider = data.data.defaultProvider || 'cloudflare';
           DEFAULT_PROVIDER_SELECT.value = savedProvider;
           DEFAULT_PROVIDER_SELECT.dispatchEvent(new Event('change'));
-          const savedModel = data.data.defaultModel || '@cf/meta/m2m100-1.2b';
+          const savedModel = data.data.defaultModel || '';
           DEFAULT_MODEL_SELECT.value = savedModel;
           document.getElementById('translatePrompt').value = data.data.promptTemplates?.translate || '';
           document.getElementById('detectPrompt').value = data.data.promptTemplates?.detect || '';
@@ -339,15 +379,10 @@
     }
 
     async function handleSaveApiKey() {
-      console.log('handleSaveApiKey called');
       const provider = apiKeyProviderSelect.value;
       const apiKey = document.getElementById('apiKeyInput').value;
       const customEndpoint = provider === 'custom' ? document.getElementById('customEndpoint').value : '';
-      console.log('provider:', provider, 'apiKey length:', apiKey?.length);
-      if (!provider || !apiKey) {
-        console.log('Validation failed');
-        return showToast('请选择提供商并输入 API Key', 'error');
-      }
+      if (!provider || !apiKey) return showToast('请选择提供商并输入 API Key', 'error');
 
       try {
         const res = await fetch('/api/admin/apiKeys', {
@@ -462,12 +497,10 @@
 
     async function handleSaveConfig() {
       const providers = {};
-      // Collect provider enable/disable
       document.querySelectorAll('.provider-enable-cb').forEach(cb => {
         const provId = cb.dataset.provider;
         providers[provId] = { ...currentProviders[provId], enabled: cb.checked, modelEnabled: [] };
       });
-      // Collect individual model selections
       document.querySelectorAll('.model-cb:checked').forEach(cb => {
         const provId = cb.dataset.provider;
         const modelId = cb.dataset.model;
@@ -475,7 +508,6 @@
           providers[provId].modelEnabled.push(modelId);
         }
       });
-      // Ensure all providers with models are tracked
       Object.entries(currentProviders).forEach(([provId, prov]) => {
         if (prov.models && prov.models.length > 0 && !providers[provId]) {
           providers[provId] = { ...prov, enabled: false, modelEnabled: [] };
@@ -501,6 +533,75 @@
       } catch (err) {
         showToast('保存失败: ' + err.message, 'error');
       }
+    }
+
+    async function loadSeo() {
+      try {
+        const res = await fetch('/api/admin/seo', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        if (data.code === 200) {
+          document.getElementById('seoTitle').value = data.data.title || '';
+          document.getElementById('seoDescription').value = data.data.description || '';
+          document.getElementById('seoKeywords').value = data.data.keywords || '';
+        }
+      } catch {}
+    }
+
+    async function handleSaveSeo() {
+      const body = {
+        title: document.getElementById('seoTitle').value,
+        description: document.getElementById('seoDescription').value,
+        keywords: document.getElementById('seoKeywords').value
+      };
+      try {
+        const res = await fetch('/api/admin/seo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        showToast(data.code === 200 ? 'SEO 设置已保存' : data.message, data.code === 200 ? 'success' : 'error');
+      } catch (err) {
+        showToast('保存失败: ' + err.message, 'error');
+      }
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/admin/stats?days=7', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        if (data.code === 200 && data.data.length > 0) {
+          const today = data.data[data.data.length - 1];
+          document.getElementById('todayUnique').textContent = today.unique;
+          document.getElementById('todayTotal').textContent = today.total;
+          renderStatsChart(data.data);
+        }
+      } catch {}
+    }
+
+    function renderStatsChart(stats) {
+      const chart = document.getElementById('statsChart');
+      if (!stats || stats.length === 0) {
+        chart.innerHTML = '<div style="text-align:center;padding:20px;color:var(--admin-text-tertiary);font-size:13px">暂无数据</div>';
+        return;
+      }
+      const maxVal = Math.max(...stats.map(s => s.unique), 1);
+      let html = '<div style="display:flex;align-items:flex-end;gap:6px;height:100px;padding-top:10px">';
+      stats.forEach(s => {
+        const h = Math.max((s.unique / maxVal) * 80, 4);
+        const date = s.date.slice(5);
+        html += `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <span style="font-size:10px;color:var(--admin-text-tertiary)">${s.unique}</span>
+          <div style="width:100%;height:${h}px;background:var(--admin-primary);border-radius:4px 4px 0 0;min-height:4px"></div>
+          <span style="font-size:10px;color:var(--admin-text-tertiary)">${date}</span>
+        </div>`;
+      });
+      html += '</div>';
+      chart.innerHTML = html;
     }
   </script>
 </body>
