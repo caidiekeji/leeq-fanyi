@@ -359,10 +359,15 @@
     }
 
     async function handleSaveApiKey() {
+      console.log('handleSaveApiKey called');
       const provider = apiKeyProviderSelect.value;
       const apiKey = document.getElementById('apiKeyInput').value;
       const customEndpoint = provider === 'custom' ? document.getElementById('customEndpoint').value : '';
-      if (!provider || !apiKey) return showToast('请选择提供商并输入 API Key', 'error');
+      console.log('provider:', provider, 'apiKey length:', apiKey?.length);
+      if (!provider || !apiKey) {
+        console.log('Validation failed');
+        return showToast('请选择提供商并输入 API Key', 'error');
+      }
 
       try {
         const res = await fetch('/api/admin/apiKeys', {
