@@ -173,7 +173,7 @@ export async function onRequestPost(context) {
       );
     }
 
-    await recordTokenUsage(env, result.tokens);
+    await recordStats(env, result.tokens);
 
     return jsonResponse({
       translatedText: result.translatedText,
