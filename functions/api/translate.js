@@ -58,13 +58,14 @@ function simpleHash(str) {
 
 function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName, mode) {
   const customPrompt = promptTemplates?.translate;
+  let base;
   if (customPrompt) {
-    return customPrompt
+    base = customPrompt
       .replace(/\[{source_lang}\]/g, sourceLangName)
       .replace(/\[{target_lang}\]/g, targetLangName);
+  } else {
+    base = `你是一个专业的翻译助手。将用户输入从${sourceLangName}翻译成${targetLangName}。只返回翻译结果，不要加任何解释。`;
   }
-
-  let base = `你是一个专业的翻译助手。将用户输入从${sourceLangName}翻译成${targetLangName}。只返回翻译结果，不要加任何解释。`;
 
   if (mode === 'markdown') {
     base += '\n\n【重要】用户内容包含Markdown格式（标题、列表、代码块、链接、加粗等标记），翻译时必须完整保留所有Markdown语法标记不变，只翻译纯文本部分的内容。绝对不能输出或复制任何指令文字。';
