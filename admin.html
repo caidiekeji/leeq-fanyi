@@ -728,6 +728,11 @@
         backup: '数据备份'
       };
       document.getElementById('pageTitle').textContent = titles[name] || '';
+      if (name === 'stats') loadStats();
+      if (name === 'usage') loadUsage();
+      if (name === 'analytics') loadAnalytics();
+      if (name === 'health') checkHealth();
+      if (name === 'logs') loadAccessLogs();
     }
 
 
@@ -965,12 +970,11 @@
     }
 
     async function handleTestKey() {
-      const provider = apiKeyProviderSelect.value;
       const apiKey = document.getElementById('apiKeyInput').value;
-      const customEndpoint = provider === 'custom' ? document.getElementById('customEndpoint').value : '';
       if (!apiKey) return showToast('请先输入 API Key', 'error');
       showToast('正在测试连接...', 'info');
-      await fetchModelsForProvider(provider, apiKey, customEndpoint);
+      const provider = apiKeyProviderSelect.value;
+      await fetchModelsForProvider(provider);
     }
 
     async function handleFetchModels(provider) {

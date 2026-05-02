@@ -18,10 +18,26 @@ async function initApp() {
   applyTheme(state.theme);
   populateLangSelectors();
   await loadSystemConfig();
+  loadSharedContent();
   bindEvents();
   bindShortcuts();
   bindDragDrop();
   updateTranslateBtn();
+}
+
+function loadSharedContent() {
+  const params = new URLSearchParams(window.location.search);
+  const sharedText = params.get('text');
+  if (!sharedText) return;
+  const source = params.get('source') || 'auto';
+  const target = params.get('target') || 'zh';
+  document.getElementById('sourceLang').value = source;
+  document.getElementById('targetLang').value = target;
+  state.sourceLang = source;
+  state.targetLang = target;
+  document.getElementById('sourceText').value = decodeURIComponent(sharedText);
+  updateTranslateBtn();
+  updateCharCount('source');
 }
 
 async function loadSystemConfig() {
