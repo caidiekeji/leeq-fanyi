@@ -54,17 +54,6 @@ function bindEvents() {
   document.getElementById('copyBtn').addEventListener('click', handleCopy);
   document.getElementById('clearBtn').addEventListener('click', handleClear);
   document.getElementById('themeBtn').addEventListener('click', toggleTheme);
-  document.getElementById('settingsBtn').addEventListener('click', () => toggleModal(true));
-  document.getElementById('modalClose').addEventListener('click', () => toggleModal(false));
-  document.getElementById('modalOverlay').addEventListener('click', e => {
-    if (e.target === e.currentTarget) toggleModal(false);
-  });
-  document.getElementById('apiKeyProvider').addEventListener('change', e => {
-    const custom = document.getElementById('customEndpointGroup');
-    custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
-  });
-  document.getElementById('saveApiKeyBtn').addEventListener('click', handleSaveApiKey);
-  document.getElementById('testConnBtn').addEventListener('click', handleTestConnection);
 }
 
 function updateCharCount(panel) {
