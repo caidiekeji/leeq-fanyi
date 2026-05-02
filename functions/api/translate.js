@@ -39,7 +39,21 @@ function errorResponse(message, status = 400) {
   });
 }
 
-async function translateWithCloudflare(text, sourceLang, targetLang, model, env) {
+function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName) {
+  const customPrompt = promptTemplates?.translate;
+  if (customPrompt) {
+    return customPrompt
+      .replace(/\[{source_lang}\]/g, sourceLangName)
+      .replace(/\[{target_lang}\]/g, targetLangName);
+  }
+  return `你是一个专业的翻译助手。将用户输入从${sourceLangName}翻译成${targetLangName}。只返回翻译结果，不要加任何解释。`;
+}
+
+async function translateWithCloudflare(text, sourceLang, targetLang, model, env, promptTemplates) {
+  const sourceLangName = sourceLang === 'auto' ? '自动检测' : (LANG_NAMES[sourceLang] || sourceLang);
+  const targetLangName = LANG_NAMES[targetLang] || targetLang;
+  const systemPrompt = getTranslatePrompt(promptTemplates, sourceLangName, targetLangName);
+
   if (model === '@cf/meta/m2m100-1.2b' || !model) {
     const srcM2m = sourceLang === 'auto' ? 'english' : (LANG_MAP[sourceLang] || 'english');
     const tgtM2m = LANG_MAP[targetLang] || 'chinese';
@@ -50,23 +64,26 @@ async function translateWithCloudflare(text, sourceLang, targetLang, model, env)
     });
     return { translatedText: response.translated_text, detectedSourceLang: sourceLang === 'auto' ? null : sourceLang };
   }
-  const targetLangName = LANG_NAMES[targetLang] || targetLang;
+
   const messages = [
-    { role: 'system', content: `你是一个专业的翻译助手。将用户输入翻译成${targetLangName}，保持原文风格和语气。只返回翻译结果，不要加任何解释。` },
+    { role: 'system', content: systemPrompt },
     { role: 'user', content: text }
   ];
   const response = await env.AI.run(model || '@cf/meta/llama-3.1-8b-instruct', { messages });
   return { translatedText: response.response, detectedSourceLang: null };
 }
 
-async function translateWithExternal(text, sourceLang, targetLang, provider, model, apiKey, customEndpoint) {
+async function translateWithExternal(text, sourceLang, targetLang, provider, model, apiKey, customEndpoint, promptTemplates) {
+  const sourceLangName = sourceLang === 'auto' ? '自动检测' : (LANG_NAMES[sourceLang] || sourceLang);
   const targetLangName = LANG_NAMES[targetLang] || targetLang;
   const prov = PROVIDERS[provider];
   const baseUrl = customEndpoint || prov?.baseUrl;
   if (!baseUrl) throw new Error('未配置 API 端点');
 
+  const systemPrompt = getTranslatePrompt(promptTemplates, sourceLangName, targetLangName);
+
   const messages = [
-    { role: 'system', content: `你是一个专业的翻译助手。将用户输入翻译成${targetLangName}，保持原文风格和语气。只返回翻译结果，不要加任何解释。` },
+    { role: 'system', content: systemPrompt },
     { role: 'user', content: text }
   ];
 
@@ -122,11 +139,15 @@ export async function onRequestPost(context) {
     if (text.length > 5000) return errorResponse('文本超过5000字符限制');
     if (!targetLang) return errorResponse('请选择目标语言');
 
+    const configData = await env.SETTINGS.get('admin:config');
+    const config = configData ? JSON.parse(configData) : {};
+    const promptTemplates = config.promptTemplates || {};
+
     const prov = provider || 'cloudflare';
     let result;
 
     if (prov === 'cloudflare') {
-      result = await translateWithCloudflare(text, sourceLang || 'auto', targetLang, model, env);
+      result = await translateWithCloudflare(text, sourceLang || 'auto', targetLang, model, env, promptTemplates);
     } else {
       const userId = request.headers.get('cf-connecting-ip') || 'default';
       const settingsData = await env.SETTINGS.get(`user:${userId}`);
@@ -135,7 +156,7 @@ export async function onRequestPost(context) {
       if (!keyData) return errorResponse('请先配置 API Key', 401);
       result = await translateWithExternal(
         text, sourceLang || 'auto', targetLang, prov, model,
-        keyData.apiKey, keyData.customEndpoint
+        keyData.apiKey, keyData.customEndpoint, promptTemplates
       );
     }
 
