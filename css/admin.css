@@ -714,16 +714,18 @@ body {
 .model-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-  padding: 12px 16px;
+  gap: 1px;
+  padding: 0;
+  background: var(--border-light);
+  border-top: 1px solid var(--border-light);
 }
 
 .model-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--bg-white);
   cursor: pointer;
   transition: all 0.2s;
   font-size: 13px;
@@ -734,12 +736,32 @@ body {
 
 .model-item.active { background: var(--primary-light); color: var(--primary); }
 
+.model-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
 .model-item input[type="checkbox"] { flex-shrink: 0; cursor: pointer; accent-color: var(--primary); }
 
 .model-name {
   font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 12px;
   word-break: break-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.model-speed {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 2px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
 }
 
 /* Key List */

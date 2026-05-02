@@ -490,10 +490,13 @@
           <div class="model-list">`;
         prov.models.forEach(m => {
           const enabled = prov.modelEnabled ? prov.modelEnabled.includes(m.id) : false;
-          const speedInfo = m.testResult ? `<span style="font-size:11px;color:var(--primary);margin-left:4px">${m.testResult.latency}ms</span>` : '';
+          const speedInfo = m.testResult ? `<span class="model-speed">${m.testResult.latency}ms</span>` : '';
           list.innerHTML += `<label class="model-item ${enabled ? 'active' : ''}" id="model-item-${provId}-${m.id.replace(/[^a-z0-9]/gi, '-')}">
-            <input type="checkbox" class="model-cb" data-provider="${provId}" data-model="${m.id}" ${enabled ? 'checked' : ''}>
-            <span class="model-name">${m.name || m.id}</span>${speedInfo}
+            <div class="model-item-left">
+              <input type="checkbox" class="model-cb" data-provider="${provId}" data-model="${m.id}" ${enabled ? 'checked' : ''}>
+              <span class="model-name">${m.name || m.id}</span>
+            </div>
+            ${speedInfo}
           </label>`;
         });
         list.innerHTML += `</div></div>`;
