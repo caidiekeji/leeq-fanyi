@@ -18,12 +18,22 @@
 <body>
   <div class="app-bg"></div>
 
+  <div id="announcementBar" class="announcement-bar" style="display:none">
+    <span id="announcementText"></span>
+  </div>
+
   <nav class="navbar">
     <a href="/" class="navbar-brand">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
       <span id="siteName">LeeQ</span>
     </a>
     <div class="navbar-actions">
+      <button class="icon-btn" id="historyBtn" title="翻译历史 Ctrl+H">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </button>
+      <button class="icon-btn" id="favoritesBtn" title="收藏夹">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
       <button class="icon-btn" id="themeBtn" title="切换主题">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
@@ -41,15 +51,42 @@
           <select id="targetLang" class="lang-select"></select>
         </div>
         <div class="control-right">
+          <button class="tool-btn" id="realtimeBtn" title="实时翻译">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </button>
+          <button class="tool-btn" id="mdToggleBtn" title="Markdown格式保留">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+          </button>
+          <button class="tool-btn" id="htmlToggleBtn" title="HTML格式保留">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </button>
+          <button class="tool-btn" id="codeToggleBtn" title="代码注释翻译">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="12" y1="2" x2="12" y2="22" stroke-dasharray="2 3"/></svg>
+          </button>
           <button id="translateBtn" class="translate-btn" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
             <span>翻译</span>
           </button>
-          <button class="tool-btn" id="clearBtn" title="清空">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <button class="tool-btn" id="batchBtn" title="批量翻译">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+          </button>
+          <button class="tool-btn" id="favoriteBtn" title="收藏翻译" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <button class="tool-btn" id="shareBtn" title="分享链接">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+          <button class="tool-btn" id="exportBtn" title="导出">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button class="tool-btn" id="ttsBtn" title="朗读">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
           </button>
           <button class="tool-btn" id="copyBtn" title="复制">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+          <button class="tool-btn" id="clearBtn" title="清空">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
       </div>
@@ -57,9 +94,14 @@
       <div class="split-panels">
         <section class="panel panel-source">
           <div class="panel-body">
-            <textarea id="sourceText" class="text-input" placeholder="输入要翻译的文本..." maxlength="5000"></textarea>
+            <textarea id="sourceText" class="text-input" placeholder="输入要翻译的文本...&#10;支持 Ctrl+Enter 翻译 · Ctrl+D 清空 · Ctrl+K 聚焦&#10;支持拖拽 .txt / .md / .srt / .json 文件" maxlength="10000"></textarea>
           </div>
           <div class="panel-footer">
+            <div class="shortcut-hints">
+              <span><kbd>Ctrl+Enter</kbd> 翻译</span>
+              <span><kbd>Ctrl+D</kbd> 清空</span>
+              <span><kbd>Ctrl+K</kbd> 聚焦</span>
+            </div>
             <span id="sourceCount" class="char-count">输入 0 / 5000</span>
           </div>
         </section>
@@ -81,7 +123,29 @@
 
   <div id="toast" class="toast"></div>
 
-  <footer class="footer">
+  <!-- 翻译历史侧边栏 -->
+  <aside class="side-panel" id="historyPanel">
+    <div class="side-panel-header">
+      <span class="side-panel-title">翻译历史</span>
+      <button class="side-panel-close" onclick="toggleHistoryPanel()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="side-panel-body" id="historyList"></div>
+  </aside>
+
+  <!-- 收藏夹侧边栏 -->
+  <aside class="side-panel" id="favoritesPanel">
+    <div class="side-panel-header">
+      <span class="side-panel-title">收藏夹</span>
+      <button class="side-panel-close" onclick="toggleFavoritesPanel()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="side-panel-body" id="favoritesList"></div>
+  </aside>
+
+  <footer class="footer" id="footerText">
     Powered by LeeQ 旗下产品 · 由 jie 开发 · Cloudflare 提供加速服务
   </footer>
 
@@ -89,7 +153,6 @@
   <script src="/js/app.js"></script>
   <script>
     (async function() {
-      // Load SEO config
       try {
         const res = await fetch('/api/admin/seo');
         if (res.ok) {
@@ -106,7 +169,6 @@
           }
         }
       } catch {}
-      // Track visit (non-blocking, same-day IP dedup)
       try { fetch('/api/admin/stats?action=track'); } catch {}
     })();
   </script>

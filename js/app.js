@@ -2,15 +2,53 @@ const state = {
   sourceLang: 'auto',
   targetLang: 'zh',
   status: 'idle',
-  theme: loadLocal('theme', 'dark')
+  theme: loadLocal('theme', 'dark'),
+  realtimeMode: loadLocal('realtimeMode', false),
+  preserveMarkdown: loadLocal('preserveMarkdown', false),
+  preserveHtml: loadLocal('preserveHtml', false),
+  codeCommentMode: loadLocal('codeCommentMode', false),
+  historyPanel: false,
+  favoritesPanel: false,
+  maxCharLimit: 5000
 };
 
-function initApp() {
+const EMPTY_RESULT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg><p>翻译结果将显示在这里</p>';
+
+async function initApp() {
   applyTheme(state.theme);
   populateLangSelectors();
-  loadSettings();
+  await loadSystemConfig();
   bindEvents();
+  bindShortcuts();
+  bindDragDrop();
   updateTranslateBtn();
+}
+
+async function loadSystemConfig() {
+  try {
+    const res = await fetch('/api/admin/system');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.code === 200 && data.data) {
+        state.maxCharLimit = data.data.maxCharLimit || 5000;
+        state.sourceLang = data.data.defaultSourceLang || 'auto';
+        state.targetLang = data.data.defaultTargetLang || 'zh';
+        document.getElementById('sourceLang').value = state.sourceLang;
+        document.getElementById('targetLang').value = state.targetLang;
+        if (data.data.siteName) {
+          document.getElementById('siteName').textContent = data.data.siteName;
+        }
+        if (data.data.announcement) {
+          document.getElementById('announcementBar').style.display = 'block';
+          document.getElementById('announcementText').textContent = data.data.announcement;
+        }
+        if (data.data.footer) {
+          document.getElementById('footerText').textContent = data.data.footer;
+        }
+        updateCharCount('source');
+      }
+    }
+  } catch(e) { console.error('加载系统配置失败:', e); }
 }
 
 function applyTheme(theme) {
@@ -33,35 +71,104 @@ function populateLangSelectors() {
   tgtSel.value = state.targetLang;
 }
 
-function loadSettings() {
-  const displayText = document.getElementById('modelDisplayText');
-  if (displayText) displayText.textContent = 'Cloudflare AI · m2m100';
-}
-
 function bindEvents() {
   document.getElementById('sourceLang').addEventListener('change', e => {
     state.sourceLang = e.target.value;
+    if (state.realtimeMode && document.getElementById('sourceText').value.trim()) {
+      debouncedTranslate();
+    }
   });
   document.getElementById('targetLang').addEventListener('change', e => {
     state.targetLang = e.target.value;
+    if (state.realtimeMode && document.getElementById('sourceText').value.trim()) {
+      debouncedTranslate();
+    }
   });
-  document.getElementById('sourceText').addEventListener('input', e => {
+  const sourceText = document.getElementById('sourceText');
+  sourceText.addEventListener('input', e => {
     updateCharCount('source');
     updateTranslateBtn();
+    if (state.realtimeMode) debouncedTranslate();
   });
+
   document.getElementById('translateBtn').addEventListener('click', handleTranslate);
   document.getElementById('swapBtn').addEventListener('click', handleSwap);
   document.getElementById('copyBtn').addEventListener('click', handleCopy);
   document.getElementById('clearBtn').addEventListener('click', handleClear);
   document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+  document.getElementById('realtimeBtn').addEventListener('click', toggleRealtimeMode);
+  document.getElementById('mdToggleBtn').addEventListener('click', toggleMarkdownMode);
+  document.getElementById('htmlToggleBtn').addEventListener('click', toggleHtmlMode);
+  document.getElementById('codeToggleBtn').addEventListener('click', toggleCodeCommentMode);
+  document.getElementById('batchBtn').addEventListener('click', handleBatchTranslate);
+  document.getElementById('favoriteBtn').addEventListener('click', handleFavorite);
+  document.getElementById('exportBtn').addEventListener('click', showExportMenu);
+  document.getElementById('shareBtn').addEventListener('click', handleShare);
+  document.getElementById('ttsBtn').addEventListener('click', handleTTS);
+  document.getElementById('historyBtn').addEventListener('click', toggleHistoryPanel);
+  document.getElementById('favoritesBtn').addEventListener('click', toggleFavoritesPanel);
 }
+
+function bindShortcuts() {
+  document.addEventListener('keydown', e => {
+    const isCtrl = e.ctrlKey || e.metaKey;
+    if (isCtrl && e.key === 'Enter') {
+      e.preventDefault();
+      handleTranslate();
+    }
+    if (isCtrl && e.key === 'k') {
+      e.preventDefault();
+      document.getElementById('sourceText').focus();
+    }
+    if (isCtrl && e.key === 'd') {
+      e.preventDefault();
+      handleClear();
+    }
+  });
+}
+
+function bindDragDrop() {
+  const sourcePanel = document.querySelector('.panel-source .panel-body');
+  if (!sourcePanel) return;
+  sourcePanel.addEventListener('dragover', e => {
+    e.preventDefault();
+    sourcePanel.classList.add('drag-over');
+  });
+  sourcePanel.addEventListener('dragleave', () => {
+    sourcePanel.classList.remove('drag-over');
+  });
+  sourcePanel.addEventListener('drop', async e => {
+    e.preventDefault();
+    sourcePanel.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const allowedExts = ['.txt', '.md', '.srt', '.json'];
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+    if (!allowedExts.includes(ext)) {
+      showToast('仅支持 .txt / .md / .srt / .json 文件', 'error');
+      return;
+    }
+    try {
+      const text = await file.text();
+      document.getElementById('sourceText').value = text;
+      updateCharCount('source');
+      updateTranslateBtn();
+      if (state.realtimeMode) debouncedTranslate();
+      showToast(`已加载 ${file.name}`, 'success');
+    } catch (err) {
+      showToast('文件读取失败: ' + err.message, 'error');
+    }
+  });
+}
+
+const debouncedTranslate = debounce(handleTranslate, 500);
 
 function updateCharCount(panel) {
   const text = document.getElementById(panel === 'source' ? 'sourceText' : 'resultText');
   const count = document.getElementById(panel === 'source' ? 'sourceCount' : 'resultCount');
   const len = (text.value || text.textContent || '').length;
-  count.textContent = `${len} / 5000`;
-  count.classList.toggle('over', len > 5000);
+  count.textContent = `输入 ${len} / ${state.maxCharLimit}`;
+  count.classList.toggle('over', len > state.maxCharLimit);
 }
 
 function updateTranslateBtn() {
@@ -73,28 +180,94 @@ function updateTranslateBtn() {
 async function handleTranslate() {
   const text = document.getElementById('sourceText').value.trim();
   if (!text) return;
+  if (text.length > state.maxCharLimit) {
+    showToast(`文本超过${state.maxCharLimit}字符限制`, 'error');
+    return;
+  }
 
   setState('translating');
+  const startTime = Date.now();
   try {
+    let translateText = text;
+    if (state.preserveMarkdown) {
+      translateText = `请保留原始Markdown格式进行翻译，不要改变任何标记语法:\n\n${text}`;
+    } else if (state.preserveHtml) {
+      translateText = `请保留所有HTML标签不变，只翻译标签之间的文本内容:\n\n${text}`;
+    } else if (state.codeCommentMode) {
+      translateText = `以下是一段代码，请只翻译其中的注释内容（以//、/*、<!--、#等开头的行），保持代码逻辑完全不变:\n\n${text}`;
+    }
     const result = await api('/api/translate', {
       method: 'POST',
-      body: { text, sourceLang: state.sourceLang, targetLang: state.targetLang }
+      body: { text: translateText, sourceLang: state.sourceLang, targetLang: state.targetLang }
     });
-    document.getElementById('resultText').textContent = result.translatedText;
-    document.getElementById('resultText').classList.remove('empty');
+    const resultEl = document.getElementById('resultText');
+    resultEl.textContent = result.translatedText;
+    resultEl.classList.remove('empty');
     updateCharCount('result');
     if (result.sourceLang && state.sourceLang === 'auto') {
       const detected = LANG_MAP[result.sourceLang]?.name || result.sourceLang;
       document.getElementById('sourceLang').querySelector('option[value="auto"]').textContent = `自动检测 (${detected})`;
     }
     saveHistory(text, result.translatedText, result.sourceLang || state.sourceLang, state.targetLang);
+    document.getElementById('favoriteBtn').disabled = false;
+    const latency = Date.now() - startTime;
     setState('success');
+    if (result.fromCache) {
+      document.getElementById('resultCount').textContent += ' · 缓存';
+    }
   } catch (err) {
     const resultEl = document.getElementById('resultText');
     resultEl.classList.add('empty');
     resultEl.innerHTML = `<div style="text-align:center;color:var(--error)"><p>翻译失败</p><p style="font-size:13px;margin-top:4px;opacity:0.8">${err.message}</p></div>`;
     setState('error');
   }
+}
+
+async function handleBatchTranslate() {
+  const text = document.getElementById('sourceText').value.trim();
+  if (!text) return;
+  const lines = text.split('\n').filter(l => l.trim());
+  if (lines.length < 2) {
+    showToast('批量翻译需要至少2行文本', 'warning');
+    return;
+  }
+  if (lines.length > 20) {
+    showToast('最多支持20行批量翻译', 'error');
+    return;
+  }
+
+  setState('translating');
+  const results = [];
+  let errors = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    try {
+      let translateText = lines[i];
+      if (state.preserveMarkdown) {
+        translateText = `请保留原始Markdown格式进行翻译:\n\n${lines[i]}`;
+      } else if (state.preserveHtml) {
+        translateText = `请保留所有HTML标签不变，只翻译标签之间的文本内容:\n\n${lines[i]}`;
+      } else if (state.codeCommentMode) {
+        translateText = `以下是一段代码，请只翻译其中的注释内容，保持代码逻辑完全不变:\n\n${lines[i]}`;
+      }
+      const result = await api('/api/translate', {
+        method: 'POST',
+        body: { text: translateText, sourceLang: state.sourceLang, targetLang: state.targetLang }
+      });
+      results.push(result.translatedText);
+    } catch (err) {
+      results.push(`[翻译失败: ${err.message}]`);
+      errors++;
+    }
+    if (i < lines.length - 1) await new Promise(r => setTimeout(r, 300));
+  }
+
+  const resultEl = document.getElementById('resultText');
+  resultEl.textContent = results.join('\n');
+  resultEl.classList.remove('empty');
+  updateCharCount('result');
+  setState('success');
+  if (errors > 0) showToast(`批量翻译完成，${errors}行失败`, 'warning');
 }
 
 function setState(s) {
@@ -123,13 +296,18 @@ function handleSwap() {
   const tmpResult = resText.textContent || '';
   const tmpSrcLang = srcLang.value === 'auto' ? state.targetLang : srcLang.value;
 
-  srcText.value = tmpResult;
-  resText.textContent = '';
+  srcText.value = '';
   resText.classList.add('empty');
-  srcLang.value = tmpSrcLang;
+  resText.innerHTML = EMPTY_RESULT;
+  srcLang.value = state.targetLang;
   tgtLang.value = tmpSrcLang;
-  state.sourceLang = tmpSrcLang;
+  state.sourceLang = state.targetLang;
   state.targetLang = tmpSrcLang;
+
+  if (tmpResult) {
+    srcText.value = tmpResult;
+    if (state.realtimeMode) debouncedTranslate();
+  }
   updateCharCount('source');
   updateTranslateBtn();
 }
@@ -149,8 +327,9 @@ function handleClear() {
   document.getElementById('sourceText').value = '';
   const resText = document.getElementById('resultText');
   resText.classList.add('empty');
-  resText.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>翻译结果将显示在这里';
+  resText.innerHTML = EMPTY_RESULT;
   document.getElementById('sourceLang').querySelector('option[value="auto"]').textContent = '自动检测';
+  document.getElementById('favoriteBtn').disabled = true;
   updateCharCount('source');
   updateTranslateBtn();
 }
@@ -161,82 +340,279 @@ function toggleTheme() {
   saveLocal('theme', state.theme);
 }
 
-function toggleModal(show) {
-  const overlay = document.getElementById('modalOverlay');
-  if (show) {
-    renderApiKeysList();
-    overlay.classList.add('active');
+function toggleRealtimeMode() {
+  state.realtimeMode = !state.realtimeMode;
+  saveLocal('realtimeMode', state.realtimeMode);
+  const btn = document.getElementById('realtimeBtn');
+  btn.classList.toggle('active', state.realtimeMode);
+  if (state.realtimeMode) {
+    showToast('实时翻译已开启', 'info');
+    const text = document.getElementById('sourceText').value.trim();
+    if (text) debouncedTranslate();
   } else {
-    overlay.classList.remove('active');
+    showToast('实时翻译已关闭', 'info');
   }
 }
 
-function renderApiKeysList() {
-  const list = document.getElementById('apiKeysList');
-  list.innerHTML = '';
-  Object.entries(state.apiKeys).forEach(([prov, keyData]) => {
-    const provName = PROVIDERS[prov]?.name || prov;
-    list.innerHTML += `<div class="api-key-item">
-      <div class="api-key-info">
-        <span class="api-key-provider">${provName}</span>
-        <span class="api-key-masked">${maskKey(keyData.apiKey)}</span>
-      </div>
-      <button class="btn btn-secondary" style="padding:4px 10px;font-size:12px;color:var(--error);border-color:var(--error)" onclick="deleteApiKey('${prov}')">删除</button>
-    </div>`;
+function toggleMarkdownMode() {
+  // 切换Markdown模式时关闭其他格式保留模式
+  if (!state.preserveMarkdown) {
+    state.preserveHtml = false;
+    state.codeCommentMode = false;
+    document.getElementById('htmlToggleBtn').classList.remove('active');
+    document.getElementById('codeToggleBtn').classList.remove('active');
+  }
+  state.preserveMarkdown = !state.preserveMarkdown;
+  saveLocal('preserveMarkdown', state.preserveMarkdown);
+  const btn = document.getElementById('mdToggleBtn');
+  btn.classList.toggle('active', state.preserveMarkdown);
+  showToast(state.preserveMarkdown ? 'Markdown格式保留已开启' : 'Markdown格式保留已关闭', 'info');
+}
+
+function toggleHtmlMode() {
+  if (!state.preserveHtml) {
+    state.preserveMarkdown = false;
+    state.codeCommentMode = false;
+    document.getElementById('mdToggleBtn').classList.remove('active');
+    document.getElementById('codeToggleBtn').classList.remove('active');
+  }
+  state.preserveHtml = !state.preserveHtml;
+  saveLocal('preserveHtml', state.preserveHtml);
+  const btn = document.getElementById('htmlToggleBtn');
+  btn.classList.toggle('active', state.preserveHtml);
+  showToast(state.preserveHtml ? 'HTML格式保留已开启' : 'HTML格式保留已关闭', 'info');
+}
+
+function toggleCodeCommentMode() {
+  if (!state.codeCommentMode) {
+    state.preserveMarkdown = false;
+    state.preserveHtml = false;
+    document.getElementById('mdToggleBtn').classList.remove('active');
+    document.getElementById('htmlToggleBtn').classList.remove('active');
+  }
+  state.codeCommentMode = !state.codeCommentMode;
+  saveLocal('codeCommentMode', state.codeCommentMode);
+  const btn = document.getElementById('codeToggleBtn');
+  btn.classList.toggle('active', state.codeCommentMode);
+  showToast(state.codeCommentMode ? '代码注释翻译已开启' : '代码注释翻译已关闭', 'info');
+}
+
+async function handleFavorite() {
+  const source = document.getElementById('sourceText').value.trim();
+  const result = document.getElementById('resultText').textContent;
+  if (!source || !result) {
+    showToast('请先完成翻译后再收藏', 'warning');
+    return;
+  }
+  await saveFavorite(source, result, state.sourceLang, state.targetLang, '');
+  showToast('已收藏', 'success');
+}
+
+function showExportMenu() {
+  const result = document.getElementById('resultText').textContent;
+  if (!result) { showToast('没有可导出的内容', 'warning'); return; }
+  const source = document.getElementById('sourceText').value.trim();
+
+  const menu = document.createElement('div');
+  menu.className = 'export-menu';
+  menu.innerHTML = `
+    <button class="export-item" data-type="txt">导出 TXT</button>
+    <button class="export-item" data-type="md">导出 Markdown (.md)</button>
+    <button class="export-item" data-type="csv">导出双语对照 (.csv)</button>
+  `;
+  document.body.appendChild(menu);
+
+  const rect = document.getElementById('exportBtn').getBoundingClientRect();
+  menu.style.position = 'fixed';
+  menu.style.top = (rect.bottom + 4) + 'px';
+  menu.style.left = (rect.left - 80) + 'px';
+
+  menu.querySelectorAll('.export-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const type = item.dataset.type;
+      let content, filename, mime;
+      if (type === 'txt') {
+        content = result;
+        filename = 'translation.txt';
+        mime = 'text/plain';
+      } else if (type === 'md') {
+        content = `${result}\n`;
+        filename = 'translation.md';
+        mime = 'text/markdown';
+      } else {
+        content = `原文,译文\n"${source.replace(/"/g, '""')}","${result.replace(/"/g, '""')}"`;
+        filename = 'translation.csv';
+        mime = 'text/csv';
+      }
+      downloadFile(content, filename, mime);
+      menu.remove();
+    });
   });
-  if (!Object.keys(state.apiKeys).length) {
-    list.innerHTML = '<p style="color:var(--text-tertiary);font-size:13px;text-align:center;padding:16px 0">暂未配置 API Key</p>';
+
+  document.addEventListener('click', function closeMenu(e) {
+    if (!menu.contains(e.target)) { menu.remove(); document.removeEventListener('click', closeMenu); }
+  }, { once: true });
+}
+
+function downloadFile(content, filename, mime) {
+  const blob = new Blob(['\ufeff' + content], { type: mime + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`已导出 ${filename}`, 'success');
+}
+
+function handleShare() {
+  const source = document.getElementById('sourceText').value.trim();
+  const result = document.getElementById('resultText').textContent;
+  if (!result) { showToast('没有可分享的内容', 'warning'); return; }
+
+  const baseUrl = window.location.origin + window.location.pathname;
+  const shareUrl = `${baseUrl}?text=${encodeURIComponent(result)}&source=${state.sourceLang}&target=${state.targetLang}`;
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    showToast('分享链接已复制到剪贴板', 'success');
+  }).catch(() => {
+    showToast('复制失败', 'error');
+  });
+}
+
+function handleTTS() {
+  const result = document.getElementById('resultText').textContent;
+  if (!result) { showToast('没有可朗读的内容', 'warning'); return; }
+  if (!('speechSynthesis' in window)) {
+    showToast('浏览器不支持语音朗读', 'error');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(result);
+  const langMap = { zh: 'zh-CN', en: 'en-US', ja: 'ja-JP', ko: 'ko-KR', fr: 'fr-FR', de: 'de-DE', es: 'es-ES', ru: 'ru-RU', pt: 'pt-BR', it: 'it-IT', ar: 'ar-SA', hi: 'hi-IN', th: 'th-TH', vi: 'vi-VN', id: 'id-ID', nl: 'nl-NL', pl: 'pl-PL', tr: 'tr-TR', sv: 'sv-SE', da: 'da-DK', fi: 'fi-FI', el: 'el-GR', cs: 'cs-CZ', ro: 'ro-RO', hu: 'hu-HU', uk: 'uk-UA', bg: 'bg-BG' };
+  utterance.lang = langMap[state.targetLang] || 'zh-CN';
+  utterance.rate = 0.9;
+  window.speechSynthesis.speak(utterance);
+  showToast('正在朗读...', 'info');
+}
+
+async function toggleHistoryPanel() {
+  state.historyPanel = !state.historyPanel;
+  const panel = document.getElementById('historyPanel');
+  panel.classList.toggle('open', state.historyPanel);
+  if (state.favoritesPanel) toggleFavoritesPanel();
+  if (state.historyPanel) await renderHistory();
+}
+
+async function renderHistory() {
+  const list = document.getElementById('historyList');
+  const history = await getHistory();
+  if (history.length === 0) {
+    list.innerHTML = '<div class="side-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>暂无翻译历史</p></div>';
+    return;
+  }
+  list.innerHTML = history.slice(0, 50).map((h, i) => `
+    <div class="side-item" data-id="${h.id}">
+      <div class="side-item-main" onclick="historyReuse(${h.id})">
+        <div class="side-item-text">${truncate(h.source, 40)}</div>
+        <div class="side-item-meta">${LANG_MAP[h.sourceLang]?.name||h.sourceLang} → ${LANG_MAP[h.targetLang]?.name||h.targetLang} · ${formatDate(h.time)}</div>
+      </div>
+      <button class="side-item-del" onclick="event.stopPropagation();historyDelete(${h.id})" title="删除">×</button>
+    </div>
+  `).join('');
+}
+
+async function historyReuse(id) {
+  const history = await getHistory();
+  const item = history.find(h => h.id === id);
+  if (!item) return;
+  document.getElementById('sourceText').value = item.source;
+  state.sourceLang = item.sourceLang;
+  state.targetLang = item.targetLang;
+  document.getElementById('sourceLang').value = item.sourceLang;
+  document.getElementById('targetLang').value = item.targetLang;
+  updateCharCount('source');
+  updateTranslateBtn();
+  toggleHistoryPanel();
+  handleTranslate();
+}
+
+async function historyDelete(id) {
+  await dbDelete('history', id);
+  renderHistory();
+}
+
+async function toggleFavoritesPanel() {
+  state.favoritesPanel = !state.favoritesPanel;
+  const panel = document.getElementById('favoritesPanel');
+  panel.classList.toggle('open', state.favoritesPanel);
+  if (state.historyPanel) toggleHistoryPanel();
+  if (state.favoritesPanel) await renderFavorites();
+}
+
+async function renderFavorites() {
+  const list = document.getElementById('favoritesList');
+  const favs = await getFavorites();
+  if (favs.length === 0) {
+    list.innerHTML = '<div class="side-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><p>暂无收藏</p></div>';
+    return;
+  }
+  list.innerHTML = favs.map(f => `
+    <div class="side-item" data-id="${f.id}">
+      <div class="side-item-main" onclick="favoriteReuse(${f.id})">
+        <div class="side-item-text">${truncate(f.source, 40)}</div>
+        <div class="side-item-meta">${LANG_MAP[f.sourceLang]?.name||f.sourceLang} → ${LANG_MAP[f.targetLang]?.name||f.targetLang}</div>
+      </div>
+      <button class="side-item-del" onclick="event.stopPropagation();favoriteDelete(${f.id})" title="取消收藏">×</button>
+    </div>
+  `).join('');
+}
+
+async function favoriteReuse(id) {
+  const favs = await getFavorites();
+  const item = favs.find(f => f.id === id);
+  if (!item) return;
+  document.getElementById('sourceText').value = item.source;
+  state.sourceLang = item.sourceLang;
+  state.targetLang = item.targetLang;
+  document.getElementById('sourceLang').value = item.sourceLang;
+  document.getElementById('targetLang').value = item.targetLang;
+  document.getElementById('resultText').textContent = item.result;
+  document.getElementById('resultText').classList.remove('empty');
+  updateCharCount('source');
+  updateCharCount('result');
+  updateTranslateBtn();
+  toggleFavoritesPanel();
+}
+
+async function favoriteDelete(id) {
+  await dbDelete('favorites', id);
+  renderFavorites();
+}
+
+// 从URL参数加载分享内容
+function loadShareContent() {
+  const params = new URLSearchParams(window.location.search);
+  const text = params.get('text');
+  if (text) {
+    document.getElementById('sourceText').value = decodeURIComponent(text);
+    const source = params.get('source');
+    const target = params.get('target');
+    if (source) { state.sourceLang = source; document.getElementById('sourceLang').value = source; }
+    if (target) { state.targetLang = target; document.getElementById('targetLang').value = target; }
+    updateCharCount('source');
+    updateTranslateBtn();
+    setTimeout(handleTranslate, 300);
   }
 }
 
-async function handleSaveApiKey() {
-  const provider = document.getElementById('apiKeyProvider').value;
-  const apiKey = document.getElementById('apiKeyInput').value.trim();
-  const customEndpoint = document.getElementById('customEndpoint').value.trim();
-  if (!apiKey) { showToast('请输入 API Key', 'error'); return; }
-
-  try {
-    const result = await api('/api/settings/apiKey', {
-      method: 'POST',
-      body: { provider, apiKey, customEndpoint: customEndpoint || null }
-    });
-    state.apiKeys[provider] = { apiKey, customEndpoint, keyMasked: result.keyMasked };
-    saveLocal('apiKeys', state.apiKeys);
-    document.getElementById('apiKeyInput').value = '';
-    document.getElementById('customEndpoint').value = '';
-    renderApiKeysList();
-    showToast(`${PROVIDERS[provider]?.name || provider} Key 已保存`, 'success');
-  } catch (err) {
-    showToast(err.message, 'error');
-  }
-}
-
-function deleteApiKey(provider) {
-  delete state.apiKeys[provider];
-  saveLocal('apiKeys', state.apiKeys);
-  renderApiKeysList();
-  populateModelSelector();
-  showToast('已删除', 'info');
-}
-
-async function handleTestConnection() {
-  showToast('测试中...', 'info');
-  try {
-    const result = await api('/api/settings/testConnection', {
-      method: 'POST',
-      body: { provider: state.provider, model: state.model }
-    });
-    showToast(result.success ? `连接成功 (${result.latency}ms)` : `连接失败: ${result.message}`, result.success ? 'success' : 'error');
-  } catch (err) {
-    showToast(`测试失败: ${err.message}`, 'error');
-  }
-}
-
-function saveHistory(source, result, sourceLang, targetLang) {
-  const history = loadLocal('history', []);
-  history.unshift({ source, result, sourceLang, targetLang, time: Date.now() });
-  if (history.length > 50) history.length = 50;
-  saveLocal('history', history);
-}
-
-document.addEventListener('DOMContentLoaded', initApp);
+document.addEventListener('DOMContentLoaded', () => {
+  initApp();
+  loadShareContent();
+  // 初始化按钮状态
+  if (state.realtimeMode) document.getElementById('realtimeBtn').classList.add('active');
+  if (state.preserveMarkdown) document.getElementById('mdToggleBtn').classList.add('active');
+  if (state.preserveHtml) document.getElementById('htmlToggleBtn').classList.add('active');
+  if (state.codeCommentMode) document.getElementById('codeToggleBtn').classList.add('active');
+});

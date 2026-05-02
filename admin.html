@@ -75,11 +75,47 @@
             </svg>
             访问统计
           </div>
+          <div class="nav-item" data-section="usage" onclick="switchSection('usage')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+            </svg>
+            API 用量
+          </div>
+          <div class="nav-item" data-section="analytics" onclick="switchSection('analytics')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/>
+            </svg>
+            高级分析
+          </div>
           <div class="nav-item" data-section="prompt" onclick="switchSection('prompt')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
             </svg>
             提示词模板
+          </div>
+          <div class="nav-item" data-section="system" onclick="switchSection('system')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            系统设置
+          </div>
+          <div class="nav-item" data-section="logs" onclick="switchSection('logs')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+            </svg>
+            访问日志
+          </div>
+          <div class="nav-item" data-section="health" onclick="switchSection('health')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+            健康监控
+          </div>
+          <div class="nav-item" data-section="backup" onclick="switchSection('backup')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            数据备份
           </div>
         </nav>
         <div class="sidebar-footer">
@@ -87,7 +123,8 @@
             <div class="sidebar-user-avatar">管</div>
             <span class="sidebar-user-name">管理员</span>
           </div>
-          <button class="sidebar-logout" onclick="handleLogout()">退出</button>
+          <button class="sidebar-logout" id="langToggleBtn" onclick="switchLang(currentLang==='zh'?'en':'zh')" style="margin-bottom:8px;font-weight:600">EN</button>
+          <button class="sidebar-logout" onclick="handleLogout()" data-i18n="login.submit">退出</button>
         </div>
       </aside>
 
@@ -159,6 +196,38 @@
                 </div>
                 <div class="stat-card-value" id="translations">0</div>
                 <div class="stat-card-label">翻译次数</div>
+              </div>
+            </div>
+
+            <!-- 实时数据大屏 -->
+            <div class="realtime-panel">
+              <div class="realtime-header">
+                <span class="realtime-title">
+                  <span class="realtime-dot"></span>
+                  <span data-i18n="realtime.title">实时监控</span>
+                </span>
+                <span class="realtime-status" id="realtimeStatus" data-i18n="realtime.connected">已连接</span>
+              </div>
+              <div class="realtime-body">
+                <div class="realtime-stat">
+                  <div class="realtime-stat-value" id="rtTodayCalls">0</div>
+                  <div class="realtime-stat-label" data-i18n="realtime.todayCalls">今日翻译</div>
+                </div>
+                <div class="realtime-stat">
+                  <div class="realtime-stat-value" id="rtTodayVisitors">0</div>
+                  <div class="realtime-stat-label" data-i18n="realtime.todayVisitors">今日访客</div>
+                </div>
+                <div class="realtime-stat">
+                  <div class="realtime-stat-value" id="rtSuccessRate">-</div>
+                  <div class="realtime-stat-label" data-i18n="realtime.successRate">成功率</div>
+                </div>
+                <div class="realtime-stat">
+                  <div class="realtime-stat-value" id="rtAvgLatency">-</div>
+                  <div class="realtime-stat-label" data-i18n="realtime.avgLatency">平均延迟</div>
+                </div>
+              </div>
+              <div class="realtime-log" id="realtimeLog">
+                <div class="realtime-log-empty" data-i18n="realtime.waiting">等待实时数据...</div>
               </div>
             </div>
 
@@ -331,6 +400,108 @@
             </div>
           </div>
 
+          <!-- Usage Section -->
+          <div id="section-usage" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">API 用量统计</span>
+                <select id="usageDays" class="form-select" style="width:auto;height:34px" onchange="loadUsage()">
+                  <option value="1">今天</option>
+                  <option value="7" selected>近7天</option>
+                  <option value="30">近30天</option>
+                </select>
+              </div>
+              <div class="section-body" style="padding:0;overflow-x:auto">
+                <table class="log-table" style="width:100%;border-collapse:collapse">
+                  <thead>
+                    <tr>
+                      <th style="padding:10px 16px;text-align:left;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">提供商</th>
+                      <th style="padding:10px 16px;text-align:right;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">调用次数</th>
+                      <th style="padding:10px 16px;text-align:right;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">字符数</th>
+                      <th style="padding:10px 16px;text-align:right;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">错误数</th>
+                      <th style="padding:10px 16px;text-align:right;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">成功率</th>
+                      <th style="padding:10px 16px;text-align:right;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">平均延迟</th>
+                    </tr>
+                  </thead>
+                  <tbody id="usageTableBody">
+                    <tr><td colspan="6" style="text-align:center;padding:48px;color:var(--text-muted)">点击刷新加载数据</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics Section -->
+          <div id="section-analytics" style="display:none">
+            <div class="stat-cards" id="analyticsSummary">
+              <div class="stat-card">
+                <div class="stat-card-icon primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+                <div class="stat-card-value" id="analyticsTotalCalls">0</div>
+                <div class="stat-card-label">总调用次数</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-icon warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                <div class="stat-card-value" id="analyticsTotalChars">0</div>
+                <div class="stat-card-label">总字符数</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-icon success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                <div class="stat-card-value" id="analyticsSuccessRate">0%</div>
+                <div class="stat-card-label">成功率</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-icon info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div class="stat-card-value" id="analyticsAvgDaily">0</div>
+                <div class="stat-card-label">日均调用</div>
+              </div>
+            </div>
+            <div class="charts-row">
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <span class="chart-card-title">每日调用量</span>
+                  <select id="analyticsDays" class="form-select" style="width:auto;height:30px;font-size:12px" onchange="loadAnalytics()">
+                    <option value="7" selected>7天</option>
+                    <option value="14">14天</option>
+                    <option value="30">30天</option>
+                  </select>
+                </div>
+                <div class="chart-card-body">
+                  <div id="analyticsDailyChart" class="chart-bar-container"></div>
+                </div>
+              </div>
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <span class="chart-card-title">热门翻译语言对</span>
+                </div>
+                <div class="chart-card-body">
+                  <div id="langPairChart" class="ranking-list"></div>
+                </div>
+              </div>
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <span class="chart-card-title">用户地域分布</span>
+                </div>
+                <div class="chart-card-body">
+                  <div id="countryChart" class="ranking-list"></div>
+                </div>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">报表导出</span>
+              </div>
+              <div class="section-body">
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">导出统计数据为 CSV 文件，可在 Excel 中打开。</p>
+                <div style="display:flex;gap:12px">
+                  <button class="btn btn-primary" onclick="handleExportReport()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    导出 CSV 报表
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Prompt Section -->
           <div id="section-prompt" style="display:none">
             <div class="section-card">
@@ -354,6 +525,145 @@
               <button class="btn btn-primary" onclick="handleSaveConfig()">保存全部配置</button>
             </div>
           </div>
+
+          <!-- System Section -->
+          <div id="section-system" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">系统基础设置</span>
+              </div>
+              <div class="section-body">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">网站名称</label>
+                    <input id="sysSiteName" class="form-input" placeholder="LeeQ 翻译">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">默认目标语言</label>
+                    <select id="sysDefaultTargetLang" class="form-select"></select>
+                  </div>
+                  <div class="form-group full-width">
+                    <label class="form-label">页脚文案</label>
+                    <input id="sysFooter" class="form-input" placeholder="Powered by LeeQ...">
+                  </div>
+                  <div class="form-group full-width">
+                    <label class="form-label">公告内容（留空则不显示）</label>
+                    <textarea id="sysAnnouncement" class="form-textarea" rows="2" placeholder="系统维护通知等内容..."></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">翻译限制配置</span>
+              </div>
+              <div class="section-body">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">单次最大字符数</label>
+                    <input id="sysMaxCharLimit" class="form-input" type="number" min="100" max="50000" placeholder="5000">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">每日每IP翻译次数上限</label>
+                    <input id="sysDailyFreeLimit" class="form-input" type="number" min="0" max="100000" placeholder="1000">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-top:24px">
+              <button class="btn btn-primary" onclick="handleSaveSystem()">保存系统设置</button>
+            </div>
+          </div>
+
+          <!-- Logs Section -->
+          <div id="section-logs" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">访问日志</span>
+                <div style="display:flex;gap:8px">
+                  <select id="logType" class="form-select" style="width:auto;height:34px" onchange="loadLogs()">
+                    <option value="access">访问日志</option>
+                    <option value="error">错误日志</option>
+                  </select>
+                  <select id="logDays" class="form-select" style="width:auto;height:34px" onchange="loadLogs()">
+                    <option value="1">今天</option>
+                    <option value="3">近3天</option>
+                    <option value="7" selected>近7天</option>
+                  </select>
+                  <button class="btn btn-default btn-sm" onclick="loadLogs()">刷新</button>
+                </div>
+              </div>
+              <div class="section-body" style="padding:0;max-height:600px;overflow-y:auto">
+                <table class="log-table" style="width:100%;border-collapse:collapse">
+                  <thead>
+                    <tr>
+                      <th style="padding:10px 16px;text-align:left;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">时间</th>
+                      <th style="padding:10px 16px;text-align:left;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">IP</th>
+                      <th style="padding:10px 16px;text-align:left;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">语言对</th>
+                      <th style="padding:10px 16px;text-align:left;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">提供商</th>
+                      <th style="padding:10px 16px;text-align:left;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">状态</th>
+                      <th style="padding:10px 16px;text-align:right;font-size:12px;color:var(--text-muted);border-bottom:1px solid var(--border-light)">耗时</th>
+                    </tr>
+                  </thead>
+                  <tbody id="logTableBody">
+                    <tr><td colspan="6" style="text-align:center;padding:48px;color:var(--text-muted)">点击刷新加载日志</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Health Section -->
+          <div id="section-health" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">模型健康监控</span>
+                <button class="btn btn-primary btn-sm" onclick="checkHealth()">立即检测</button>
+              </div>
+              <div class="section-body" id="healthResults">
+                <div class="empty-state">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                  <p>点击"立即检测"检查所有已启用提供商的健康状态</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Backup Section -->
+          <div id="section-backup" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">数据备份</span>
+              </div>
+              <div class="section-body">
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px">导出当前系统所有配置数据为 JSON 文件，可用于迁移或灾难恢复。导入备份将覆盖当前配置。</p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap">
+                  <button class="btn btn-primary" onclick="handleExportBackup()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    导出备份
+                  </button>
+                  <label class="btn btn-default" style="cursor:pointer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    导入备份
+                    <input type="file" accept=".json" onchange="handleImportBackup(event)" style="display:none">
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">备份说明</span>
+              </div>
+              <div class="section-body">
+                <ul style="font-size:13px;color:var(--text-secondary);line-height:2;padding-left:20px">
+                  <li>备份包含：系统配置、API Key、SEO 设置、系统设置、今日统计</li>
+                  <li>备份不包含：翻译缓存、访问日志、历史统计数据</li>
+                  <li>导入备份将<strong style="color:var(--danger)">覆盖</strong>当前所有配置，请谨慎操作</li>
+                  <li>建议定期导出备份并保存到安全位置</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -362,6 +672,7 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <script src="/js/utils.js"></script>
+  <script src="/js/i18n.js"></script>
   <script>
     const DEFAULT_PROVIDERS = {
       cloudflare: { name: 'Cloudflare Workers AI', enabled: false, models: [] },
@@ -408,7 +719,13 @@
         apikey: 'API 管理',
         seo: 'SEO 设置',
         stats: '访问统计',
-        prompt: '提示词模板'
+        usage: 'API 用量',
+        analytics: '高级分析',
+        prompt: '提示词模板',
+        system: '系统设置',
+        logs: '访问日志',
+        health: '健康监控',
+        backup: '数据备份'
       };
       document.getElementById('pageTitle').textContent = titles[name] || '';
     }
@@ -439,6 +756,7 @@
     function handleLogout() {
       adminToken = '';
       sessionStorage.removeItem('adminToken');
+      stopRealtimePolling();
       document.getElementById('loginPage').style.display = '';
       document.getElementById('dashboardPage').style.display = 'none';
     }
@@ -448,6 +766,8 @@
       document.getElementById('dashboardPage').style.display = '';
       await Promise.all([loadConfig(), loadApiKeys(), loadSeo(), loadStats()]);
       updateDashboardStats();
+      applyAdminI18n();
+      startRealtimePolling();
     }
 
     async function loadConfig() {
@@ -764,6 +1084,7 @@
       });
       document.getElementById('availableModels').textContent = totalModels;
       document.getElementById('activeUsers').textContent = configuredCount;
+      renderModelRanking();
     }
 
     function renderStatsChart(stats) {
@@ -848,6 +1169,423 @@
       });
       ranking.innerHTML = html;
     }
+
+    // ====== 系统设置 ======
+    async function loadSystemConfig() {
+      try {
+        const res = await fetch('/api/admin/system', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+        const data = await res.json();
+        if (data.code === 200) {
+          document.getElementById('sysSiteName').value = data.data.siteName || '';
+          document.getElementById('sysFooter').value = data.data.footer || '';
+          document.getElementById('sysAnnouncement').value = data.data.announcement || '';
+          document.getElementById('sysMaxCharLimit').value = data.data.maxCharLimit || 5000;
+          document.getElementById('sysDailyFreeLimit').value = data.data.dailyFreeLimit || 1000;
+          populateSystemLangSelect(data.data.defaultSourceLang || 'auto', data.data.defaultTargetLang || 'zh');
+        }
+      } catch {}
+    }
+
+    function populateSystemLangSelect(defaultSource, defaultTarget) {
+      const sel = document.getElementById('sysDefaultTargetLang');
+      sel.innerHTML = '';
+      const langMap = { auto: '中文', zh: '中文', en: '英语', ja: '日语', ko: '韩语', fr: '法语', de: '德语', es: '西班牙语', ru: '俄语', pt: '葡萄牙语', it: '意大利语', ar: '阿拉伯语', hi: '印地语', th: '泰语', vi: '越南语', id: '印尼语', nl: '荷兰语', pl: '波兰语', tr: '土耳其语', sv: '瑞典语', da: '丹麦语', fi: '芬兰语', el: '希腊语', cs: '捷克语', ro: '罗马尼亚语', hu: '匈牙利语', uk: '乌克兰语', bg: '保加利亚语' };
+      Object.entries(langMap).forEach(([code, name]) => {
+        sel.innerHTML += `<option value="${code}" ${code === defaultTarget ? 'selected' : ''}>${name}</option>`;
+      });
+    }
+
+    async function handleSaveSystem() {
+      const body = {
+        siteName: document.getElementById('sysSiteName').value,
+        footer: document.getElementById('sysFooter').value,
+        announcement: document.getElementById('sysAnnouncement').value,
+        defaultSourceLang: 'auto',
+        defaultTargetLang: document.getElementById('sysDefaultTargetLang').value,
+        maxCharLimit: parseInt(document.getElementById('sysMaxCharLimit').value) || 5000,
+        dailyFreeLimit: parseInt(document.getElementById('sysDailyFreeLimit').value) || 1000
+      };
+      try {
+        const res = await fetch('/api/admin/system', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        showToast(data.code === 200 ? '系统设置已保存' : data.message, data.code === 200 ? 'success' : 'error');
+      } catch (err) { showToast('保存失败: ' + err.message, 'error'); }
+    }
+
+    // ====== 访问日志 ======
+    async function loadLogs() {
+      const type = document.getElementById('logType').value;
+      const days = document.getElementById('logDays').value;
+      const tbody = document.getElementById('logTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">加载中...</td></tr>';
+      try {
+        const res = await fetch(`/api/admin/logs?type=${type}&days=${days}`, {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        if (data.code === 200 && data.data.logs.length > 0) {
+          tbody.innerHTML = data.data.logs.map(log => {
+            const time = new Date(log.timestamp).toLocaleString('zh-CN');
+            const langPair = `${log.sourceLang || '-'} → ${log.targetLang || '-'}`;
+            const statusClass = log.success ? 'tag tag-success' : 'tag tag-default';
+            const statusText = log.success ? '成功' : '失败';
+            return `<tr style="border-bottom:1px solid var(--border-light)">
+              <td style="padding:8px 16px;font-size:12px;color:var(--text-secondary);white-space:nowrap">${time}</td>
+              <td style="padding:8px 16px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono)">${log.ip || '-'}</td>
+              <td style="padding:8px 16px;font-size:12px;color:var(--text-secondary)">${langPair}</td>
+              <td style="padding:8px 16px;font-size:12px;color:var(--text-secondary)">${log.provider || '-'}</td>
+              <td style="padding:8px 16px"><span class="${statusClass}">${statusText}</span></td>
+              <td style="padding:8px 16px;font-size:12px;color:var(--text-muted);text-align:right">${log.latency || '-'}ms</td>
+            </tr>`;
+          }).join('');
+          document.getElementById('logTableBody').innerHTML += `<tr><td colspan="6" style="text-align:center;padding:12px;color:var(--text-muted);font-size:12px">共 ${data.data.total} 条日志</td></tr>`;
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:48px;color:var(--text-muted)">暂无日志数据</td></tr>';
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--danger)">加载失败: ${err.message}</td></tr>`;
+      }
+    }
+
+    // 监听导航切换到系统设置和日志时加载数据
+    const origSwitchSection = switchSection;
+    switchSection = function(name) {
+      origSwitchSection(name);
+      if (name === 'system') loadSystemConfig();
+      if (name === 'logs') loadLogs();
+      if (name === 'health') checkHealth();
+      if (name === 'usage') loadUsage();
+      if (name === 'analytics') loadAnalytics();
+    };
+
+    // ====== API用量统计 ======
+    async function loadUsage() {
+      const days = document.getElementById('usageDays').value;
+      const tbody = document.getElementById('usageTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">加载中...</td></tr>';
+      try {
+        const res = await fetch(`/api/admin/usage?days=${days}`, {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        if (data.code === 200 && data.data.usage.length > 0) {
+          tbody.innerHTML = data.data.usage.map(u => {
+            const provName = DEFAULT_PROVIDERS[u.provider]?.name || u.provider;
+            const rateClass = u.successRate >= 90 ? 'tag tag-success' : u.successRate >= 50 ? 'tag tag-warning' : 'tag tag-danger';
+            return `<tr style="border-bottom:1px solid var(--border-light)">
+              <td style="padding:10px 16px;font-size:13px;font-weight:500;color:var(--text-primary)">${provName}</td>
+              <td style="padding:10px 16px;font-size:13px;text-align:right;color:var(--text-secondary)">${u.calls}</td>
+              <td style="padding:10px 16px;font-size:13px;text-align:right;color:var(--text-secondary)">${u.chars.toLocaleString()}</td>
+              <td style="padding:10px 16px;font-size:13px;text-align:right;color:${u.errors > 0 ? 'var(--danger)' : 'var(--text-muted)'}">${u.errors}</td>
+              <td style="padding:10px 16px;text-align:right"><span class="${rateClass}">${u.successRate}%</span></td>
+              <td style="padding:10px 16px;font-size:13px;text-align:right;color:var(--text-muted)">${u.avgLatency}ms</td>
+            </tr>`;
+          }).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:48px;color:var(--text-muted)">暂无用量数据</td></tr>';
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--danger)">加载失败: ${err.message}</td></tr>`;
+      }
+    }
+
+    // ====== 高级分析 ======
+    async function loadAnalytics() {
+      const days = document.getElementById('analyticsDays').value;
+      try {
+        const res = await fetch(`/api/admin/analytics?days=${days}`, {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        if (data.code === 200) {
+          const s = data.data.summary;
+          document.getElementById('analyticsTotalCalls').textContent = s.totalCalls.toLocaleString();
+          document.getElementById('analyticsTotalChars').textContent = s.totalChars.toLocaleString();
+          document.getElementById('analyticsSuccessRate').textContent = s.successRate + '%';
+          document.getElementById('analyticsAvgDaily').textContent = s.avgDaily;
+
+          // 每日调用量图表
+          const daily = data.data.daily;
+          const maxVal = Math.max(...daily.map(d => d.calls), 1);
+          const chart = document.getElementById('analyticsDailyChart');
+          chart.innerHTML = daily.map(d => {
+            const h = Math.max((d.calls / maxVal) * 120, 4);
+            const date = d.date.slice(5);
+            const errColor = d.errors > 0 ? `var(--danger)` : 'transparent';
+            return `<div class="chart-bar-item">
+              <span class="chart-bar-value">${d.calls}${d.errors > 0 ? ` <span style="color:var(--danger);font-size:10px">(${d.errors}错误)</span>` : ''}</span>
+              <div class="chart-bar" style="height:${h}px"></div>
+              <span class="chart-bar-label">${date}</span>
+            </div>`;
+          }).join('');
+
+          // 语言对排行
+          const pairs = data.data.langPairRanking;
+          const pairChart = document.getElementById('langPairChart');
+          if (pairs.length === 0) {
+            pairChart.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted)">暂无数据</div>';
+          } else {
+            const maxPair = pairs[0].count;
+            pairChart.innerHTML = pairs.map(p => {
+              const pct = Math.round((p.count / maxPair) * 100);
+              return `<div class="ranking-item">
+                <div class="ranking-info"><span class="ranking-name">${p.pair}</span><span class="ranking-value">${p.count}</span></div>
+                <div class="ranking-bar"><div class="ranking-bar-fill" style="width:${pct}%"></div></div>
+              </div>`;
+            }).join('');
+          }
+
+          // 地域分布
+          const countries = data.data.countryDistribution || [];
+          const countryChart = document.getElementById('countryChart');
+          if (countries.length === 0) {
+            countryChart.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted)">暂无数据</div>';
+          } else {
+            const maxCountry = countries[0].count;
+            countryChart.innerHTML = countries.map(c => {
+              const pct = Math.round((c.count / maxCountry) * 100);
+              return `<div class="ranking-item">
+                <div class="ranking-info"><span class="ranking-name">${c.country}</span><span class="ranking-value">${c.count}</span></div>
+                <div class="ranking-bar"><div class="ranking-bar-fill" style="width:${pct}%"></div></div>
+              </div>`;
+            }).join('');
+          }
+        }
+      } catch (err) {
+        console.error('加载分析数据失败:', err);
+      }
+    }
+
+    // ====== 报表导出 ======
+    async function handleExportReport() {
+      const days = document.getElementById('analyticsDays').value;
+      showToast('正在生成报表...', 'info');
+      try {
+        const res = await fetch(`/api/admin/export?days=${days}`, {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `stats-report-${new Date().toISOString().slice(0,10)}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast('报表已导出', 'success');
+        } else {
+          showToast('导出失败', 'error');
+        }
+      } catch (err) {
+        showToast('导出失败: ' + err.message, 'error');
+      }
+    }
+
+    // ====== 健康监控 ======
+    async function checkHealth() {
+      const container = document.getElementById('healthResults');
+      container.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text-muted)"><div class="spinner-inline"></div><p style="margin-top:12px">正在检测所有已启用的提供商...</p></div>';
+      try {
+        const res = await fetch('/api/admin/health', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        if (data.code === 200 && data.data.results) {
+          const results = data.data.results;
+          if (results.length === 0) {
+            container.innerHTML = '<div class="empty-state"><p>没有已启用的提供商，请先在 API 管理中配置并启用</p></div>';
+            return;
+          }
+          const checkedAt = new Date(data.data.checkedAt).toLocaleString('zh-CN');
+          let html = `<div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">检测时间：${checkedAt}</div>`;
+          html += '<div class="health-grid">';
+          results.forEach(r => {
+            const provName = DEFAULT_PROVIDERS[r.provider]?.name || r.provider;
+            const statusClass = r.healthy ? 'health-ok' : 'health-err';
+            const statusIcon = r.healthy
+              ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+              : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+            html += `<div class="health-card ${statusClass}">
+              <div class="health-card-header">
+                <span class="health-card-icon">${statusIcon}</span>
+                <span class="health-card-name">${provName}</span>
+              </div>
+              <div class="health-card-body">
+                <span class="health-card-status">${r.healthy ? '正常' : '异常'}</span>
+                <span class="health-card-latency">${r.latency}ms</span>
+              </div>
+              ${!r.healthy && r.error ? `<div class="health-card-error">${r.error}</div>` : ''}
+            </div>`;
+          });
+          html += '</div>';
+          container.innerHTML = html;
+        } else {
+          container.innerHTML = '<div class="empty-state"><p>检测失败：' + (data.message || '未知错误') + '</p></div>';
+        }
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state"><p>请求失败：' + err.message + '</p></div>';
+      }
+    }
+
+    // ====== 数据备份 ======
+    async function handleExportBackup() {
+      showToast('正在生成备份...', 'info');
+      try {
+        const res = await fetch('/api/admin/backup', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        if (data.code === 200) {
+          const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `leeq-backup-${new Date().toISOString().slice(0,10)}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast('备份已导出', 'success');
+        } else {
+          showToast('导出失败：' + data.message, 'error');
+        }
+      } catch (err) {
+        showToast('导出失败：' + err.message, 'error');
+      }
+    }
+
+    async function handleImportBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (!confirm('导入备份将覆盖当前所有配置，确定要继续吗？')) {
+        event.target.value = '';
+        return;
+      }
+      try {
+        const text = await file.text();
+        const backupData = JSON.parse(text);
+        if (!backupData._meta) {
+          showToast('无效的备份文件', 'error');
+          return;
+        }
+        const res = await fetch('/api/admin/backup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+          body: JSON.stringify(backupData)
+        });
+        const data = await res.json();
+        if (data.code === 200) {
+          showToast(`备份已恢复，共 ${data.data.restored} 项配置`, 'success');
+          await loadConfig();
+          await loadApiKeys();
+          await loadSeo();
+        } else {
+          showToast('恢复失败：' + data.message, 'error');
+        }
+      } catch (err) {
+        showToast('恢复失败：' + err.message, 'error');
+      }
+      event.target.value = '';
+    }
+
+    // ====== 国际化 ======
+    let realtimeTimer = null;
+    let lastLogCount = 0;
+
+    async function fetchRealtimeData() {
+      try {
+        const res = await fetch('/api/admin/realtime', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        if (data.code === 200) {
+          const d = data.data;
+          document.getElementById('rtTodayCalls').textContent = d.todayCalls.toLocaleString();
+          document.getElementById('rtTodayVisitors').textContent = d.todayVisitors.toLocaleString();
+          document.getElementById('rtSuccessRate').textContent = d.successRate + '%';
+          document.getElementById('rtAvgLatency').textContent = d.avgLatency + 'ms';
+          document.getElementById('realtimeStatus').textContent = t('realtime.connected');
+          document.getElementById('realtimeStatus').classList.remove('disconnected');
+          renderRealtimeLog(d.recentLogs);
+        } else {
+          document.getElementById('realtimeStatus').textContent = t('realtime.disconnected');
+          document.getElementById('realtimeStatus').classList.add('disconnected');
+        }
+      } catch (err) {
+        document.getElementById('realtimeStatus').textContent = t('realtime.disconnected');
+        document.getElementById('realtimeStatus').classList.add('disconnected');
+      }
+    }
+
+    function renderRealtimeLog(logs) {
+      const container = document.getElementById('realtimeLog');
+      if (!logs || logs.length === 0) {
+        container.innerHTML = '<div class="realtime-log-empty">' + t('realtime.waiting') + '</div>';
+        lastLogCount = 0;
+        return;
+      }
+      const isNewData = logs.length !== lastLogCount;
+      lastLogCount = logs.length;
+      container.innerHTML = logs.map((log, i) => {
+        const dotClass = log.success ? 'success' : 'error';
+        const pair = `${log.sourceLang}→${log.targetLang}`;
+        const time = new Date(log.timestamp).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const animStyle = (isNewData && i === 0) ? 'style="animation:realtimeLogIn 0.3s ease"' : '';
+        return `<div class="realtime-log-item" ${animStyle}>
+          <span class="realtime-log-dot ${dotClass}"></span>
+          <span class="realtime-log-pair">${pair}</span>
+          <span class="realtime-log-provider">${log.provider}</span>
+          <span class="realtime-log-latency">${log.latency}ms</span>
+          <span class="realtime-log-time">${time}</span>
+        </div>`;
+      }).join('');
+    }
+
+    function startRealtimePolling() {
+      if (realtimeTimer) return;
+      fetchRealtimeData();
+      realtimeTimer = setInterval(fetchRealtimeData, 5000);
+    }
+
+    function stopRealtimePolling() {
+      if (realtimeTimer) {
+        clearInterval(realtimeTimer);
+        realtimeTimer = null;
+      }
+      document.getElementById('realtimeStatus').textContent = t('realtime.disconnected');
+      document.getElementById('realtimeStatus').classList.add('disconnected');
+    }
+
+    function applyAdminI18n() {
+      const navMap = {
+        dashboard: 'nav.dashboard', models: 'nav.models', apikey: 'nav.apikey',
+        seo: 'nav.seo', stats: 'nav.stats', usage: 'nav.usage', analytics: 'nav.analytics',
+        prompt: 'nav.prompt', system: 'nav.system', logs: 'nav.logs', health: 'nav.health', backup: 'nav.backup'
+      };
+      document.querySelectorAll('.nav-item').forEach(item => {
+        const section = item.dataset.section;
+        if (section && navMap[section]) {
+          const textNode = item.childNodes[item.childNodes.length - 1];
+          if (textNode && textNode.nodeType === 3) {
+            textNode.textContent = '\n            ' + t(navMap[section]) + '\n          ';
+          }
+        }
+      });
+      const langBtn = document.getElementById('langToggleBtn');
+      if (langBtn) langBtn.textContent = currentLang === 'zh' ? 'EN' : '中文';
+    }
+
+    const origSwitchLang = switchLang;
+    switchLang = function(lang) {
+      origSwitchLang(lang);
+      applyAdminI18n();
+    };
 
     function showToast(msg, type) {
       const container = document.getElementById('toastContainer');

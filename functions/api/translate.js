@@ -22,21 +22,38 @@ const PROVIDERS = {
   openai: { baseUrl: 'https://api.openai.com/v1', defaultModel: 'gpt-4o-mini' },
   anthropic: { baseUrl: 'https://api.anthropic.com/v1', defaultModel: 'claude-sonnet-4-20250514' },
   gemini: { baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai', defaultModel: 'gemini-2.0-flash' },
-  deepseek: { baseUrl: 'https://api.deepseek.com/v1', defaultModel: 'deepseek-chat' }
+  deepseek: { baseUrl: 'https://api.deepseek.com/v1', defaultModel: 'deepseek-chat' },
+  nvidia: { baseUrl: 'https://integrate.api.nvidia.com/v1', defaultModel: 'meta/llama-3.1-8b-instruct' },
+  baidu: { baseUrl: 'https://qianfan.baidubce.com/v2', defaultModel: 'ernie-4.0-8k' },
+  aliyun: { baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1', defaultModel: 'qwen-turbo' },
+  zhipu: { baseUrl: 'https://open.bigmodel.cn/api/paas/v4', defaultModel: 'glm-4-flash' },
+  minimax: { baseUrl: 'https://api.minimax.chat/v1', defaultModel: 'abab6.5-chat' },
+  moonshot: { baseUrl: 'https://api.moonshot.cn/v1', defaultModel: 'moonshot-v1-8k' },
+  xunfei: { baseUrl: 'https://spark-api-open.xf-yun.com/v1', defaultModel: '4.0Ultra' },
+  tencent: { baseUrl: 'https://api.hunyuan.cloud.tencent.com/v1', defaultModel: 'hunyuan-standard' },
+  custom: { baseUrl: '', defaultModel: '' }
 };
 
 function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify({ code: status, data, message: 'success' }), {
-    status,
-    headers: { 'Content-Type': 'application/json' }
+    status, headers: { 'Content-Type': 'application/json' }
   });
 }
 
 function errorResponse(message, status = 400) {
   return new Response(JSON.stringify({ code: status, data: null, message }), {
-    status,
-    headers: { 'Content-Type': 'application/json' }
+    status, headers: { 'Content-Type': 'application/json' }
   });
+}
+
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(16);
 }
 
 function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName) {
@@ -59,6 +76,28 @@ async function recordStats(env, tokens) {
     stats.translations = (stats.translations || 0) + 1;
     await env.SETTINGS.put(key, JSON.stringify(stats));
   } catch (e) { console.error('记录统计数据失败:', e); }
+}
+
+async function logAccess(env, ip, sourceLang, targetLang, provider, charCount, success, latency, country) {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const key = `logs:access:${today}`;
+    const data = await env.SETTINGS.get(key);
+    const logs = data ? JSON.parse(data) : [];
+    logs.push({
+      ip,
+      timestamp: Date.now(),
+      sourceLang,
+      targetLang,
+      provider,
+      charCount,
+      success,
+      latency,
+      country: country || null
+    });
+    if (logs.length > 500) logs.splice(0, logs.length - 500);
+    await env.SETTINGS.put(key, JSON.stringify(logs));
+  } catch (e) { console.error('记录访问日志失败:', e); }
 }
 
 async function translateWithCloudflare(text, sourceLang, targetLang, model, env, promptTemplates) {
@@ -144,45 +183,185 @@ async function translateWithExternal(text, sourceLang, targetLang, provider, mod
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  const startTime = Date.now();
+  const clientIp = request.headers.get('cf-connecting-ip') || 'unknown';
+  const clientCountry = request.headers.get('cf-ipcountry') || null;
+
   try {
     const body = await request.json();
     const { text, sourceLang, targetLang, provider, model } = body;
 
     if (!text || !text.trim()) return errorResponse('文本不能为空');
-    if (text.length > 5000) return errorResponse('文本超过5000字符限制');
+
+    // 读取系统配置，检查翻译限制
+    let maxCharLimit = 5000;
+    let dailyFreeLimit = 1000;
+    try {
+      const sysData = await env.SETTINGS.get('admin:system');
+      if (sysData) {
+        const sysConfig = JSON.parse(sysData);
+        maxCharLimit = sysConfig.maxCharLimit || 5000;
+        dailyFreeLimit = sysConfig.dailyFreeLimit || 1000;
+      }
+    } catch {}
+
+    if (text.length > maxCharLimit) return errorResponse(`文本超过${maxCharLimit}字符限制`);
+
+    // 检查每日翻译次数限制
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const dailyKey = `rate:daily:${clientIp}:${today}`;
+      const dailyData = await env.SETTINGS.get(dailyKey);
+      const dailyCount = dailyData ? parseInt(dailyData) : 0;
+      if (dailyCount >= dailyFreeLimit) {
+        return errorResponse(`今日翻译次数已达上限（${dailyFreeLimit}次）`, 429);
+      }
+      await env.SETTINGS.put(dailyKey, String(dailyCount + 1), { expirationTtl: 86400 });
+    } catch {}
+
     if (!targetLang) return errorResponse('请选择目标语言');
 
+    const srcLang = sourceLang || 'auto';
     const configData = await env.SETTINGS.get('admin:config');
     const config = configData ? JSON.parse(configData) : {};
     const promptTemplates = config.promptTemplates || {};
+
+    // 翻译缓存：尝试从缓存获取
+    const cacheHash = simpleHash(text.trim().toLowerCase() + '|' + srcLang + '|' + targetLang);
+    try {
+      const cacheKey = `cache:translate:${cacheHash}`;
+      const cached = await env.SETTINGS.get(cacheKey);
+      if (cached) {
+        const cachedResult = JSON.parse(cached);
+        await logAccess(env, clientIp, srcLang, targetLang, 'cache', text.length, true, Date.now() - startTime, clientCountry);
+        return jsonResponse({
+          translatedText: cachedResult.translatedText,
+          sourceLang: srcLang,
+          targetLang,
+          provider: 'cache',
+          model: 'cached',
+          fromCache: true
+        });
+      }
+    } catch {}
 
     const prov = provider || 'cloudflare';
     let result;
 
     if (prov === 'cloudflare') {
-      result = await translateWithCloudflare(text, sourceLang || 'auto', targetLang, model, env, promptTemplates);
+      result = await translateWithCloudflare(text, srcLang, targetLang, model, env, promptTemplates);
+      await logAccess(env, clientIp, srcLang, targetLang, 'cloudflare', text.length, true, Date.now() - startTime, clientCountry);
     } else {
-      const userId = request.headers.get('cf-connecting-ip') || 'default';
-      const settingsData = await env.SETTINGS.get(`user:${userId}`);
-      const settings = settingsData ? JSON.parse(settingsData) : {};
-      const keyData = settings.apiKeys?.[prov];
-      if (!keyData) return errorResponse('请先配置 API Key', 401);
-      result = await translateWithExternal(
-        text, sourceLang || 'auto', targetLang, prov, model,
-        keyData.apiKey, keyData.customEndpoint, promptTemplates
-      );
+      // 智能路由：从admin:apiKeys获取所有启用的API Key，按优先级尝试
+      const apiKeysData = await env.SETTINGS.get('admin:apiKeys');
+      const adminKeys = apiKeysData ? JSON.parse(apiKeysData) : {};
+
+      // 如果指定了provider，尝试用该provider；否则智能路由
+      if (prov && adminKeys[prov]?.apiKey) {
+        try {
+          result = await translateWithExternal(
+            text, srcLang, targetLang, prov, model,
+            adminKeys[prov].apiKey,
+            adminKeys[prov].customEndpoint || '',
+            promptTemplates
+          );
+          await logAccess(env, clientIp, srcLang, targetLang, prov, text.length, true, Date.now() - startTime, clientCountry);
+        } catch (err) {
+          await logAccess(env, clientIp, srcLang, targetLang, prov, text.length, false, Date.now() - startTime, clientCountry);
+          // 故障转移：尝试其他启用的提供商
+          const configProviders = config.providers || {};
+          const fallbackKeys = Object.entries(adminKeys)
+            .filter(([pId]) => pId !== prov && configProviders[pId]?.enabled && adminKeys[pId]?.apiKey);
+          let translated = false;
+          for (const [fbId, fbKey] of fallbackKeys) {
+            try {
+              result = await translateWithExternal(
+                text, srcLang, targetLang, fbId,
+                PROVIDERS[fbId]?.defaultModel || 'gpt-4o-mini',
+                typeof fbKey === 'string' ? fbKey : fbKey.apiKey,
+                (typeof fbKey === 'object' ? fbKey.customEndpoint : '') || '',
+                promptTemplates
+              );
+              await logAccess(env, clientIp, srcLang, targetLang, fbId, text.length, true, Date.now() - startTime, clientCountry);
+              translated = true;
+              break;
+            } catch { continue; }
+          }
+          if (!translated) throw err;
+        }
+      } else {
+        // 智能路由：从启用的提供商中选择
+        const configProviders = config.providers || {};
+        const enabledKeys = Object.entries(adminKeys)
+          .filter(([pId]) => configProviders[pId]?.enabled && adminKeys[pId]?.apiKey);
+        if (enabledKeys.length === 0) {
+          return errorResponse('请先在管理后台配置并启用 API Key', 401);
+        }
+        let translated = false;
+        let lastError = null;
+        for (const [pId, k] of enabledKeys) {
+          try {
+            const kd = typeof k === 'object' ? k : { apiKey: k, customEndpoint: '' };
+            const useModel = model || PROVIDERS[pId]?.defaultModel || 'gpt-4o-mini';
+            result = await translateWithExternal(
+              text, srcLang, targetLang, pId, useModel,
+              kd.apiKey, kd.customEndpoint || '', promptTemplates
+            );
+            await logAccess(env, clientIp, srcLang, targetLang, pId, text.length, true, Date.now() - startTime, clientCountry);
+            translated = true;
+            break;
+          } catch (e) {
+            lastError = e;
+            continue;
+          }
+        }
+        if (!translated) {
+          await logAccess(env, clientIp, srcLang, targetLang, 'none', text.length, false, Date.now() - startTime, clientCountry);
+          throw lastError || new Error('所有可用的翻译服务均失败');
+        }
+      }
     }
 
     await recordStats(env, result.tokens);
 
+    // 写入翻译缓存（24小时过期）
+    try {
+      const cacheKey = `cache:translate:${cacheHash}`;
+      await env.SETTINGS.put(cacheKey, JSON.stringify({
+        translatedText: result.translatedText,
+        provider: provider || 'cloudflare',
+        createdAt: Date.now()
+      }), { expirationTtl: 86400 });
+    } catch {}
+
     return jsonResponse({
       translatedText: result.translatedText,
-      sourceLang: result.detectedSourceLang || sourceLang,
+      sourceLang: result.detectedSourceLang || srcLang,
       targetLang,
       provider: prov,
       model: model || (prov === 'cloudflare' ? '@cf/meta/m2m100-1.2b' : PROVIDERS[prov]?.defaultModel)
     });
   } catch (err) {
+    // 记录错误日志
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const errorKey = `logs:error:${today}`;
+      const errorData = await env.SETTINGS.get(errorKey);
+      const errorLogs = errorData ? JSON.parse(errorData) : [];
+      errorLogs.push({
+        ip: clientIp,
+        timestamp: Date.now(),
+        sourceLang: body?.sourceLang || 'unknown',
+        targetLang: body?.targetLang || 'unknown',
+        provider: body?.provider || 'unknown',
+        charCount: body?.text?.length || 0,
+        success: false,
+        latency: Date.now() - startTime,
+        error: err.message || '未知错误'
+      });
+      if (errorLogs.length > 200) errorLogs.splice(0, errorLogs.length - 200);
+      await env.SETTINGS.put(errorKey, JSON.stringify(errorLogs));
+    } catch (logErr) { console.error('记录错误日志失败:', logErr); }
     return errorResponse(err.message || '翻译失败', 500);
   }
 }
