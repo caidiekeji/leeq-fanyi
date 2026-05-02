@@ -394,8 +394,8 @@
         });
         const data = await res.json();
         if (data.code === 200 && data.data.models.length > 0) {
-          updateProviderModels(provider, data.data.models);
-          showToast(`成功获取 ${data.data.models.length} 个模型`, 'success');
+          await saveProviderModels(provider, data.data.models);
+          showToast(`成功获取 ${data.data.models.length} 个模型并已保存`, 'success');
         } else if (data.data.message) {
           showToast(data.data.message, 'warning');
         } else {
@@ -406,15 +406,44 @@
       }
     }
 
-    function updateProviderModels(provider, models) {
-      if (!currentProviders[provider]) return;
-      currentProviders[provider].models = models.slice(0, 20).map(m => ({
+    async function saveProviderModels(provider, models) {
+      const formattedModels = models.slice(0, 50).map(m => ({
         id: m.id,
         name: m.name || m.id
       }));
-      currentProviders[provider].enabled = true;
+      currentProviders[provider] = { ...currentProviders[provider], models: formattedModels, enabled: true };
       renderProviders(currentProviders);
       DEFAULT_PROVIDER_SELECT.dispatchEvent(new Event('change'));
+      await saveAllProviders();
+    }
+
+    async function saveAllProviders() {
+      const providers = {};
+      Object.entries(currentProviders).forEach(([id, prov]) => {
+        providers[id] = {
+          name: prov.name,
+          enabled: prov.enabled,
+          models: prov.models || []
+        };
+      });
+      const body = {
+        providers,
+        defaultProvider: document.getElementById('defaultProvider').value,
+        defaultModel: document.getElementById('defaultModel').value,
+        promptTemplates: {
+          translate: document.getElementById('translatePrompt').value,
+          detect: document.getElementById('detectPrompt').value
+        }
+      };
+      try {
+        await fetch('/api/admin/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+          body: JSON.stringify(body)
+        });
+      } catch (err) {
+        console.error('自动保存配置失败:', err);
+      }
     }
 
     async function handleTestKey() {
