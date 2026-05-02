@@ -493,7 +493,13 @@
         const res = await fetch('/api/admin/config', { headers: { 'Authorization': `Bearer ${adminToken}` } });
         const data = await res.json();
         if (data.code === 200) {
-          renderProviders(data.data.providers || DEFAULT_PROVIDERS);
+          const loadedProviders = data.data.providers || {};
+          Object.entries(loadedProviders).forEach(([id, prov]) => {
+            if (currentProviders[id]) {
+              currentProviders[id] = { ...currentProviders[id], ...prov };
+            }
+          });
+          renderProviders(currentProviders);
           const savedProvider = data.data.defaultProvider || 'cloudflare';
           DEFAULT_PROVIDER_SELECT.value = savedProvider;
           DEFAULT_PROVIDER_SELECT.dispatchEvent(new Event('change'));
@@ -552,13 +558,15 @@
       list.innerHTML = '';
       Object.entries(keys).forEach(([provider, keyData]) => {
         const provName = DEFAULT_PROVIDERS[provider]?.name || provider;
+        const hasModels = currentProviders[provider]?.models?.length > 0;
         list.innerHTML += `<div class="key-list-item">
           <div class="key-list-item-left">
             <span class="key-list-item-name">${provName}</span>
             <span class="key-list-item-mask">${keyData.apiKey || '未设置'}</span>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span class="tag ${keyData.configured ? 'tag-success' : 'tag-default'}">${keyData.configured ? '已配置' : '未配置'}</span>
+            <span class="tag ${hasModels ? 'tag-success' : 'tag-default'}">${hasModels ? '已获取 ' + currentProviders[provider].models.length + ' 个模型' : '未获取模型'}</span>
+            <button class="btn btn-primary btn-sm" onclick="handleFetchModels('${provider}')">获取模型</button>
             <button class="btn btn-danger btn-sm" onclick="handleDeleteApiKey('${provider}')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
             </button>
@@ -636,6 +644,19 @@
       if (!apiKey) return showToast('请先输入 API Key', 'error');
       showToast('正在测试连接...', 'info');
       await fetchModelsForProvider(provider, apiKey, customEndpoint);
+    }
+
+    async function handleFetchModels(provider) {
+      try {
+        const res = await fetch('/api/admin/apiKeys', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+        const data = await res.json();
+        if (data.code === 200 && data.data[provider]) {
+          const keyData = data.data[provider];
+          await fetchModelsForProvider(provider, keyData.apiKey, keyData.customEndpoint || '');
+        } else {
+          showToast('未找到该 API Key', 'error');
+        }
+      } catch (err) { showToast('获取失败: ' + err.message, 'error'); }
     }
 
     async function handleDeleteApiKey(provider) {
