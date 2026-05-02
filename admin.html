@@ -194,23 +194,7 @@
                 </div>
               </div>
             </div>
-            <div class="section-card">
-              <div class="section-header">
-                <span class="section-title">默认模型</span>
-              </div>
-              <div class="section-body">
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label class="form-label">提供商</label>
-                    <select id="defaultProvider" class="form-select"></select>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">模型</label>
-                    <select id="defaultModel" class="form-select"></select>
-                  </div>
-                </div>
-              </div>
-            </div>
+
             <div style="display:flex;justify-content:flex-end;margin-top:24px">
               <button class="btn btn-primary" onclick="handleSaveConfig()">保存全部配置</button>
             </div>
@@ -389,26 +373,10 @@
 
     let adminToken = sessionStorage.getItem('adminToken') || '';
     let currentProviders = JSON.parse(JSON.stringify(DEFAULT_PROVIDERS));
-    let DEFAULT_MODEL_SELECT, DEFAULT_PROVIDER_SELECT, apiKeyProviderSelect, customEndpointRow;
 
     document.addEventListener('DOMContentLoaded', () => {
-      DEFAULT_MODEL_SELECT = document.getElementById('defaultModel');
-      DEFAULT_PROVIDER_SELECT = document.getElementById('defaultProvider');
-      apiKeyProviderSelect = document.getElementById('apiKeyProviderSelect');
-      customEndpointRow = document.getElementById('customEndpointRow');
-
-      DEFAULT_PROVIDER_SELECT.addEventListener('change', () => {
-        const provider = DEFAULT_PROVIDER_SELECT.value;
-        const models = DEFAULT_PROVIDERS[provider]?.models || [];
-        DEFAULT_MODEL_SELECT.innerHTML = '';
-        if (models.length === 0) {
-          DEFAULT_MODEL_SELECT.innerHTML = '<option value="">暂无可用模型</option>';
-        } else {
-          models.forEach(m => {
-            DEFAULT_MODEL_SELECT.innerHTML += `<option value="${m.id}">${m.name}</option>`;
-          });
-        }
-      });
+      const apiKeyProviderSelect = document.getElementById('apiKeyProviderSelect');
+      const customEndpointRow = document.getElementById('customEndpointRow');
 
       apiKeyProviderSelect.addEventListener('change', () => {
         customEndpointRow.style.display = apiKeyProviderSelect.value === 'custom' ? 'block' : 'none';
@@ -436,20 +404,6 @@
       document.getElementById('pageTitle').textContent = titles[name] || '';
     }
 
-    function populateDefaultProviderOptions() {
-      const sel = DEFAULT_PROVIDER_SELECT;
-      sel.innerHTML = '';
-      Object.entries(currentProviders).forEach(([id, prov]) => {
-        if (prov.models && prov.models.length > 0) {
-          sel.innerHTML += `<option value="${id}">${prov.name}</option>`;
-        }
-      });
-      const firstOption = sel.querySelector('option');
-      if (firstOption) {
-        sel.value = firstOption.value;
-        sel.dispatchEvent(new Event('change'));
-      }
-    }
 
     async function handleLogin() {
       const password = document.getElementById('adminPassword').value;
@@ -483,7 +437,6 @@
     async function showDashboard() {
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('dashboardPage').style.display = '';
-      populateDefaultProviderOptions();
       await Promise.all([loadConfig(), loadApiKeys(), loadSeo(), loadStats()]);
       updateDashboardStats();
     }
@@ -500,11 +453,6 @@
             }
           });
           renderProviders(currentProviders);
-          const savedProvider = data.data.defaultProvider || 'cloudflare';
-          DEFAULT_PROVIDER_SELECT.value = savedProvider;
-          DEFAULT_PROVIDER_SELECT.dispatchEvent(new Event('change'));
-          const savedModel = data.data.defaultModel || '';
-          DEFAULT_MODEL_SELECT.value = savedModel;
           document.getElementById('translatePrompt').value = data.data.promptTemplates?.translate || '';
           document.getElementById('detectPrompt').value = data.data.promptTemplates?.detect || '';
         }
@@ -618,7 +566,6 @@
       const formattedModels = models.slice(0, 50).map(m => ({ id: m.id, name: m.name || m.id }));
       currentProviders[provider] = { ...currentProviders[provider], models: formattedModels, enabled: true };
       renderProviders(currentProviders);
-      DEFAULT_PROVIDER_SELECT.dispatchEvent(new Event('change'));
       await saveAllProviders();
       updateDashboardStats();
     }
@@ -630,8 +577,6 @@
       });
       const body = {
         providers,
-        defaultProvider: document.getElementById('defaultProvider').value,
-        defaultModel: document.getElementById('defaultModel').value,
         promptTemplates: { translate: document.getElementById('translatePrompt').value, detect: document.getElementById('detectPrompt').value }
       };
       try { await fetch('/api/admin/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify(body) }); } catch (err) { console.error('自动保存配置失败:', err); }
@@ -687,8 +632,6 @@
       });
       const body = {
         providers,
-        defaultProvider: document.getElementById('defaultProvider').value,
-        defaultModel: document.getElementById('defaultModel').value,
         promptTemplates: { translate: document.getElementById('translatePrompt').value, detect: document.getElementById('detectPrompt').value }
       };
       try {

@@ -15,8 +15,6 @@ const DEFAULT_CONFIG = {
     tencent: { name: '腾讯混元', enabled: false, models: [] },
     custom: { name: '自定义 API', enabled: false, models: [] }
   },
-  defaultProvider: 'cloudflare',
-  defaultModel: '',
   promptTemplates: {
     translate: '',
     detect: ''
