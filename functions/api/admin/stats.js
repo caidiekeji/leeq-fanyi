@@ -23,13 +23,13 @@ export async function onRequestGet(context) {
     const key = `stats:${today}`;
     try {
       const data = await env.SETTINGS.get(key);
-      const visits = data ? JSON.parse(data) : { unique: [], total: 0 };
+      const visits = data ? JSON.parse(data) : { unique: [], total: 0, tokens: 0, translations: 0 };
       if (!visits.unique.includes(ip)) {
         visits.unique.push(ip);
       }
       visits.total += 1;
       await env.SETTINGS.put(key, JSON.stringify(visits));
-      return new Response(JSON.stringify({ code: 200, data: { unique: visits.unique.length, total: visits.total }, message: 'success' }), {
+      return new Response(JSON.stringify({ code: 200, data: { unique: visits.unique.length, total: visits.total, tokens: visits.tokens || 0, translations: visits.translations || 0 }, message: 'success' }), {
         headers: { 'Content-Type': 'application/json' }
       });
     } catch (err) {
@@ -48,20 +48,26 @@ export async function onRequestGet(context) {
   try {
     const days = parseInt(url.searchParams.get('days')) || 7;
     const stats = [];
+    let totalTokens = 0;
+    let totalTranslations = 0;
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateKey = date.toISOString().slice(0, 10);
       const key = `stats:${dateKey}`;
       const data = await env.SETTINGS.get(key);
-      const visit = data ? JSON.parse(data) : { unique: [], total: 0 };
+      const visit = data ? JSON.parse(data) : { unique: [], total: 0, tokens: 0, translations: 0 };
+      totalTokens += visit.tokens || 0;
+      totalTranslations += visit.translations || 0;
       stats.push({
         date: dateKey,
         unique: visit.unique.length,
-        total: visit.total
+        total: visit.total,
+        tokens: visit.tokens || 0,
+        translations: visit.translations || 0
       });
     }
-    return new Response(JSON.stringify({ code: 200, data: stats, message: 'success' }), {
+    return new Response(JSON.stringify({ code: 200, data: { stats, totalTokens, totalTranslations }, message: 'success' }), {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (err) {

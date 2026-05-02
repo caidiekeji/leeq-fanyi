@@ -49,6 +49,18 @@ function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName) {
   return `你是一个专业的翻译助手。将用户输入从${sourceLangName}翻译成${targetLangName}。只返回翻译结果，不要加任何解释。`;
 }
 
+async function recordStats(env, tokens) {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const key = `stats:${today}`;
+    const data = await env.SETTINGS.get(key);
+    const stats = data ? JSON.parse(data) : { unique: [], total: 0, tokens: 0, translations: 0 };
+    stats.tokens = (stats.tokens || 0) + (tokens || 0);
+    stats.translations = (stats.translations || 0) + 1;
+    await env.SETTINGS.put(key, JSON.stringify(stats));
+  } catch (e) { console.error('记录统计数据失败:', e); }
+}
+
 async function translateWithCloudflare(text, sourceLang, targetLang, model, env, promptTemplates) {
   const sourceLangName = sourceLang === 'auto' ? '自动检测' : (LANG_NAMES[sourceLang] || sourceLang);
   const targetLangName = LANG_NAMES[targetLang] || targetLang;
@@ -62,7 +74,7 @@ async function translateWithCloudflare(text, sourceLang, targetLang, model, env,
       source_lang: srcM2m,
       target_lang: tgtM2m
     });
-    return { translatedText: response.translated_text, detectedSourceLang: sourceLang === 'auto' ? null : sourceLang };
+    return { translatedText: response.translated_text, detectedSourceLang: sourceLang === 'auto' ? null : sourceLang, tokens: 0 };
   }
 
   const messages = [
@@ -70,7 +82,7 @@ async function translateWithCloudflare(text, sourceLang, targetLang, model, env,
     { role: 'user', content: text }
   ];
   const response = await env.AI.run(model || '@cf/meta/llama-3.1-8b-instruct', { messages });
-  return { translatedText: response.response, detectedSourceLang: null };
+  return { translatedText: response.response, detectedSourceLang: null, tokens: 0 };
 }
 
 async function translateWithExternal(text, sourceLang, targetLang, provider, model, apiKey, customEndpoint, promptTemplates) {
@@ -126,7 +138,8 @@ async function translateWithExternal(text, sourceLang, targetLang, provider, mod
     : data.choices?.[0]?.message?.content;
 
   if (!translatedText) throw new Error('API 返回格式异常');
-  return { translatedText, detectedSourceLang: null };
+  const tokens = data.usage?.total_tokens || 0;
+  return { translatedText, detectedSourceLang: null, tokens };
 }
 
 export async function onRequestPost(context) {
@@ -159,6 +172,8 @@ export async function onRequestPost(context) {
         keyData.apiKey, keyData.customEndpoint, promptTemplates
       );
     }
+
+    await recordTokenUsage(env, result.tokens);
 
     return jsonResponse({
       translatedText: result.translatedText,
