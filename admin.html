@@ -469,17 +469,22 @@
         list.innerHTML += `<div class="provider-group">
           <div class="provider-group-header">
             <strong>${prov.name}</strong>
-            <label class="provider-toggle">
-              <input type="checkbox" class="provider-enable-cb" data-provider="${provId}" ${prov.enabled ? 'checked' : ''}>
-              启用
-            </label>
+            <div style="display:flex;align-items:center;gap:12px">
+              <span id="testResult-${provId}" style="font-size:12px;color:var(--text-muted)"></span>
+              <button class="btn btn-primary btn-sm" onclick="handleTestAllModels('${provId}')">一键测速</button>
+              <label class="provider-toggle">
+                <input type="checkbox" class="provider-enable-cb" data-provider="${provId}" ${prov.enabled ? 'checked' : ''}>
+                启用
+              </label>
+            </div>
           </div>
           <div class="model-list">`;
         prov.models.forEach(m => {
           const enabled = prov.modelEnabled ? prov.modelEnabled.includes(m.id) : false;
-          list.innerHTML += `<label class="model-item ${enabled ? 'active' : ''}">
+          const speedInfo = m.testResult ? `<span style="font-size:11px;color:var(--primary);margin-left:4px">${m.testResult.latency}ms</span>` : '';
+          list.innerHTML += `<label class="model-item ${enabled ? 'active' : ''}" id="model-item-${provId}-${m.id.replace(/[^a-z0-9]/gi, '-')}">
             <input type="checkbox" class="model-cb" data-provider="${provId}" data-model="${m.id}" ${enabled ? 'checked' : ''}>
-            <span class="model-name">${m.name || m.id}</span>
+            <span class="model-name">${m.name || m.id}</span>${speedInfo}
           </label>`;
         });
         list.innerHTML += `</div></div>`;
@@ -580,6 +585,58 @@
         promptTemplates: { translate: document.getElementById('translatePrompt').value, detect: document.getElementById('detectPrompt').value }
       };
       try { await fetch('/api/admin/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify(body) }); } catch (err) { console.error('自动保存配置失败:', err); }
+    }
+
+    async function handleTestAllModels(providerId) {
+      const prov = currentProviders[providerId];
+      if (!prov || !prov.models || prov.models.length === 0) {
+        return showToast('该提供商暂无可用模型', 'error');
+      }
+      try {
+        const res = await fetch('/api/admin/apiKeys', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+        const data = await res.json();
+        const keyData = data.code === 200 ? data.data[providerId] : null;
+        if (!keyData || !keyData.apiKey) {
+          return showToast('请先在 API 管理中配置 API Key', 'error');
+        }
+        const apiKey = keyData.apiKey;
+        const customEndpoint = keyData.customEndpoint || '';
+        const resultEl = document.getElementById(`testResult-${providerId}`);
+        resultEl.textContent = '测试中 0/' + prov.models.length;
+        let tested = 0;
+        const total = Math.min(prov.models.length, 20);
+        for (let i = 0; i < total; i++) {
+          const model = prov.models[i];
+          try {
+            const testRes = await fetch('/api/admin/testSpeed', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+              body: JSON.stringify({ provider: providerId, model: model.id, apiKey, customEndpoint })
+            });
+            const testData = await testRes.json();
+            if (testData.code === 200) {
+              model.testResult = { latency: testData.data.latency, tokens: testData.data.tokens };
+              const itemEl = document.getElementById(`model-item-${providerId}-${model.id.replace(/[^a-z0-9]/gi, '-')}`);
+              if (itemEl) {
+                const nameSpan = itemEl.querySelector('.model-name');
+                const existingSpeed = itemEl.querySelector('.model-speed');
+                if (existingSpeed) existingSpeed.remove();
+                const speedSpan = document.createElement('span');
+                speedSpan.className = 'model-speed';
+                speedSpan.style.cssText = 'font-size:11px;color:var(--primary);margin-left:4px';
+                speedSpan.textContent = `${testData.data.latency}ms`;
+                itemEl.appendChild(speedSpan);
+              }
+            }
+          } catch (e) { console.warn(`测试模型 ${model.id} 失败:`, e.message); }
+          tested++;
+          resultEl.textContent = `测试中 ${tested}/${total}`;
+          if (i < total - 1) await new Promise(r => setTimeout(r, 1800));
+        }
+        const avgLatency = prov.models.filter(m => m.testResult).reduce((s, m) => s + m.testResult.latency, 0) / tested;
+        resultEl.textContent = `平均 ${Math.round(avgLatency)}ms`;
+        showToast(`测试完成，共测试 ${tested} 个模型`, 'success');
+      } catch (err) { showToast('测试失败: ' + err.message, 'error'); }
     }
 
     async function handleTestKey() {
