@@ -78,7 +78,7 @@ export async function onRequestGet(context) {
     const providers = config.providers || {};
     const results = [];
     const enabledProviders = Object.entries(providers)
-      .filter(([, p]) => p.enabled && apiKeys[p]?.apiKey);
+      .filter(([pId, p]) => p.enabled && apiKeys[pId]?.apiKey);
     for (const [pId] of enabledProviders) {
       const kd = apiKeys[pId];
       const result = await checkProvider(pId, kd.apiKey, kd.customEndpoint || '');

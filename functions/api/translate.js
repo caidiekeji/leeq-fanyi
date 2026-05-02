@@ -66,7 +66,7 @@ function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName) {
   return `你是一个专业的翻译助手。将用户输入从${sourceLangName}翻译成${targetLangName}。只返回翻译结果，不要加任何解释。`;
 }
 
-async function recordStats(env, tokens) {
+async function recordStats(env, ip, tokens) {
   try {
     const today = new Date().toISOString().slice(0, 10);
     const key = `stats:${today}`;
@@ -74,8 +74,13 @@ async function recordStats(env, tokens) {
     const stats = data ? JSON.parse(data) : { unique: [], total: 0, tokens: 0, translations: 0 };
     stats.tokens = (stats.tokens || 0) + (tokens || 0);
     stats.translations = (stats.translations || 0) + 1;
+    stats.total = (stats.total || 0) + 1;
+    if (ip && ip !== 'unknown' && !stats.unique.includes(ip)) {
+      stats.unique.push(ip);
+    }
+    if (stats.unique.length > 10000) stats.unique.splice(0, stats.unique.length - 10000);
     await env.SETTINGS.put(key, JSON.stringify(stats));
-  } catch (e) { console.error('记录统计数据失败:', e); }
+  } catch (e) { /* 静默失败 */ }
 }
 
 async function logAccess(env, ip, sourceLang, targetLang, provider, charCount, success, latency, country) {
@@ -97,7 +102,7 @@ async function logAccess(env, ip, sourceLang, targetLang, provider, charCount, s
     });
     if (logs.length > 500) logs.splice(0, logs.length - 500);
     await env.SETTINGS.put(key, JSON.stringify(logs));
-  } catch (e) { console.error('记录访问日志失败:', e); }
+  } catch (e) { /* 访问日志记录失败，静默处理 */ }
 }
 
 async function translateWithCloudflare(text, sourceLang, targetLang, model, env, promptTemplates) {
@@ -322,7 +327,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    await recordStats(env, result.tokens);
+    await recordStats(env, clientIp, result.tokens);
 
     // 写入翻译缓存（24小时过期）
     try {
@@ -361,7 +366,7 @@ export async function onRequestPost(context) {
       });
       if (errorLogs.length > 200) errorLogs.splice(0, errorLogs.length - 200);
       await env.SETTINGS.put(errorKey, JSON.stringify(errorLogs));
-    } catch (logErr) { console.error('记录错误日志失败:', logErr); }
+    } catch (logErr) { /* 错误日志记录失败，静默处理 */ }
     return errorResponse(err.message || '翻译失败', 500);
   }
 }
