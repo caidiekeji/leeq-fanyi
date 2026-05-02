@@ -416,46 +416,85 @@
   gap: 10px;
 }
 
-.provider-item {
+.empty-models {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+.provider-group {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.provider-group:hover { border-color: var(--primary); }
+
+.provider-group-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 14px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  transition: border-color var(--transition-fast);
+  background: rgba(19,135,192,0.04);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-.provider-item:hover { border-color: var(--primary); }
-
-.provider-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.provider-name {
+.provider-group-header strong {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.provider-models {
+.provider-toggle {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
 }
 
-.model-tag {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 10px;
+.model-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 6px;
+  padding: 10px 14px;
+}
+
+.model-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.model-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.model-item.active {
   background: rgba(19,135,192,0.12);
   color: var(--primary);
-  font-weight: 500;
-  white-space: nowrap;
+}
+
+.model-item input[type="checkbox"] {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.model-name {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 11px;
+  word-break: break-all;
 }
 
 /* Toggle Switch */
