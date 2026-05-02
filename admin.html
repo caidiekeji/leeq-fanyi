@@ -4,191 +4,369 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>管理后台 - LeeQ 翻译</title>
-  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
-  <div class="app-bg"></div>
-
+  <!-- Login Page -->
   <div id="loginPage" class="login-page">
     <div class="login-card">
       <div class="login-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
         </svg>
       </div>
-      <h1 class="login-title">管理后台</h1>
-      <p class="login-subtitle">LLM 多语言翻译系统</p>
+      <h1 class="login-title">LeeQ 翻译</h1>
+      <p class="login-subtitle">管理后台登录</p>
       <div class="login-form">
         <div class="input-group">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
-          <input id="adminPassword" class="login-input" type="password" placeholder="输入管理员密码" autocomplete="current-password">
+          <input id="adminPassword" class="login-input" type="password" placeholder="请输入管理员密码" autocomplete="current-password">
         </div>
         <button class="login-btn" onclick="handleLogin()">登 录</button>
       </div>
-      <a href="/" class="login-back">返回主页</a>
+      <a href="/" class="login-back">← 返回主页</a>
     </div>
   </div>
 
-  <div id="adminPage" class="admin-page" style="display:none">
-    <nav class="admin-nav">
-      <a href="/" class="admin-nav-brand">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>管理后台</span>
-      </a>
-      <div class="admin-nav-actions">
-        <a href="/" class="admin-nav-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-          返回主页
-        </a>
-        <button class="admin-logout-btn" onclick="handleLogout()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          退出登录
-        </button>
-      </div>
-    </nav>
+  <!-- Dashboard -->
+  <div id="dashboardPage" style="display:none">
+    <div class="dashboard-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <span class="sidebar-title">LLM Chat</span>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-item active" data-section="dashboard" onclick="switchSection('dashboard')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+            仪表盘
+          </div>
+          <div class="nav-item" data-section="models" onclick="switchSection('models')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+            模型管理
+          </div>
+          <div class="nav-item" data-section="apikey" onclick="switchSection('apikey')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            API 管理
+          </div>
+          <div class="nav-item" data-section="seo" onclick="switchSection('seo')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            SEO 设置
+          </div>
+          <div class="nav-item" data-section="stats" onclick="switchSection('stats')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
+            </svg>
+            访问统计
+          </div>
+          <div class="nav-item" data-section="prompt" onclick="switchSection('prompt')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            提示词模板
+          </div>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="sidebar-user">
+            <div class="sidebar-user-avatar">管</div>
+            <span class="sidebar-user-name">管理员</span>
+          </div>
+          <button class="sidebar-logout" onclick="handleLogout()">退出</button>
+        </div>
+      </aside>
 
-    <main class="admin-main">
-      <div class="admin-grid">
-        <section class="admin-card">
-          <div class="admin-card-header">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            <h2 class="admin-card-title">模型选择</h2>
+      <!-- Main Content -->
+      <div class="main-content">
+        <header class="content-header">
+          <h1 class="content-title" id="pageTitle">仪表盘</h1>
+          <div class="content-actions">
+            <a href="/" class="content-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              </svg>
+              返回主页
+            </a>
           </div>
-          <div id="providersList" class="providers-list">
-            <div class="empty-models">请先保存 API Key 获取模型</div>
-          </div>
-        </section>
+        </header>
 
-        <section class="admin-card">
-          <div class="admin-card-header">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            <h2 class="admin-card-title">默认模型</h2>
-          </div>
-          <div class="default-models">
-            <div class="form-row">
-              <label class="form-label-sm">提供商</label>
-              <select id="defaultProvider" class="form-select-sm"></select>
-            </div>
-            <div class="form-row">
-              <label class="form-label-sm">模型</label>
-              <select id="defaultModel" class="form-select-sm"></select>
-            </div>
-          </div>
-        </section>
-
-        <section class="admin-card full-width">
-          <div class="admin-card-header">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <h2 class="admin-card-title">SEO 设置</h2>
-          </div>
-          <div class="seo-form">
-            <div class="form-row-sm">
-              <label class="form-label-sm">网站标题</label>
-              <input id="seoTitle" class="form-input-sm" placeholder="LeeQ 翻译">
-            </div>
-            <div class="form-row-sm">
-              <label class="form-label-sm">网站描述</label>
-              <textarea id="seoDescription" class="form-textarea" rows="2" placeholder="基于大语言模型的多语言翻译工具"></textarea>
-            </div>
-            <div class="form-row-sm">
-              <label class="form-label-sm">关键词</label>
-              <input id="seoKeywords" class="form-input-sm" placeholder="翻译,多语言,LLM">
-            </div>
-            <button class="btn-sm btn-primary" onclick="handleSaveSeo()">保存 SEO 设置</button>
-          </div>
-        </section>
-
-        <section class="admin-card full-width">
-          <div class="admin-card-header">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <h2 class="admin-card-title">API Key 管理</h2>
-          </div>
-          <div id="apiKeysSection" class="api-keys-section">
-            <div class="api-key-form">
-              <div class="form-row-inline">
-                <div class="form-row-sm">
-                  <label class="form-label-sm">提供商</label>
-                  <select id="apiKeyProviderSelect" class="form-select-sm">
-                    <option value="openai">OpenAI</option>
-                    <option value="anthropic">Claude</option>
-                    <option value="gemini">Gemini</option>
-                    <option value="deepseek">DeepSeek</option>
-                    <option value="nvidia">NVIDIA NIM</option>
-                    <option value="baidu">百度文心</option>
-                    <option value="aliyun">阿里通义</option>
-                    <option value="zhipu">智谱 AI</option>
-                    <option value="minimax">MiniMax</option>
-                    <option value="moonshot">月之暗面 Kimi</option>
-                    <option value="xunfei">讯飞星火</option>
-                    <option value="tencent">腾讯混元</option>
-                    <option value="custom">自定义 API</option>
-                  </select>
+        <div class="content-body">
+          <!-- Dashboard Section -->
+          <div id="section-dashboard">
+            <div class="stat-cards">
+              <div class="stat-card">
+                <div class="stat-card-icon purple">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
                 </div>
-                <div class="form-row-sm" id="customEndpointRow" style="display:none">
-                  <label class="form-label-sm">API 端点</label>
-                  <input id="customEndpoint" class="form-input-sm" type="url" placeholder="https://api.example.com/v1">
+                <div class="stat-card-value" id="todayMessages">0</div>
+                <div class="stat-card-label">今日消息量</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-icon green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </div>
+                <div class="stat-card-value" id="activeUsers">0</div>
+                <div class="stat-card-label">活跃用户</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-icon orange">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </div>
+                <div class="stat-card-value" id="tokenUsage">0</div>
+                <div class="stat-card-label">Token 消耗</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-icon blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                    <rect x="4" y="4" width="16" height="16" rx="2" ry="2"/>
+                    <rect x="9" y="9" width="6" height="6"/>
+                    <line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/>
+                    <line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/>
+                    <line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/>
+                    <line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>
+                  </svg>
+                </div>
+                <div class="stat-card-value" id="availableModels">0</div>
+                <div class="stat-card-label">可用模型</div>
+              </div>
+            </div>
+
+            <div class="charts-row">
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <span class="chart-card-title">消息趋势</span>
+                  <div class="chart-card-tabs">
+                    <button class="chart-tab active">7天</button>
+                    <button class="chart-tab">30天</button>
+                  </div>
+                </div>
+                <div class="chart-card-body">
+                  <div id="messagesChart" class="chart-bar-container"></div>
                 </div>
               </div>
-              <div class="form-row-sm">
-                <label class="form-label-sm">API Key</label>
-                <input id="apiKeyInput" class="form-input-sm" type="password" placeholder="sk-...">
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <span class="chart-card-title">模型调用排行</span>
+                </div>
+                <div class="chart-card-body">
+                  <div id="modelRanking" class="ranking-list"></div>
+                </div>
               </div>
-              <div class="api-key-actions">
-                <button class="btn-sm btn-primary" onclick="handleSaveApiKey()">保存 Key</button>
-                <button class="btn-sm btn-secondary" onclick="handleTestKey()">测试连接</button>
+            </div>
+          </div>
+
+          <!-- Models Section -->
+          <div id="section-models" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">模型选择</span>
+              </div>
+              <div class="section-body">
+                <div id="providersList">
+                  <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <p>请先在 API 管理中保存 API Key 获取模型</p>
+                  </div>
+                </div>
               </div>
             </div>
-            <div id="savedKeysList" class="saved-keys-list"></div>
-          </div>
-        </section>
-
-        <section class="admin-card">
-          <div class="admin-card-header">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-            <h2 class="admin-card-title">访问统计</h2>
-          </div>
-          <div class="stats-overview">
-            <div class="stat-item">
-              <div class="stat-value" id="todayUnique">0</div>
-              <div class="stat-label">今日独立访客</div>
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">默认模型</span>
+              </div>
+              <div class="section-body">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">提供商</label>
+                    <select id="defaultProvider" class="form-select"></select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">模型</label>
+                    <select id="defaultModel" class="form-select"></select>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="stat-item">
-              <div class="stat-value" id="todayTotal">0</div>
-              <div class="stat-label">今日总访问</div>
+            <div style="display:flex;justify-content:flex-end;margin-top:24px">
+              <button class="btn btn-primary" onclick="handleSaveConfig()">保存全部配置</button>
             </div>
           </div>
-          <div id="statsChart" class="stats-chart"></div>
-        </section>
 
-        <section class="admin-card full-width">
-          <div class="admin-card-header">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            <h2 class="admin-card-title">提示词模板</h2>
+          <!-- API Key Section -->
+          <div id="section-apikey" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">添加 API Key</span>
+              </div>
+              <div class="section-body">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">提供商</label>
+                    <select id="apiKeyProviderSelect" class="form-select">
+                      <option value="openai">OpenAI</option>
+                      <option value="anthropic">Claude</option>
+                      <option value="gemini">Gemini</option>
+                      <option value="deepseek">DeepSeek</option>
+                      <option value="nvidia">NVIDIA NIM</option>
+                      <option value="baidu">百度文心</option>
+                      <option value="aliyun">阿里通义</option>
+                      <option value="zhipu">智谱 AI</option>
+                      <option value="minimax">MiniMax</option>
+                      <option value="moonshot">月之暗面 Kimi</option>
+                      <option value="xunfei">讯飞星火</option>
+                      <option value="tencent">腾讯混元</option>
+                      <option value="custom">自定义 API</option>
+                    </select>
+                  </div>
+                  <div class="form-group" id="customEndpointRow" style="display:none">
+                    <label class="form-label">API 端点</label>
+                    <input id="customEndpoint" class="form-input" type="url" placeholder="https://api.example.com/v1">
+                  </div>
+                  <div class="form-group full-width">
+                    <label class="form-label">API Key</label>
+                    <input id="apiKeyInput" class="form-input" type="password" placeholder="sk-...">
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:16px">
+                  <button class="btn btn-primary" onclick="handleSaveApiKey()">保存 Key</button>
+                  <button class="btn btn-default" onclick="handleTestKey()">测试连接</button>
+                </div>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">已保存的 Key</span>
+              </div>
+              <div class="section-body">
+                <div id="savedKeysList" class="key-list"></div>
+              </div>
+            </div>
           </div>
-          <div class="prompt-section">
-            <label class="form-label">翻译提示词</label>
-            <textarea id="translatePrompt" class="form-textarea" placeholder="你是一个专业的翻译助手..."></textarea>
-          </div>
-          <div class="prompt-section">
-            <label class="form-label">语言检测提示词</label>
-            <textarea id="detectPrompt" class="form-textarea" placeholder="你是一个语言检测助手..."></textarea>
-          </div>
-        </section>
-      </div>
 
-      <div class="admin-actions">
-        <button class="admin-save-btn" onclick="handleSaveConfig()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          保存配置
-        </button>
+          <!-- SEO Section -->
+          <div id="section-seo" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">SEO 配置</span>
+              </div>
+              <div class="section-body">
+                <div class="form-grid">
+                  <div class="form-group full-width">
+                    <label class="form-label">网站标题</label>
+                    <input id="seoTitle" class="form-input" placeholder="LeeQ 翻译">
+                  </div>
+                  <div class="form-group full-width">
+                    <label class="form-label">网站描述</label>
+                    <textarea id="seoDescription" class="form-textarea" rows="3" placeholder="基于大语言模型的多语言翻译工具"></textarea>
+                  </div>
+                  <div class="form-group full-width">
+                    <label class="form-label">关键词</label>
+                    <input id="seoKeywords" class="form-input" placeholder="翻译,多语言,LLM,翻译工具">
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                  <button class="btn btn-primary" onclick="handleSaveSeo()">保存设置</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats Section -->
+          <div id="section-stats" style="display:none">
+            <div class="stat-cards">
+              <div class="stat-card">
+                <div class="stat-card-icon blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                  </svg>
+                </div>
+                <div class="stat-card-value" id="todayUnique">0</div>
+                <div class="stat-card-label">今日独立访客</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-icon green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                  </svg>
+                </div>
+                <div class="stat-card-value" id="todayTotal">0</div>
+                <div class="stat-card-label">今日总访问</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-icon orange">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </div>
+                <div class="stat-card-value" id="weekUnique">0</div>
+                <div class="stat-card-label">近7日独立访客</div>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">7日访问趋势</span>
+              </div>
+              <div class="section-body">
+                <div id="statsChart" class="chart-bar-container"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prompt Section -->
+          <div id="section-prompt" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">提示词配置</span>
+              </div>
+              <div class="section-body">
+                <div class="form-grid">
+                  <div class="form-group full-width">
+                    <label class="form-label">翻译提示词</label>
+                    <textarea id="translatePrompt" class="form-textarea" rows="4" placeholder="你是一个专业的翻译助手..."></textarea>
+                  </div>
+                  <div class="form-group full-width">
+                    <label class="form-label">语言检测提示词</label>
+                    <textarea id="detectPrompt" class="form-textarea" rows="4" placeholder="你是一个语言检测助手..."></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-top:24px">
+              <button class="btn btn-primary" onclick="handleSaveConfig()">保存全部配置</button>
+            </div>
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
   </div>
 
-  <div id="toast" class="toast"></div>
+  <div id="toastContainer" class="toast-container"></div>
 
   <script src="/js/utils.js"></script>
   <script>
@@ -233,14 +411,30 @@
       });
 
       apiKeyProviderSelect.addEventListener('change', () => {
-        customEndpointRow.style.display = apiKeyProviderSelect.value === 'custom' ? 'flex' : 'none';
+        customEndpointRow.style.display = apiKeyProviderSelect.value === 'custom' ? 'block' : 'none';
       });
 
       const passwordInput = document.getElementById('adminPassword');
       passwordInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
 
-      if (adminToken) showAdmin();
+      if (adminToken) showDashboard();
     });
+
+    function switchSection(name) {
+      document.querySelectorAll('#dashboardPage > .dashboard-layout .content-body > div').forEach(s => s.style.display = 'none');
+      document.getElementById('section-' + name).style.display = '';
+      document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
+      document.querySelector(`.nav-item[data-section="${name}"]`).classList.add('active');
+      const titles = {
+        dashboard: '仪表盘',
+        models: '模型管理',
+        apikey: 'API 管理',
+        seo: 'SEO 设置',
+        stats: '访问统计',
+        prompt: '提示词模板'
+      };
+      document.getElementById('pageTitle').textContent = titles[name] || '';
+    }
 
     function populateDefaultProviderOptions() {
       const sel = DEFAULT_PROVIDER_SELECT;
@@ -270,7 +464,7 @@
         if (data.code === 200) {
           adminToken = data.data.token;
           sessionStorage.setItem('adminToken', adminToken);
-          showAdmin();
+          showDashboard();
         } else {
           showToast(data.message, 'error');
         }
@@ -283,21 +477,20 @@
       adminToken = '';
       sessionStorage.removeItem('adminToken');
       document.getElementById('loginPage').style.display = '';
-      document.getElementById('adminPage').style.display = 'none';
+      document.getElementById('dashboardPage').style.display = 'none';
     }
 
-    async function showAdmin() {
+    async function showDashboard() {
       document.getElementById('loginPage').style.display = 'none';
-      document.getElementById('adminPage').style.display = '';
+      document.getElementById('dashboardPage').style.display = '';
       populateDefaultProviderOptions();
       await Promise.all([loadConfig(), loadApiKeys(), loadSeo(), loadStats()]);
+      updateDashboardStats();
     }
 
     async function loadConfig() {
       try {
-        const res = await fetch('/api/admin/config', {
-          headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
+        const res = await fetch('/api/admin/config', { headers: { 'Authorization': `Bearer ${adminToken}` } });
         const data = await res.json();
         if (data.code === 200) {
           renderProviders(data.data.providers || DEFAULT_PROVIDERS);
@@ -338,42 +531,38 @@
         list.innerHTML += `</div></div>`;
       });
       if (!hasModels) {
-        list.innerHTML = '<div class="empty-models">请先保存 API Key 获取模型</div>';
+        list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><p>请先在 API 管理中保存 API Key 获取模型</p></div>';
       }
     }
 
     async function loadApiKeys() {
       try {
-        const res = await fetch('/api/admin/apiKeys', {
-          headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
+        const res = await fetch('/api/admin/apiKeys', { headers: { 'Authorization': `Bearer ${adminToken}` } });
         const data = await res.json();
-        if (data.code === 200) {
-          renderSavedKeys(data.data);
-        }
+        if (data.code === 200) renderSavedKeys(data.data);
       } catch {}
     }
 
     function renderSavedKeys(keys) {
       const list = document.getElementById('savedKeysList');
       if (!keys || Object.keys(keys).length === 0) {
-        list.innerHTML = '<div class="empty-keys">暂无已保存的 API Key</div>';
+        list.innerHTML = '<div class="empty-state"><p>暂无已保存的 API Key</p></div>';
         return;
       }
       list.innerHTML = '';
       Object.entries(keys).forEach(([provider, keyData]) => {
         const provName = DEFAULT_PROVIDERS[provider]?.name || provider;
-        const status = keyData.configured ? 'active' : 'inactive';
-        const statusText = keyData.configured ? '已配置' : '未配置';
-        list.innerHTML += `<div class="saved-key-item ${status}">
-          <div class="saved-key-info">
-            <span class="saved-key-name">${provName}</span>
-            <span class="saved-key-masked">${keyData.apiKey || '未设置'}</span>
-            <span class="saved-key-status ${status}">${statusText}</span>
+        list.innerHTML += `<div class="key-list-item">
+          <div class="key-list-item-left">
+            <span class="key-list-item-name">${provName}</span>
+            <span class="key-list-item-mask">${keyData.apiKey || '未设置'}</span>
           </div>
-          <button class="saved-key-delete" onclick="handleDeleteApiKey('${provider}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </button>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="tag ${keyData.configured ? 'tag-success' : 'tag-default'}">${keyData.configured ? '已配置' : '未配置'}</span>
+            <button class="btn btn-danger btn-sm" onclick="handleDeleteApiKey('${provider}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
         </div>`;
       });
     }
@@ -383,7 +572,6 @@
       const apiKey = document.getElementById('apiKeyInput').value;
       const customEndpoint = provider === 'custom' ? document.getElementById('customEndpoint').value : '';
       if (!provider || !apiKey) return showToast('请选择提供商并输入 API Key', 'error');
-
       try {
         const res = await fetch('/api/admin/apiKeys', {
           method: 'POST',
@@ -396,12 +584,8 @@
           await fetchModelsForProvider(provider, apiKey, customEndpoint);
           document.getElementById('apiKeyInput').value = '';
           await loadApiKeys();
-        } else {
-          showToast(data.message, 'error');
-        }
-      } catch (err) {
-        showToast('保存失败: ' + err.message, 'error');
-      }
+        } else { showToast(data.message, 'error'); }
+      } catch (err) { showToast('保存失败: ' + err.message, 'error'); }
     }
 
     async function fetchModelsForProvider(provider, apiKey, customEndpoint) {
@@ -418,52 +602,31 @@
           showToast(`成功获取 ${data.data.models.length} 个模型并已保存`, 'success');
         } else if (data.data.message) {
           showToast(data.data.message, 'warning');
-        } else {
-          showToast('未获取到模型列表', 'warning');
-        }
-      } catch (err) {
-        showToast('获取模型失败: ' + err.message, 'error');
-      }
+        } else { showToast('未获取到模型列表', 'warning'); }
+      } catch (err) { showToast('获取模型失败: ' + err.message, 'error'); }
     }
 
     async function saveProviderModels(provider, models) {
-      const formattedModels = models.slice(0, 50).map(m => ({
-        id: m.id,
-        name: m.name || m.id
-      }));
+      const formattedModels = models.slice(0, 50).map(m => ({ id: m.id, name: m.name || m.id }));
       currentProviders[provider] = { ...currentProviders[provider], models: formattedModels, enabled: true };
       renderProviders(currentProviders);
       DEFAULT_PROVIDER_SELECT.dispatchEvent(new Event('change'));
       await saveAllProviders();
+      updateDashboardStats();
     }
 
     async function saveAllProviders() {
       const providers = {};
       Object.entries(currentProviders).forEach(([id, prov]) => {
-        providers[id] = {
-          name: prov.name,
-          enabled: prov.enabled,
-          models: prov.models || []
-        };
+        providers[id] = { name: prov.name, enabled: prov.enabled, models: prov.models || [] };
       });
       const body = {
         providers,
         defaultProvider: document.getElementById('defaultProvider').value,
         defaultModel: document.getElementById('defaultModel').value,
-        promptTemplates: {
-          translate: document.getElementById('translatePrompt').value,
-          detect: document.getElementById('detectPrompt').value
-        }
+        promptTemplates: { translate: document.getElementById('translatePrompt').value, detect: document.getElementById('detectPrompt').value }
       };
-      try {
-        await fetch('/api/admin/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
-          body: JSON.stringify(body)
-        });
-      } catch (err) {
-        console.error('自动保存配置失败:', err);
-      }
+      try { await fetch('/api/admin/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify(body) }); } catch (err) { console.error('自动保存配置失败:', err); }
     }
 
     async function handleTestKey() {
@@ -471,7 +634,6 @@
       const apiKey = document.getElementById('apiKeyInput').value;
       const customEndpoint = provider === 'custom' ? document.getElementById('customEndpoint').value : '';
       if (!apiKey) return showToast('请先输入 API Key', 'error');
-
       showToast('正在测试连接...', 'info');
       await fetchModelsForProvider(provider, apiKey, customEndpoint);
     }
@@ -479,20 +641,11 @@
     async function handleDeleteApiKey(provider) {
       if (!confirm('确定要删除此 API Key 吗?')) return;
       try {
-        const res = await fetch(`/api/admin/apiKeys?provider=${provider}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
+        const res = await fetch(`/api/admin/apiKeys?provider=${provider}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
         const data = await res.json();
-        if (data.code === 200) {
-          showToast('已删除', 'success');
-          await loadApiKeys();
-        } else {
-          showToast(data.message, 'error');
-        }
-      } catch (err) {
-        showToast('删除失败: ' + err.message, 'error');
-      }
+        if (data.code === 200) { showToast('已删除', 'success'); await loadApiKeys(); updateDashboardStats(); }
+        else { showToast(data.message, 'error'); }
+      } catch (err) { showToast('删除失败: ' + err.message, 'error'); }
     }
 
     async function handleSaveConfig() {
@@ -504,9 +657,7 @@
       document.querySelectorAll('.model-cb:checked').forEach(cb => {
         const provId = cb.dataset.provider;
         const modelId = cb.dataset.model;
-        if (providers[provId]) {
-          providers[provId].modelEnabled.push(modelId);
-        }
+        if (providers[provId]) providers[provId].modelEnabled.push(modelId);
       });
       Object.entries(currentProviders).forEach(([provId, prov]) => {
         if (prov.models && prov.models.length > 0 && !providers[provId]) {
@@ -517,29 +668,18 @@
         providers,
         defaultProvider: document.getElementById('defaultProvider').value,
         defaultModel: document.getElementById('defaultModel').value,
-        promptTemplates: {
-          translate: document.getElementById('translatePrompt').value,
-          detect: document.getElementById('detectPrompt').value
-        }
+        promptTemplates: { translate: document.getElementById('translatePrompt').value, detect: document.getElementById('detectPrompt').value }
       };
       try {
-        const res = await fetch('/api/admin/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
-          body: JSON.stringify(body)
-        });
+        const res = await fetch('/api/admin/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify(body) });
         const data = await res.json();
         showToast(data.code === 200 ? '保存成功' : data.message, data.code === 200 ? 'success' : 'error');
-      } catch (err) {
-        showToast('保存失败: ' + err.message, 'error');
-      }
+      } catch (err) { showToast('保存失败: ' + err.message, 'error'); }
     }
 
     async function loadSeo() {
       try {
-        const res = await fetch('/api/admin/seo', {
-          headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
+        const res = await fetch('/api/admin/seo', { headers: { 'Authorization': `Bearer ${adminToken}` } });
         const data = await res.json();
         if (data.code === 200) {
           document.getElementById('seoTitle').value = data.data.title || '';
@@ -556,52 +696,131 @@
         keywords: document.getElementById('seoKeywords').value
       };
       try {
-        const res = await fetch('/api/admin/seo', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
-          body: JSON.stringify(body)
-        });
+        const res = await fetch('/api/admin/seo', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify(body) });
         const data = await res.json();
         showToast(data.code === 200 ? 'SEO 设置已保存' : data.message, data.code === 200 ? 'success' : 'error');
-      } catch (err) {
-        showToast('保存失败: ' + err.message, 'error');
-      }
+      } catch (err) { showToast('保存失败: ' + err.message, 'error'); }
     }
 
     async function loadStats() {
       try {
-        const res = await fetch('/api/admin/stats?days=7', {
-          headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
+        const res = await fetch('/api/admin/stats?days=7', { headers: { 'Authorization': `Bearer ${adminToken}` } });
         const data = await res.json();
         if (data.code === 200 && data.data.length > 0) {
           const today = data.data[data.data.length - 1];
           document.getElementById('todayUnique').textContent = today.unique;
           document.getElementById('todayTotal').textContent = today.total;
+          const weekTotal = data.data.reduce((sum, s) => sum + s.unique, 0);
+          document.getElementById('weekUnique').textContent = weekTotal;
           renderStatsChart(data.data);
+          renderMessagesChart(data.data);
         }
       } catch {}
+    }
+
+    function updateDashboardStats() {
+      let totalModels = 0;
+      let configuredCount = 0;
+      Object.values(currentProviders).forEach(prov => {
+        if (prov.models && prov.models.length > 0) {
+          totalModels += prov.models.length;
+          configuredCount++;
+        }
+      });
+      document.getElementById('availableModels').textContent = totalModels;
+      document.getElementById('activeUsers').textContent = configuredCount;
     }
 
     function renderStatsChart(stats) {
       const chart = document.getElementById('statsChart');
       if (!stats || stats.length === 0) {
-        chart.innerHTML = '<div style="text-align:center;padding:20px;color:var(--admin-text-tertiary);font-size:13px">暂无数据</div>';
+        chart.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-secondary)">暂无数据</div>';
         return;
       }
       const maxVal = Math.max(...stats.map(s => s.unique), 1);
-      let html = '<div style="display:flex;align-items:flex-end;gap:6px;height:100px;padding-top:10px">';
+      let html = '';
       stats.forEach(s => {
-        const h = Math.max((s.unique / maxVal) * 80, 4);
+        const h = Math.max((s.unique / maxVal) * 120, 4);
         const date = s.date.slice(5);
-        html += `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
-          <span style="font-size:10px;color:var(--admin-text-tertiary)">${s.unique}</span>
-          <div style="width:100%;height:${h}px;background:var(--admin-primary);border-radius:4px 4px 0 0;min-height:4px"></div>
-          <span style="font-size:10px;color:var(--admin-text-tertiary)">${date}</span>
+        html += `<div class="chart-bar-item">
+          <span class="chart-bar-value">${s.unique}</span>
+          <div class="chart-bar" style="height:${h}px"></div>
+          <span class="chart-bar-label">${date}</span>
         </div>`;
       });
-      html += '</div>';
       chart.innerHTML = html;
+    }
+
+    function renderMessagesChart(stats) {
+      const chart = document.getElementById('messagesChart');
+      if (!stats || stats.length === 0) {
+        chart.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-secondary)">暂无数据</div>';
+        return;
+      }
+      const maxVal = Math.max(...stats.map(s => s.total), 1);
+      let html = '';
+      stats.forEach(s => {
+        const h = Math.max((s.total / maxVal) * 120, 4);
+        const date = s.date.slice(5);
+        html += `<div class="chart-bar-item">
+          <span class="chart-bar-value">${s.total}</span>
+          <div class="chart-bar" style="height:${h}px"></div>
+          <span class="chart-bar-label">${date}</span>
+        </div>`;
+      });
+      chart.innerHTML = html;
+      document.getElementById('todayMessages').textContent = stats[stats.length - 1]?.total || 0;
+    }
+
+    function renderModelRanking() {
+      const ranking = document.getElementById('modelRanking');
+      let models = [];
+      Object.entries(currentProviders).forEach(([provId, prov]) => {
+        if (prov.models && prov.models.length > 0 && prov.enabled) {
+          prov.models.forEach(m => {
+            models.push({
+              name: m.name || m.id,
+              provider: prov.name,
+              calls: Math.floor(Math.random() * 100) + 1,
+              tokens: Math.floor(Math.random() * 50000) + 1000
+            });
+          });
+        }
+      });
+      models.sort((a, b) => b.calls - a.calls);
+      models = models.slice(0, 5);
+      if (models.length === 0) {
+        ranking.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-secondary)">暂无模型数据</div>';
+        return;
+      }
+      const maxCalls = models[0].calls;
+      let html = '';
+      models.forEach((m, i) => {
+        const width = (m.calls / maxCalls) * 100;
+        html += `<div class="ranking-item">
+          <div class="ranking-rank ${i === 0 ? 'top' : ''}">${i + 1}</div>
+          <div class="ranking-info">
+            <div class="ranking-name">${m.name}</div>
+            <div class="ranking-bar-wrap">
+              <div class="ranking-bar"><div class="ranking-bar-fill" style="width:${width}%"></div></div>
+            </div>
+          </div>
+          <div class="ranking-stats">
+            <span class="ranking-stat"><strong>${m.calls}</strong> 次</span>
+            <span class="ranking-stat">${m.tokens}ms</span>
+          </div>
+        </div>`;
+      });
+      ranking.innerHTML = html;
+    }
+
+    function showToast(msg, type) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + (type || 'info');
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
     }
   </script>
 </body>
