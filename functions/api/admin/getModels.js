@@ -77,12 +77,22 @@ export async function onRequestPost(context) {
     });
   }
   try {
-    const { provider, apiKey, customEndpoint } = await request.json();
-    if (!provider || !apiKey) {
-      return new Response(JSON.stringify({ code: 400, data: null, message: '参数不完整' }), {
+    const { provider } = await request.json();
+    if (!provider) {
+      return new Response(JSON.stringify({ code: 400, data: null, message: '缺少 provider 参数' }), {
         status: 400, headers: { 'Content-Type': 'application/json' }
       });
     }
+
+    const keysData = await env.SETTINGS.get('admin:apiKeys');
+    const keys = keysData ? JSON.parse(keysData) : {};
+    const apiKey = keys[provider]?.apiKey;
+    if (!apiKey) {
+      return new Response(JSON.stringify({ code: 400, data: null, message: `未配置 ${provider} 的 API Key` }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    const customEndpoint = keys[provider]?.customEndpoint || '';
 
     const result = await fetchModels(provider, apiKey, customEndpoint);
     if (!result) {

@@ -95,14 +95,24 @@ export async function onRequestPost(context) {
   }
 
   try {
-    const { provider, model, apiKey, customEndpoint } = await request.json();
-    if (!provider || !model || !apiKey) {
-      return new Response(JSON.stringify({ code: 400, data: null, message: '缺少必要参数' }), {
+    const { provider, model } = await request.json();
+    if (!provider || !model) {
+      return new Response(JSON.stringify({ code: 400, data: null, message: '缺少 provider 或 model 参数' }), {
         status: 400, headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    const result = await testModelSpeed(provider, model, apiKey, customEndpoint);
+    const keysData = await env.SETTINGS.get('admin:apiKeys');
+    const keys = keysData ? JSON.parse(keysData) : {};
+    const realKey = keys[provider]?.apiKey;
+    if (!realKey) {
+      return new Response(JSON.stringify({ code: 400, data: null, message: `未配置 ${provider} 的 API Key` }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    const customEndpoint = keys[provider]?.customEndpoint || '';
+
+    const result = await testModelSpeed(provider, model, realKey, customEndpoint);
     return new Response(JSON.stringify({ code: 200, data: result, message: '测试成功' }), {
       headers: { 'Content-Type': 'application/json' }
     });
