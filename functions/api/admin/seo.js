@@ -9,9 +9,9 @@ function verifyToken(request) {
 }
 
 const DEFAULT_SEO = {
-  title: 'LeeQ 翻译',
-  description: '基于大语言模型的多语言翻译工具，支持20+种语言互译',
-  keywords: '翻译,多语言,LLM,翻译工具,LeeQ',
+  title: 'LeeQ 翻译 - 基于大语言模型的智能多语言翻译工具',
+  description: 'LeeQ 翻译是一款基于大语言模型（LLM）的智能多语言翻译工具。支持 20+ 种语言互译，智能语言检测，格式完美保留，为您提供快速、精准、专业的翻译服务。',
+  keywords: 'LeeQ 翻译，在线翻译，多语言翻译，LLM 翻译，大语言模型翻译，智能翻译，AI 翻译，格式保留翻译，免费翻译工具，文本翻译，语言互译',
   ogImage: ''
 };
 
