@@ -56,14 +56,25 @@ function simpleHash(str) {
   return Math.abs(hash).toString(16);
 }
 
-function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName) {
+function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName, mode) {
   const customPrompt = promptTemplates?.translate;
   if (customPrompt) {
     return customPrompt
       .replace(/\[{source_lang}\]/g, sourceLangName)
       .replace(/\[{target_lang}\]/g, targetLangName);
   }
-  return `你是一个专业的翻译助手。将用户输入从${sourceLangName}翻译成${targetLangName}。只返回翻译结果，不要加任何解释。`;
+
+  let base = `你是一个专业的翻译助手。将用户输入从${sourceLangName}翻译成${targetLangName}。只返回翻译结果，不要加任何解释。`;
+
+  if (mode === 'markdown') {
+    base += '\n\n【重要】用户内容包含Markdown格式（标题、列表、代码块、链接、加粗等标记），翻译时必须完整保留所有Markdown语法标记不变，只翻译纯文本部分的内容。绝对不能输出或复制任何指令文字。';
+  } else if (mode === 'html') {
+    base += '\n\n【重要】用户内容包含HTML标签，翻译时必须保留所有HTML标签及其属性完全不变，只翻译标签之间的文本内容。';
+  } else if (mode === 'code') {
+    base += '\n\n【重要】用户内容是代码文件，请只翻译其中的注释内容（以//、/*、<!--、#、--、;等开头的注释行），保持所有代码逻辑、变量名、函数名、语法结构完全不变。';
+  }
+
+  return base;
 }
 
 async function recordStats(env, ip, tokens) {
@@ -105,10 +116,10 @@ async function logAccess(env, ip, sourceLang, targetLang, provider, charCount, s
   } catch (e) { /* 访问日志记录失败，静默处理 */ }
 }
 
-async function translateWithCloudflare(text, sourceLang, targetLang, model, env, promptTemplates) {
+async function translateWithCloudflare(text, sourceLang, targetLang, model, env, promptTemplates, mode) {
   const sourceLangName = sourceLang === 'auto' ? '自动检测' : (LANG_NAMES[sourceLang] || sourceLang);
   const targetLangName = LANG_NAMES[targetLang] || targetLang;
-  const systemPrompt = getTranslatePrompt(promptTemplates, sourceLangName, targetLangName);
+  const systemPrompt = getTranslatePrompt(promptTemplates, sourceLangName, targetLangName, mode);
 
   if (model === '@cf/meta/m2m100-1.2b' || !model) {
     const srcM2m = sourceLang === 'auto' ? 'english' : (LANG_MAP[sourceLang] || 'english');
@@ -129,7 +140,7 @@ async function translateWithCloudflare(text, sourceLang, targetLang, model, env,
   return { translatedText: response.response, detectedSourceLang: null, tokens: 0 };
 }
 
-async function translateWithExternal(text, sourceLang, targetLang, provider, model, apiKey, customEndpoint, promptTemplates) {
+async function translateWithExternal(text, sourceLang, targetLang, provider, model, apiKey, customEndpoint, promptTemplates, mode) {
   const sourceLangName = sourceLang === 'auto' ? '自动检测' : (LANG_NAMES[sourceLang] || sourceLang);
   const targetLangName = LANG_NAMES[targetLang] || targetLang;
   const prov = PROVIDERS[provider];
@@ -194,7 +205,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { text, sourceLang, targetLang, provider, model } = body;
+    const { text, sourceLang, targetLang, provider, model, mode } = body;
 
     if (!text || !text.trim()) return errorResponse('文本不能为空');
 
@@ -254,7 +265,7 @@ export async function onRequestPost(context) {
     let result;
 
     if (prov === 'cloudflare') {
-      result = await translateWithCloudflare(text, srcLang, targetLang, model, env, promptTemplates);
+      result = await translateWithCloudflare(text, srcLang, targetLang, model, env, promptTemplates, mode);
       await logAccess(env, clientIp, srcLang, targetLang, 'cloudflare', text.length, true, Date.now() - startTime, clientCountry);
     } else {
       // 智能路由：从admin:apiKeys获取所有启用的API Key，按优先级尝试
@@ -268,7 +279,8 @@ export async function onRequestPost(context) {
             text, srcLang, targetLang, prov, model,
             adminKeys[prov].apiKey,
             adminKeys[prov].customEndpoint || '',
-            promptTemplates
+            promptTemplates,
+            mode
           );
           await logAccess(env, clientIp, srcLang, targetLang, prov, text.length, true, Date.now() - startTime, clientCountry);
         } catch (err) {
@@ -285,7 +297,8 @@ export async function onRequestPost(context) {
                 PROVIDERS[fbId]?.defaultModel || 'gpt-4o-mini',
                 typeof fbKey === 'string' ? fbKey : fbKey.apiKey,
                 (typeof fbKey === 'object' ? fbKey.customEndpoint : '') || '',
-                promptTemplates
+                promptTemplates,
+                mode
               );
               await logAccess(env, clientIp, srcLang, targetLang, fbId, text.length, true, Date.now() - startTime, clientCountry);
               translated = true;
@@ -310,7 +323,7 @@ export async function onRequestPost(context) {
             const useModel = model || PROVIDERS[pId]?.defaultModel || 'gpt-4o-mini';
             result = await translateWithExternal(
               text, srcLang, targetLang, pId, useModel,
-              kd.apiKey, kd.customEndpoint || '', promptTemplates
+              kd.apiKey, kd.customEndpoint || '', promptTemplates, mode
             );
             await logAccess(env, clientIp, srcLang, targetLang, pId, text.length, true, Date.now() - startTime, clientCountry);
             translated = true;

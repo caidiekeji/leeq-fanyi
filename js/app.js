@@ -188,17 +188,12 @@ async function handleTranslate() {
   setState('translating');
   const startTime = Date.now();
   try {
-    let translateText = text;
-    if (state.preserveMarkdown) {
-      translateText = `请保留原始Markdown格式进行翻译，不要改变任何标记语法:\n\n${text}`;
-    } else if (state.preserveHtml) {
-      translateText = `请保留所有HTML标签不变，只翻译标签之间的文本内容:\n\n${text}`;
-    } else if (state.codeCommentMode) {
-      translateText = `以下是一段代码，请只翻译其中的注释内容（以//、/*、<!--、#等开头的行），保持代码逻辑完全不变:\n\n${text}`;
-    }
+    const translatorMode = state.preserveMarkdown ? 'markdown'
+      : state.preserveHtml ? 'html'
+      : state.codeCommentMode ? 'code' : '';
     const result = await api('/api/translate', {
       method: 'POST',
-      body: { text: translateText, sourceLang: state.sourceLang, targetLang: state.targetLang }
+      body: { text, sourceLang: state.sourceLang, targetLang: state.targetLang, mode: translatorMode }
     });
     const resultEl = document.getElementById('resultText');
     resultEl.textContent = result.translatedText;
@@ -242,17 +237,12 @@ async function handleBatchTranslate() {
 
   for (let i = 0; i < lines.length; i++) {
     try {
-      let translateText = lines[i];
-      if (state.preserveMarkdown) {
-        translateText = `请保留原始Markdown格式进行翻译:\n\n${lines[i]}`;
-      } else if (state.preserveHtml) {
-        translateText = `请保留所有HTML标签不变，只翻译标签之间的文本内容:\n\n${lines[i]}`;
-      } else if (state.codeCommentMode) {
-        translateText = `以下是一段代码，请只翻译其中的注释内容，保持代码逻辑完全不变:\n\n${lines[i]}`;
-      }
+      const translatorMode = state.preserveMarkdown ? 'markdown'
+        : state.preserveHtml ? 'html'
+        : state.codeCommentMode ? 'code' : '';
       const result = await api('/api/translate', {
         method: 'POST',
-        body: { text: translateText, sourceLang: state.sourceLang, targetLang: state.targetLang }
+        body: { text: lines[i], sourceLang: state.sourceLang, targetLang: state.targetLang, mode: translatorMode }
       });
       results.push(result.translatedText);
     } catch (err) {
