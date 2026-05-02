@@ -764,6 +764,47 @@ body {
   padding: 0;
 }
 
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+
+.model-card {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 14px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 13px;
+  background: var(--bg-white);
+  gap: 6px;
+}
+
+.model-card:hover { border-color: var(--primary-light); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+
+.model-card.active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.model-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.model-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-left: 24px;
+}
+
 .model-item {
   display: flex;
   align-items: center;
@@ -813,15 +854,44 @@ body {
 .model-item.active .model-name { color: var(--primary); }
 
 .model-speed {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--primary);
-  background: var(--primary-light);
-  padding: 2px 10px;
-  border-radius: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
   flex-shrink: 0;
   white-space: nowrap;
   letter-spacing: 0.3px;
+}
+
+.model-speed.speed-fast { color: #16a34a; background: #f0fdf4; }
+.model-speed.speed-normal { color: #ea580c; background: #fff7ed; }
+.model-speed.speed-slow { color: #dc2626; background: #fef2f2; }
+
+.model-test-btn {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--primary);
+  background: transparent;
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  padding: 1px 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: all 0.15s;
+  line-height: 1.6;
+}
+
+.model-test-btn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.provider-model-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: 8px;
+  font-weight: 400;
 }
 
 /* Key List */
@@ -1245,6 +1315,7 @@ body {
   .stat-cards { grid-template-columns: repeat(2, 1fr); }
   .charts-row { grid-template-columns: 1fr; }
   .realtime-body { grid-template-columns: repeat(2, 1fr); }
+  .model-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 }
 
 @media (max-width: 768px) {

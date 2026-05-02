@@ -63,7 +63,7 @@ async function fetchModels(provider, apiKey, customEndpoint) {
       models = data.models.map(m => ({ id: m.id || m.model || '', name: m.id || m.model || '' })).filter(m => m.id);
     }
     
-    return { models: models.slice(0, 50), error: null };
+    return { models: models.slice(0, 200), error: null };
   } catch (err) {
     return { models: [], error: err.message };
   }
