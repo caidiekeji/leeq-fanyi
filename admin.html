@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>管理后台 - LeeQ 翻译</title>
-  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/admin.css?v=2">
 </head>
 <body>
   <!-- Login Page -->
@@ -630,12 +630,10 @@
               model.testResult = { latency: testData.data.latency, tokens: testData.data.tokens };
               const itemEl = document.getElementById(`model-item-${providerId}-${model.id.replace(/[^a-z0-9]/gi, '-')}`);
               if (itemEl) {
-                const nameSpan = itemEl.querySelector('.model-name');
                 const existingSpeed = itemEl.querySelector('.model-speed');
                 if (existingSpeed) existingSpeed.remove();
                 const speedSpan = document.createElement('span');
                 speedSpan.className = 'model-speed';
-                speedSpan.style.cssText = 'font-size:11px;color:var(--primary);margin-left:4px';
                 speedSpan.textContent = `${testData.data.latency}ms`;
                 itemEl.appendChild(speedSpan);
               }
