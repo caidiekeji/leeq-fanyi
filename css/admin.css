@@ -606,7 +606,7 @@ body {
 .section-body { padding: 20px; }
 
 .section-body-scroll {
-  max-height: calc(100vh - 180px);
+  max-height: calc(100vh - 240px);
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border-color) transparent;
@@ -908,6 +908,65 @@ body {
   background: var(--danger);
   border-color: var(--danger);
   color: #fff;
+}
+
+/* 分页控件 */
+.model-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border-light);
+}
+
+.page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--bg-white);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.page-btn:hover:not(.disabled) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.page-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* 模型页底部固定保存栏 */
+.models-save-bar {
+  position: fixed;
+  bottom: 0;
+  left: var(--sidebar-width);
+  right: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-light);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+  z-index: 50;
 }
 
 .provider-model-count {
@@ -1409,6 +1468,7 @@ body {
   .content-link span { display: none; }
   .realtime-body { grid-template-columns: repeat(2, 1fr); }
   .provider-group-header { flex-wrap: wrap; gap: 8px; }
+  .models-save-bar { left: 0; }
 }
 
 @media (max-width: 480px) {

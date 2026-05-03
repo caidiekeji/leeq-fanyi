@@ -274,7 +274,7 @@
           </div>
 
           <!-- Models Section -->
-          <div id="section-models" style="display:none">
+          <div id="section-models">
             <div class="section-card">
               <div class="section-header">
                 <span class="section-title">模型选择</span>
@@ -291,7 +291,7 @@
               </div>
             </div>
 
-            <div style="display:flex;justify-content:flex-end;margin-top:24px">
+            <div class="models-save-bar">
               <button class="btn btn-primary" onclick="handleSaveConfig()">保存全部配置</button>
             </div>
           </div>
@@ -828,14 +828,20 @@
               currentProviders[id] = { ...currentProviders[id], ...prov };
             }
           });
-          renderProviders(currentProviders);
+          renderProviders(currentProviders, true);
           document.getElementById('translatePrompt').value = data.data.promptTemplates?.translate || '';
           document.getElementById('detectPrompt').value = data.data.promptTemplates?.detect || '';
         }
       } catch {}
     }
 
-    function renderProviders(providers) {
+    // 模型分页状态：按提供商存储当前页码，每页固定显示条数
+    let modelPageState = {};
+    const MODELS_PER_PAGE = 20;
+
+    function renderProviders(providers, resetPages) {
+      // 如果需要重置分页（如首次加载），清空分页状态
+      if (resetPages) modelPageState = {};
       const list = document.getElementById('providersList');
       list.innerHTML = '';
       let hasModels = false;
@@ -843,7 +849,15 @@
         const hasProvModels = prov.models && prov.models.length > 0;
         if (!hasProvModels) return;
         hasModels = true;
-        list.innerHTML += `<div class="provider-group">
+
+        // 初始化该提供商的分页状态
+        if (!(provId in modelPageState)) modelPageState[provId] = 1;
+        const currentPage = modelPageState[provId];
+        const totalPages = Math.ceil(prov.models.length / MODELS_PER_PAGE);
+        const startIdx = (currentPage - 1) * MODELS_PER_PAGE;
+        const pageModels = prov.models.slice(startIdx, startIdx + MODELS_PER_PAGE);
+
+        list.innerHTML += `<div class="provider-group" data-provider="${provId}">
           <div class="provider-group-header">
             <strong>${prov.name}</strong>
             <span class="provider-model-count">${prov.models.length} 个模型</span>
@@ -857,8 +871,9 @@
               </label>
             </div>
           </div>
-          <div class="model-list">`;
-        prov.models.forEach(m => {
+          <div class="model-list" id="modelList-${provId}">`;
+        // 渲染当前页的模型
+        pageModels.forEach(m => {
           const enabled = prov.modelEnabled ? prov.modelEnabled.includes(m.id) : false;
           const tr = m.testResult;
           let speedHtml = '';
@@ -881,6 +896,14 @@
             </div>
           </div>`;
         });
+        // 渲染分页控件
+        if (totalPages > 1) {
+          list.innerHTML += `<div class="model-pagination">
+            <button class="page-btn ${currentPage === 1 ? 'disabled' : ''}" data-prov="${provId}" data-page="${currentPage - 1}">‹</button>
+            <span class="page-info">第 ${currentPage} / ${totalPages} 页</span>
+            <button class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" data-prov="${provId}" data-page="${currentPage + 1}">›</button>
+          </div>`;
+        }
         list.innerHTML += `</div></div>`;
       });
 
@@ -982,9 +1005,10 @@
     }
 
     async function saveProviderModels(provider, models) {
-      const formattedModels = models.slice(0, 50).map(m => ({ id: m.id, name: m.name || m.id }));
+      // 保存所有获取到的模型，不做数量限制
+      const formattedModels = models.map(m => ({ id: m.id, name: m.name || m.id }));
       currentProviders[provider] = { ...currentProviders[provider], models: formattedModels, enabled: true };
-      renderProviders(currentProviders);
+      renderProviders(currentProviders, true);
       await saveAllProviders();
       updateDashboardStats();
     }
@@ -1022,6 +1046,15 @@
           currentProviders[provId].modelEnabled = (currentProviders[provId].modelEnabled || []).filter(id => id !== modelId);
           // 保存配置并刷新UI
           saveAllProviders();
+          renderProviders(currentProviders);
+        });
+      });
+      // 分页按钮事件绑定
+      document.querySelectorAll('.page-btn:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const provId = btn.dataset.prov;
+          const page = parseInt(btn.dataset.page);
+          modelPageState[provId] = page;
           renderProviders(currentProviders);
         });
       });
