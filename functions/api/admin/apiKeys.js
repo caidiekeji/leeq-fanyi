@@ -86,6 +86,15 @@ export async function onRequestDelete(context) {
     delete keys[provider];
     await env.SETTINGS.put('admin:apiKeys', JSON.stringify(keys));
 
+    const configData = await env.SETTINGS.get('admin:config');
+    if (configData) {
+      const config = JSON.parse(configData);
+      if (config.providers && config.providers[provider]) {
+        config.providers[provider] = { name: config.providers[provider].name, enabled: false, models: [] };
+        await env.SETTINGS.put('admin:config', JSON.stringify(config));
+      }
+    }
+
     return new Response(JSON.stringify({ code: 200, data: null, message: '已删除' }), {
       headers: { 'Content-Type': 'application/json' }
     });

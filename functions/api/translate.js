@@ -131,27 +131,24 @@ function checkTranslationQuality(translatedText, originalText, sourceLang, targe
 }
 
 /**
- * 生成翻译提示词
+ * 生成翻译提示词（仅使用管理员配置）
+ * @param {Object} promptTemplates - 管理员配置的提示词模板
+ * @param {string} sourceLangName - 源语言名称
+ * @param {string} targetLangName - 目标语言名称
+ * @returns {string} 翻译系统提示词
  */
 function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName) {
+  // 仅使用管理员配置的翻译提示词
   const customPrompt = promptTemplates?.translate;
-  let base;
-  if (customPrompt && customPrompt.trim()) {
-    base = customPrompt
-      .replace(/\[{source_lang}\]/g, sourceLangName)
-      .replace(/\[{target_lang}\]/g, targetLangName);
-  } else {
-    base = `你是一个专业翻译。请严格将以下${sourceLangName}文本翻译为${targetLangName}。
-
-【重要规则】
-1. 只输出翻译后的${targetLangName}结果，绝对不要输出原文
-2. 不要添加任何解释、前言或后缀
-3. 保持原文的段落结构和换行
-4. 专有名词、技术术语保留原文不翻译
-5. 语气和风格与原文保持一致`;
+  
+  if (!customPrompt || !customPrompt.trim()) {
+    throw new Error('请先在管理后台配置翻译提示词模板');
   }
 
-  return base;
+  // 替换占位符并返回
+  return customPrompt
+    .replace(/\[{source_lang}\]/g, sourceLangName)
+    .replace(/\[{target_lang}\]/g, targetLangName);
 }
 
 /**

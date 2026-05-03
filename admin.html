@@ -1052,7 +1052,12 @@
       try {
         const res = await fetch(`/api/admin/apiKeys?provider=${provider}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
         const data = await res.json();
-        if (data.code === 200) { showToast('已删除', 'success'); await loadApiKeys(); updateDashboardStats(); }
+        if (data.code === 200) {
+          showToast('已删除', 'success');
+          await loadApiKeys();
+          await loadConfig();
+          updateDashboardStats();
+        }
         else { showToast(data.message, 'error'); }
       } catch (err) { showToast('删除失败: ' + err.message, 'error'); }
     }
