@@ -279,7 +279,7 @@
               <div class="section-header">
                 <span class="section-title">模型选择</span>
               </div>
-              <div class="section-body section-body-scroll">
+              <div class="section-body">
                 <div id="providersList">
                   <div class="empty-state">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
@@ -837,7 +837,7 @@
 
     // 模型分页状态：按提供商存储当前页码，每页固定显示条数
     let modelPageState = {};
-    const MODELS_PER_PAGE = 20;
+    const MODELS_PER_PAGE = 30;
 
     function renderProviders(providers, resetPages) {
       // 如果需要重置分页（如首次加载），清空分页状态

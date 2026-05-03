@@ -10,15 +10,15 @@
   --accent: #0c8fa3;
   --accent-hover: #0eb0c9;
   --accent-light: #0a7a8c;
-  --bg-primary: #fffef8;
-  --bg-secondary: #f5f4ec;
-  --bg-tertiary: #eae9df;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f8f8;
+  --bg-tertiary: #f0f0f0;
   --bg-elevated: #ffffff;
-  --bg-hover: #ddd9cc;
+  --bg-hover: #e8e8e8;
   --surface-glass: rgba(14, 176, 201, 0.05);
-  --border-subtle: #d5cfc7;
-  --border-default: #847c74;
-  --border-strong: #6b645c;
+  --border-subtle: #e0e0e0;
+  --border-default: #d0d0d0;
+  --border-strong: #b0b0b0;
   --text-primary: #2D2D2D;
   --text-secondary: #5a5a5a;
   --text-tertiary: #8a8a8a;
@@ -33,11 +33,11 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --shadow-sm: 0 1px 2px rgba(132, 124, 116, 0.08);
-  --shadow-md: 0 4px 12px rgba(132, 124, 116, 0.12);
-  --shadow-lg: 0 8px 32px rgba(132, 124, 116, 0.15);
-  --shadow-glow: 0 0 40px rgba(14, 176, 201, 0.2);
-  --shadow-primary: 0 0 40px rgba(14, 176, 201, 0.2);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 40px rgba(14, 176, 201, 0.15);
+  --shadow-primary: 0 0 40px rgba(14, 176, 201, 0.15);
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -45,15 +45,15 @@
 }
 
 [data-theme="light"] {
-  --bg-primary: #fffef8;
-  --bg-secondary: #f5f4ec;
-  --bg-tertiary: #eae9df;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f8f8;
+  --bg-tertiary: #f0f0f0;
   --bg-elevated: #ffffff;
-  --bg-hover: #ddd9cc;
+  --bg-hover: #e8e8e8;
   --surface-glass: rgba(14, 176, 201, 0.04);
-  --border-subtle: #d5cfc7;
-  --border-default: #847c74;
-  --border-strong: #6b645c;
+  --border-subtle: #e0e0e0;
+  --border-default: #d0d0d0;
+  --border-strong: #b0b0b0;
   --text-primary: #2D2D2D;
   --text-secondary: #5a5a5a;
   --text-tertiary: #8a8a8a;
@@ -61,9 +61,9 @@
   --accent-gradient: linear-gradient(135deg, #0c8fa3 0%, #0eb0c9 100%);
   --accent-gradient-hover: linear-gradient(135deg, #0eb0c9 0%, #0a7a8c 100%);
   --primary-gradient: linear-gradient(135deg, #0c8fa3 0%, #0eb0c9 100%);
-  --shadow-sm: 0 1px 3px rgba(132, 124, 116, 0.1);
-  --shadow-md: 0 4px 12px rgba(132, 124, 116, 0.1);
-  --shadow-lg: 0 8px 32px rgba(132, 124, 116, 0.12);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
   --shadow-glow: 0 0 30px rgba(14, 176, 201, 0.15);
   --shadow-primary: 0 0 30px rgba(14, 176, 201, 0.15);
 }
@@ -95,9 +95,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(14,176,201,0.15) 0%, transparent 60%),
-    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background: var(--bg-primary);
 }
 
 .navbar {
@@ -195,11 +193,13 @@ body {
 /* ====== 主体 ====== */
 .main-container {
   max-width: 1200px;
+  width: 90%;
   margin: 0 auto;
   padding: 24px;
   height: calc(100vh - 73px);
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .translate-wrapper {
@@ -208,9 +208,9 @@ body {
   flex-direction: column;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
-  background: var(--bg-secondary);
+  background: var(--bg-elevated);
   overflow: hidden;
-  box-shadow: var(--shadow-lg), 0 0 60px rgba(255,87,34,0.1);
+  box-shadow: var(--shadow-lg);
   min-height: 0;
 }
 
