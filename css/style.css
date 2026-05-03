@@ -799,12 +799,13 @@ body {
 
 /* ====== 导出菜单 ====== */
 .export-menu {
+  position: fixed;
   background: var(--bg-elevated);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   padding: 4px;
-  z-index: 300;
+  z-index: 9999;
   min-width: 180px;
 }
 
