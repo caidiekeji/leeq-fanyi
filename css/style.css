@@ -101,16 +101,23 @@ body {
 .navbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 12px 24px;
   border-bottom: 1px solid var(--border-subtle);
   gap: 16px;
   flex-wrap: wrap;
   backdrop-filter: blur(12px);
-  background: rgba(250,237,209,0.02);
-  position: sticky;
-  top: 0;
-  z-index: 50;
+  background: var(--bg-elevated);
+  position: relative;
+  z-index: 10;
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
 }
 
 .navbar-brand {

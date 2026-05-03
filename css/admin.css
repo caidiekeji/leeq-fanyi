@@ -1,17 +1,17 @@
 /* ====== Modern Admin Dashboard Style ====== */
 :root {
-  --sidebar-bg: #0eb0c9;
+  --sidebar-bg: #f5f5f5;
   --sidebar-width: 220px;
-  --bg-primary: #fffef8;
-  --bg-secondary: #f5f4ec;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f8f8;
   --bg-white: #ffffff;
   --text-primary: #2D2D2D;
   --text-secondary: #5a5a5a;
   --text-muted: #8a8a8a;
-  --border-color: #847c74;
-  --border-default: #847c74;
-  --border-light: #d5cfc7;
-  --border-subtle: #e0dbd3;
+  --border-color: #e0e0e0;
+  --border-default: #e0e0e0;
+  --border-light: #f0f0f0;
+  --border-subtle: #f5f5f5;
   --primary: #0c8fa3;
   --primary-hover: #0a7a8c;
   --primary-light: rgba(14, 176, 201, 0.1);
@@ -24,9 +24,9 @@
   --danger-light: #FFEBEE;
   --info: #0eb0c9;
   --info-light: rgba(14, 176, 201, 0.1);
-  --shadow-sm: 0 1px 2px rgba(132, 124, 116, 0.08);
-  --shadow: 0 1px 3px rgba(132, 124, 116, 0.12), 0 1px 2px rgba(132, 124, 116, 0.08);
-  --shadow-md: 0 4px 6px -1px rgba(132, 124, 116, 0.15), 0 2px 4px -1px rgba(132, 124, 116, 0.08);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 16px;
@@ -165,7 +165,7 @@ body {
 .sidebar {
   width: var(--sidebar-width);
   background: var(--sidebar-bg);
-  border-right: 1px solid var(--border-light);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -236,12 +236,12 @@ body {
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.06);
   color: var(--text-primary);
 }
 
 .nav-item.active {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--primary);
   color: #fff;
   font-weight: 600;
 }
@@ -267,11 +267,11 @@ body {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 12px;
   font-weight: 600;
 }
