@@ -4,8 +4,6 @@ const state = {
   status: 'idle',
   theme: loadLocal('theme', 'dark'),
   realtimeMode: loadLocal('realtimeMode', false),
-  historyPanel: false,
-  favoritesPanel: false,
   maxCharLimit: 5000,
   defaultProvider: null,
   defaultModel: null
@@ -128,12 +126,9 @@ function bindEvents() {
   document.getElementById('themeBtn').addEventListener('click', toggleTheme);
   document.getElementById('realtimeBtn').addEventListener('click', toggleRealtimeMode);
   document.getElementById('batchBtn').addEventListener('click', handleBatchTranslate);
-  document.getElementById('favoriteBtn').addEventListener('click', handleFavorite);
   document.getElementById('exportBtn').addEventListener('click', showExportMenu);
   document.getElementById('shareBtn').addEventListener('click', handleShare);
   document.getElementById('ttsBtn').addEventListener('click', handleTTS);
-  document.getElementById('historyBtn').addEventListener('click', toggleHistoryPanel);
-  document.getElementById('favoritesBtn').addEventListener('click', toggleFavoritesPanel);
 }
 
 function bindShortcuts() {
@@ -234,8 +229,6 @@ async function handleTranslate(forceRefresh = false) {
       const detected = LANG_MAP[result.sourceLang]?.name || result.sourceLang;
       document.getElementById('sourceLang').querySelector('option[value="auto"]').textContent = `自动检测 (${detected})`;
     }
-    saveHistory(text, result.translatedText, result.sourceLang || state.sourceLang, state.targetLang);
-    document.getElementById('favoriteBtn').disabled = false;
     const latency = Date.now() - startTime;
     setState('success');
     if (result.fromCache) {
@@ -353,7 +346,6 @@ function handleClear() {
   resText.classList.add('empty');
   resText.innerHTML = EMPTY_RESULT;
   document.getElementById('sourceLang').querySelector('option[value="auto"]').textContent = '自动检测';
-  document.getElementById('favoriteBtn').disabled = true;
   updateCharCount('source');
   updateTranslateBtn();
 }
@@ -376,17 +368,6 @@ function toggleRealtimeMode() {
   } else {
     showToast('实时翻译已关闭', 'info');
   }
-}
-
-async function handleFavorite() {
-  const source = document.getElementById('sourceText').value.trim();
-  const result = document.getElementById('resultText').textContent;
-  if (!source || !result) {
-    showToast('请先完成翻译后再收藏', 'warning');
-    return;
-  }
-  await saveFavorite(source, result, state.sourceLang, state.targetLang, '');
-  showToast('已收藏', 'success');
 }
 
 function showExportMenu() {
@@ -476,100 +457,6 @@ function handleTTS() {
   utterance.rate = 0.9;
   window.speechSynthesis.speak(utterance);
   showToast('正在朗读...', 'info');
-}
-
-async function toggleHistoryPanel() {
-  state.historyPanel = !state.historyPanel;
-  const panel = document.getElementById('historyPanel');
-  panel.classList.toggle('open', state.historyPanel);
-  if (state.favoritesPanel) toggleFavoritesPanel();
-  if (state.historyPanel) await renderHistory();
-}
-
-async function renderHistory() {
-  const list = document.getElementById('historyList');
-  const history = await getHistory();
-  if (history.length === 0) {
-    list.innerHTML = '<div class="side-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>暂无翻译历史</p></div>';
-    return;
-  }
-  list.innerHTML = history.slice(0, 50).map((h, i) => `
-    <div class="side-item" data-id="${h.id}">
-      <div class="side-item-main" onclick="historyReuse(${h.id})">
-        <div class="side-item-text">${truncate(h.source, 40)}</div>
-        <div class="side-item-meta">${LANG_MAP[h.sourceLang]?.name||h.sourceLang} → ${LANG_MAP[h.targetLang]?.name||h.targetLang} · ${formatDate(h.time)}</div>
-      </div>
-      <button class="side-item-del" onclick="event.stopPropagation();historyDelete(${h.id})" title="删除">×</button>
-    </div>
-  `).join('');
-}
-
-async function historyReuse(id) {
-  const history = await getHistory();
-  const item = history.find(h => h.id === id);
-  if (!item) return;
-  document.getElementById('sourceText').value = item.source;
-  state.sourceLang = item.sourceLang;
-  state.targetLang = item.targetLang;
-  document.getElementById('sourceLang').value = item.sourceLang;
-  document.getElementById('targetLang').value = item.targetLang;
-  updateCharCount('source');
-  updateTranslateBtn();
-  toggleHistoryPanel();
-  handleTranslate();
-}
-
-async function historyDelete(id) {
-  await dbDelete('history', id);
-  renderHistory();
-}
-
-async function toggleFavoritesPanel() {
-  state.favoritesPanel = !state.favoritesPanel;
-  const panel = document.getElementById('favoritesPanel');
-  panel.classList.toggle('open', state.favoritesPanel);
-  if (state.historyPanel) toggleHistoryPanel();
-  if (state.favoritesPanel) await renderFavorites();
-}
-
-async function renderFavorites() {
-  const list = document.getElementById('favoritesList');
-  const favs = await getFavorites();
-  if (favs.length === 0) {
-    list.innerHTML = '<div class="side-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><p>暂无收藏</p></div>';
-    return;
-  }
-  list.innerHTML = favs.map(f => `
-    <div class="side-item" data-id="${f.id}">
-      <div class="side-item-main" onclick="favoriteReuse(${f.id})">
-        <div class="side-item-text">${truncate(f.source, 40)}</div>
-        <div class="side-item-meta">${LANG_MAP[f.sourceLang]?.name||f.sourceLang} → ${LANG_MAP[f.targetLang]?.name||f.targetLang}</div>
-      </div>
-      <button class="side-item-del" onclick="event.stopPropagation();favoriteDelete(${f.id})" title="取消收藏">×</button>
-    </div>
-  `).join('');
-}
-
-async function favoriteReuse(id) {
-  const favs = await getFavorites();
-  const item = favs.find(f => f.id === id);
-  if (!item) return;
-  document.getElementById('sourceText').value = item.source;
-  state.sourceLang = item.sourceLang;
-  state.targetLang = item.targetLang;
-  document.getElementById('sourceLang').value = item.sourceLang;
-  document.getElementById('targetLang').value = item.targetLang;
-  document.getElementById('resultText').textContent = item.result;
-  document.getElementById('resultText').classList.remove('empty');
-  updateCharCount('source');
-  updateCharCount('result');
-  updateTranslateBtn();
-  toggleFavoritesPanel();
-}
-
-async function favoriteDelete(id) {
-  await dbDelete('favorites', id);
-  renderFavorites();
 }
 
 // 从URL参数加载分享内容
