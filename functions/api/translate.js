@@ -267,6 +267,67 @@ async function translateWithExternal(text, sourceLang, targetLang, provider, mod
 }
 
 /**
+ * 检测是否为搜索引擎爬虫
+ * @param {string} ua - User-Agent 字符串
+ * @returns {Object|null} 爬虫信息 {name, type} 或 null
+ */
+function detectSpider(ua) {
+  if (!ua) return null;
+  const uaLower = ua.toLowerCase();
+  
+  const spiders = [
+    { pattern: /googlebot/i, name: 'Google', type: 'google' },
+    { pattern: /bingbot|msnbot/i, name: 'Bing', type: 'bing' },
+    { pattern: /baiduspider/i, name: '百度', type: 'baidu' },
+    { pattern: /sogou (spider|web)/i, name: '搜狗', type: 'sogou' },
+    { pattern: /soso.*spider/i, name: '搜搜', type: 'soso' },
+    { pattern: /360spider|haosouspider/i, name: '360', type: '360' },
+    { pattern: /yandexbot/i, name: 'Yandex', type: 'yandex' },
+    { pattern: /duckduckbot/i, name: 'DuckDuckGo', type: 'duckduckgo' },
+    { pattern: /facebookexternalhit|facebot/i, name: 'Facebook', type: 'facebook' },
+    { pattern: /twitterbot/i, name: 'Twitter', type: 'twitter' },
+    { pattern: /linkedinbot/i, name: 'LinkedIn', type: 'linkedin' },
+    { pattern: /applebot/i, name: 'Apple', type: 'apple' },
+    { pattern: /petalbot/i, name: '华为花瓣', type: 'petal' },
+    { pattern: /bytespider/i, name: '字节', type: 'bytedance' },
+  ];
+  
+  for (const spider of spiders) {
+    if (spider.pattern.test(ua)) {
+      return { name: spider.name, type: spider.type };
+    }
+  }
+  return null;
+}
+
+/**
+ * 记录爬虫访问日志
+ * @param {Object} env - Cloudflare KV 环境
+ * @param {string} ip - 访问者 IP
+ * @param {string} ua - User-Agent
+ * @param {string} spiderName - 爬虫名称
+ * @param {string} path - 请求路径
+ */
+async function logSpiderAccess(env, ip, ua, spiderName, path) {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const key = `logs:spider:${today}`;
+    const data = await env.SETTINGS.get(key);
+    const logs = data ? JSON.parse(data) : [];
+    logs.push({
+      ip,
+      ua,
+      spider: spiderName,
+      path: path || '/',
+      timestamp: Date.now()
+    });
+    // 每天最多保留 200 条记录
+    if (logs.length > 200) logs.splice(0, logs.length - 200);
+    await env.SETTINGS.put(key, JSON.stringify(logs));
+  } catch (e) { /* 静默失败 */ }
+}
+
+/**
  * 翻译请求入口
  */
 export async function onRequestPost(context) {
@@ -274,6 +335,13 @@ export async function onRequestPost(context) {
   const startTime = Date.now();
   const clientIp = request.headers.get('cf-connecting-ip') || 'unknown';
   const clientCountry = request.headers.get('cf-ipcountry') || null;
+  const userAgent = request.headers.get('user-agent') || '';
+
+  // 检测爬虫并记录
+  const spider = detectSpider(userAgent);
+  if (spider) {
+    await logSpiderAccess(env, clientIp, userAgent, spider.name, '/api/translate');
+  }
 
   try {
     const body = await request.json();

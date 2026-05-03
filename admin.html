@@ -42,8 +42,8 @@
             </svg>
           </div>
           <span class="sidebar-title">LLM Chat</span>
-          <button class="sidebar-close" onclick="toggleSidebar()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <button class="sidebar-close" onclick="toggleSidebar()" aria-label="关闭侧边栏">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
@@ -109,6 +109,12 @@
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
             </svg>
             访问日志
+          </div>
+          <div class="nav-item" data-section="spider" onclick="switchSection('spider')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><line x1="12" y1="9" x2="5" y2="6"/><line x1="12" y1="9" x2="19" y2="6"/><line x1="12" y1="15" x2="5" y2="18"/><line x1="12" y1="15" x2="19" y2="18"/>
+            </svg>
+            爬虫日志
           </div>
           <div class="nav-item" data-section="health" onclick="switchSection('health')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -625,6 +631,23 @@
             </div>
           </div>
 
+          <!-- Spider Logs Section -->
+          <div id="section-spider" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">爬虫日志</span>
+                <div class="date-filter">
+                  <input type="date" id="spiderDate" onchange="loadSpiderLogs()">
+                  <button class="btn btn-primary btn-sm" onclick="loadSpiderLogs()">刷新</button>
+                </div>
+              </div>
+              <div class="section-body">
+                <div id="spiderStats" class="stats-grid"></div>
+                <div id="spiderLogsList" class="log-list"></div>
+              </div>
+            </div>
+          </div>
+
           <!-- Health Section -->
           <div id="section-health" style="display:none">
             <div class="section-card">
@@ -735,6 +758,7 @@
         prompt: '提示词模板',
         system: '系统设置',
         logs: '访问日志',
+        spider: '爬虫日志',
         health: '健康监控',
         backup: '数据备份'
       };
@@ -744,6 +768,7 @@
       if (name === 'analytics') loadAnalytics();
       if (name === 'health') checkHealth();
       if (name === 'logs') loadAccessLogs();
+      if (name === 'spider') loadSpiderLogs();
       if (window.innerWidth <= 768) toggleSidebar();
     }
 
@@ -832,7 +857,7 @@
               </label>
             </div>
           </div>
-          <div class="model-grid">`;
+          <div class="model-list">`;
         prov.models.forEach(m => {
           const enabled = prov.modelEnabled ? prov.modelEnabled.includes(m.id) : false;
           const tr = m.testResult;
@@ -843,14 +868,12 @@
           } else {
             speedHtml = `<button class="model-test-btn" data-prov="${provId}" data-mid="${m.id}" title="测试此模型">测试</button>`;
           }
-          list.innerHTML += `<label class="model-card ${enabled ? 'active' : ''}">
-            <div class="model-card-top">
+          list.innerHTML += `<label class="model-item ${enabled ? 'active' : ''}">
+            <div class="model-item-left">
               <input type="checkbox" class="model-cb" data-provider="${provId}" data-model="${m.id}" ${enabled ? 'checked' : ''}>
               <span class="model-name" title="${m.id}">${m.name || m.id}</span>
             </div>
-            <div class="model-card-bottom">
-              ${speedHtml}
-            </div>
+            ${speedHtml}
           </label>`;
         });
         list.innerHTML += `</div></div>`;
@@ -1154,6 +1177,22 @@
       } catch {}
     }
 
+    function countUp(el, target, duration) {
+      if (!el || target === undefined) return;
+      const start = parseInt(el.textContent) || 0;
+      if (start === target) return;
+      const startTime = performance.now();
+      function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(start + (target - start) * eased);
+        el.textContent = current;
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
     function updateDashboardStats() {
       let totalModels = 0;
       let configuredCount = 0;
@@ -1163,8 +1202,8 @@
           configuredCount++;
         }
       });
-      document.getElementById('availableModels').textContent = totalModels;
-      document.getElementById('activeUsers').textContent = configuredCount;
+      countUp(document.getElementById('availableModels'), totalModels, 800);
+      countUp(document.getElementById('activeUsers'), configuredCount, 800);
       renderModelRanking();
     }
 
@@ -1329,6 +1368,76 @@
         }
       } catch (err) {
         tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--danger)">加载失败: ${err.message}</td></tr>`;
+      }
+    }
+
+    // ====== 爬虫日志 ======
+    async function loadSpiderLogs() {
+      const dateInput = document.getElementById('spiderDate');
+      if (!dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
+      
+      const date = dateInput.value;
+      const statsEl = document.getElementById('spiderStats');
+      const logsEl = document.getElementById('spiderLogsList');
+      
+      statsEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted)"><div class="spinner-inline"></div><p style="margin-top:12px">加载中...</p></div>';
+      logsEl.innerHTML = '';
+      
+      try {
+        const res = await fetch(`/api/admin/spiderLogs?date=${date}`, {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        
+        if (data.code === 200) {
+          const { spiderStats, logs } = data.data;
+          
+          if (spiderStats.length === 0 && logs.length === 0) {
+            statsEl.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text-muted)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/></svg><p style="margin-top:12px">当日暂无爬虫访问记录</p></div>';
+            return;
+          }
+          
+          // 显示统计卡片
+          statsEl.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;margin-bottom:24px">
+            ${spiderStats.map(s => `
+              <div class="stat-card">
+                <div class="stat-value">${s.count}</div>
+                <div class="stat-label">${s.name}</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:4px">IP: ${s.uniqueIps}</div>
+              </div>
+            `).join('')}
+          </div>`;
+          
+          // 显示详细日志
+          logsEl.innerHTML = `
+            <table style="width:100%;border-collapse:collapse;font-size:13px">
+              <thead>
+                <tr style="border-bottom:2px solid var(--border-light)">
+                  <th style="padding:8px 16px;text-align:left;color:var(--text-muted);font-weight:500">时间</th>
+                  <th style="padding:8px 16px;text-align:left;color:var(--text-muted);font-weight:500">爬虫</th>
+                  <th style="padding:8px 16px;text-align:left;color:var(--text-muted);font-weight:500">IP</th>
+                  <th style="padding:8px 16px;text-align:left;color:var(--text-muted);font-weight:500">路径</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${logs.map(log => {
+                  const time = new Date(log.timestamp).toLocaleString('zh-CN');
+                  return `<tr style="border-bottom:1px solid var(--border-light)">
+                    <td style="padding:8px 16px;font-size:12px;color:var(--text-secondary);white-space:nowrap">${time}</td>
+                    <td style="padding:8px 16px"><span class="tag tag-primary">${log.spider}</span></td>
+                    <td style="padding:8px 16px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono)">${log.ip}</td>
+                    <td style="padding:8px 16px;font-size:12px;color:var(--text-secondary)">${log.path}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+            <div style="text-align:center;padding:12px;color:var(--text-muted);font-size:12px">共 ${logs.length} 条记录（最多显示100条）</div>
+          `;
+        } else {
+          statsEl.innerHTML = `<div style="text-align:center;padding:32px;color:var(--danger)">加载失败: ${data.message}</div>`;
+        }
+      } catch (err) {
+        statsEl.innerHTML = `<div style="text-align:center;padding:32px;color:var(--danger)">加载失败: ${err.message}</div>`;
       }
     }
 
