@@ -9,7 +9,9 @@ const state = {
   codeCommentMode: loadLocal('codeCommentMode', false),
   historyPanel: false,
   favoritesPanel: false,
-  maxCharLimit: 5000
+  maxCharLimit: 5000,
+  defaultProvider: null,
+  defaultModel: null
 };
 
 const EMPTY_RESULT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg><p>翻译结果将显示在这里</p>';
@@ -65,6 +67,19 @@ async function loadSystemConfig() {
       }
     }
   } catch(e) { console.error('加载系统配置失败:', e); }
+
+  // 加载翻译配置（默认提供商和模型）
+  try {
+    const res = await fetch('/api/translateConfig');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.code === 200 && data.data) {
+        state.defaultProvider = data.data.defaultProvider;
+        state.defaultModel = data.data.defaultModel;
+        console.log('翻译配置加载成功:', data.data.defaultProvider, data.data.defaultModel);
+      }
+    }
+  } catch(e) { console.error('加载翻译配置失败:', e); }
 }
 
 function applyTheme(theme) {
@@ -209,7 +224,14 @@ async function handleTranslate() {
       : state.codeCommentMode ? 'code' : '';
     const result = await api('/api/translate', {
       method: 'POST',
-      body: { text, sourceLang: state.sourceLang, targetLang: state.targetLang, mode: translatorMode }
+      body: { 
+        text, 
+        sourceLang: state.sourceLang, 
+        targetLang: state.targetLang, 
+        mode: translatorMode,
+        provider: state.defaultProvider,
+        model: state.defaultModel
+      }
     });
     const resultEl = document.getElementById('resultText');
     resultEl.textContent = result.translatedText;
@@ -258,7 +280,14 @@ async function handleBatchTranslate() {
         : state.codeCommentMode ? 'code' : '';
       const result = await api('/api/translate', {
         method: 'POST',
-        body: { text: lines[i], sourceLang: state.sourceLang, targetLang: state.targetLang, mode: translatorMode }
+        body: { 
+          text: lines[i], 
+          sourceLang: state.sourceLang, 
+          targetLang: state.targetLang, 
+          mode: translatorMode,
+          provider: state.defaultProvider,
+          model: state.defaultModel
+        }
       });
       results.push(result.translatedText);
     } catch (err) {

@@ -1,13 +1,3 @@
-const LANG_MAP = {
-  zh: 'chinese', en: 'english', ja: 'japanese', ko: 'korean',
-  fr: 'french', de: 'german', es: 'spanish', ru: 'russian',
-  pt: 'portuguese', it: 'italian', ar: 'arabic', hi: 'hindi',
-  th: 'thai', vi: 'vietnamese', id: 'indonesian', nl: 'dutch',
-  pl: 'polish', tr: 'turkish', sv: 'swedish', da: 'danish',
-  fi: 'finnish', el: 'greek', cs: 'czech', ro: 'romanian',
-  hu: 'hungarian', uk: 'ukrainian', bg: 'bulgarian'
-};
-
 const LANG_NAMES = {
   zh: '中文', en: '英语', ja: '日语', ko: '韩语',
   fr: '法语', de: '德语', es: '西班牙语', ru: '俄语',
@@ -56,28 +46,122 @@ function simpleHash(str) {
   return Math.abs(hash).toString(16);
 }
 
+/**
+ * 清理输入文本，移除不可见字符和异常编码
+ */
+function sanitizeInput(text) {
+  return text
+    .replace(/\uFEFF/g, '')
+    .replace(/\u200B/g, '')
+    .replace(/\u200C/g, '')
+    .replace(/\u200D/g, '')
+    .replace(/\uFFFD/g, '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .trim();
+}
+
+/**
+ * 清洗LLM返回的翻译结果，去除多余内容
+ */
+function cleanTranslationResult(text, originalText, mode) {
+  if (!text) return '';
+
+  let cleaned = text.trim();
+
+  // 移除可能的Markdown代码块标记
+  if (mode !== 'code') {
+    cleaned = cleaned.replace(/^```[\s\S]*?\n([\s\S]*?)\n?```$/m, '$1').trim();
+  }
+
+  // 移除常见的AI回复前缀
+  const prefixesToRemove = [
+    '翻译结果：', '翻译结果:', '译文：', '译文:',
+    '好的，翻译如下：', '好的，翻译如下:',
+    '以下是翻译结果：', '以下是翻译结果:',
+    '翻译如下：', '翻译如下:',
+  ];
+  for (const prefix of prefixesToRemove) {
+    if (cleaned.startsWith(prefix)) {
+      cleaned = cleaned.slice(prefix.length).trim();
+      break;
+    }
+  }
+
+  return cleaned;
+}
+
+/**
+ * 翻译质量检查：检测常见翻译异常
+ */
+function checkTranslationQuality(translatedText, originalText, sourceLang, targetLang) {
+  const issues = [];
+  if (!translatedText || !translatedText.trim()) {
+    issues.push('翻译结果为空');
+    return issues;
+  }
+
+  const cleaned = translatedText.trim();
+  const original = originalText.trim();
+
+  // 检查是否与原文完全相同（可能未翻译）
+  if (cleaned === original && sourceLang !== targetLang) {
+    issues.push('翻译结果与原文相同');
+  }
+
+  // 检查长度比例异常
+  const ratio = cleaned.length / original.length;
+  if (ratio > 3.0) {
+    issues.push(`翻译结果过长（是原文的${(ratio * 100).toFixed(0)}%），可能包含多余内容`);
+  } else if (ratio < 0.1 && original.length > 10) {
+    issues.push(`翻译结果过短（是原文的${(ratio * 100).toFixed(0)}%），可能被截断`);
+  }
+
+  // 检查是否包含明显的错误提示
+  const errorPatterns = [/error/i, /failed/i, /无法翻译/, /翻译失败/, /不支持/];
+  for (const pattern of errorPatterns) {
+    if (pattern.test(cleaned) && cleaned.length < 50) {
+      issues.push('翻译结果可能包含错误信息');
+      break;
+    }
+  }
+
+  return issues;
+}
+
+/**
+ * 生成翻译提示词
+ */
 function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName, mode) {
   const customPrompt = promptTemplates?.translate;
   let base;
-  if (customPrompt) {
+  if (customPrompt && customPrompt.trim()) {
     base = customPrompt
       .replace(/\[{source_lang}\]/g, sourceLangName)
       .replace(/\[{target_lang}\]/g, targetLangName);
   } else {
-    base = `你是一个专业的翻译助手。将用户输入从${sourceLangName}翻译成${targetLangName}。只返回翻译结果，不要加任何解释。`;
+    base = `你是一个专业翻译。将以下${sourceLangName}文本翻译为${targetLangName}。
+【规则】
+1. 只输出翻译结果，不要任何解释、前缀或后缀
+2. 保持原文的段落结构和换行
+3. 专有名词、技术术语保留原文不翻译
+4. 语气和风格与原文保持一致`;
   }
 
   if (mode === 'markdown') {
-    base += '\n\n【重要】用户内容包含Markdown格式（标题、列表、代码块、链接、加粗等标记），翻译时必须完整保留所有Markdown语法标记不变，只翻译纯文本部分的内容。绝对不能输出或复制任何指令文字。';
+    base += '\n\n【格式要求】内容是Markdown格式，必须保留所有Markdown标记（#标题、**加粗**、*斜体*、-列表、```代码块`、[链接](url)等）不变，只翻译其中的文本内容。';
   } else if (mode === 'html') {
-    base += '\n\n【重要】用户内容包含HTML标签，翻译时必须保留所有HTML标签及其属性完全不变，只翻译标签之间的文本内容。';
+    base += '\n\n【格式要求】内容是HTML格式，必须保留所有HTML标签（<div>、<p>、<span>等）及其属性不变，只翻译标签之间的文本。';
   } else if (mode === 'code') {
-    base += '\n\n【重要】用户内容是代码文件，请只翻译其中的注释内容（以//、/*、<!--、#、--、;等开头的注释行），保持所有代码逻辑、变量名、函数名、语法结构完全不变。';
+    base += '\n\n【格式要求】内容是代码，只翻译注释部分（//、/* */、<!-- -->、#、--、;等开头的行），所有代码逻辑、变量名、函数名、语法结构必须保持不变。';
   }
 
   return base;
 }
 
+/**
+ * 记录翻译统计
+ */
 async function recordStats(env, ip, tokens) {
   try {
     const today = new Date().toISOString().slice(0, 10);
@@ -95,6 +179,9 @@ async function recordStats(env, ip, tokens) {
   } catch (e) { /* 静默失败 */ }
 }
 
+/**
+ * 记录访问日志
+ */
 async function logAccess(env, ip, sourceLang, targetLang, provider, charCount, success, latency, country) {
   try {
     const today = new Date().toISOString().slice(0, 10);
@@ -117,30 +204,9 @@ async function logAccess(env, ip, sourceLang, targetLang, provider, charCount, s
   } catch (e) { /* 访问日志记录失败，静默处理 */ }
 }
 
-async function translateWithCloudflare(text, sourceLang, targetLang, model, env, promptTemplates, mode) {
-  const sourceLangName = sourceLang === 'auto' ? '自动检测' : (LANG_NAMES[sourceLang] || sourceLang);
-  const targetLangName = LANG_NAMES[targetLang] || targetLang;
-  const systemPrompt = getTranslatePrompt(promptTemplates, sourceLangName, targetLangName, mode);
-
-  if (model === '@cf/meta/m2m100-1.2b' || !model) {
-    const srcM2m = sourceLang === 'auto' ? 'english' : (LANG_MAP[sourceLang] || 'english');
-    const tgtM2m = LANG_MAP[targetLang] || 'chinese';
-    const response = await env.AI.run('@cf/meta/m2m100-1.2b', {
-      text,
-      source_lang: srcM2m,
-      target_lang: tgtM2m
-    });
-    return { translatedText: response.translated_text, detectedSourceLang: sourceLang === 'auto' ? null : sourceLang, tokens: 0 };
-  }
-
-  const messages = [
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: text }
-  ];
-  const response = await env.AI.run(model || '@cf/meta/llama-3.1-8b-instruct', { messages });
-  return { translatedText: response.response, detectedSourceLang: null, tokens: 0 };
-}
-
+/**
+ * 调用第三方翻译API
+ */
 async function translateWithExternal(text, sourceLang, targetLang, provider, model, apiKey, customEndpoint, promptTemplates, mode) {
   const sourceLangName = sourceLang === 'auto' ? '自动检测' : (LANG_NAMES[sourceLang] || sourceLang);
   const targetLangName = LANG_NAMES[targetLang] || targetLang;
@@ -166,7 +232,10 @@ async function translateWithExternal(text, sourceLang, targetLang, provider, mod
     model: model || prov?.defaultModel || 'gpt-4o-mini',
     messages,
     max_tokens: 4096,
-    temperature: 0.3
+    temperature: 0.1,
+    top_p: 0.9,
+    frequency_penalty: 0.0,
+    presence_penalty: 0.0
   };
 
   const endpoint = provider === 'anthropic'
@@ -190,15 +259,20 @@ async function translateWithExternal(text, sourceLang, targetLang, provider, mod
   }
 
   const data = await res.json();
-  const translatedText = provider === 'anthropic'
+  const rawText = provider === 'anthropic'
     ? data.content?.[0]?.text
     : data.choices?.[0]?.message?.content;
 
-  if (!translatedText) throw new Error('API 返回格式异常');
+  if (!rawText) throw new Error('API 返回格式异常');
+  
+  const cleanedText = cleanTranslationResult(rawText, text, mode);
   const tokens = data.usage?.total_tokens || 0;
-  return { translatedText, detectedSourceLang: null, tokens };
+  return { translatedText: cleanedText, detectedSourceLang: null, tokens };
 }
 
+/**
+ * 翻译请求入口
+ */
 export async function onRequestPost(context) {
   const { request, env } = context;
   const startTime = Date.now();
@@ -207,9 +281,13 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { text, sourceLang, targetLang, provider, model, mode } = body;
+    let { text, sourceLang, targetLang, provider, model, mode } = body;
 
     if (!text || !text.trim()) return errorResponse('文本不能为空');
+
+    // 预处理：清理不可见字符和异常编码
+    text = sanitizeInput(text);
+    if (!text) return errorResponse('文本预处理后为空');
 
     // 读取系统配置，检查翻译限制
     let maxCharLimit = 5000;
@@ -243,6 +321,34 @@ export async function onRequestPost(context) {
     const configData = await env.SETTINGS.get('admin:config');
     const config = configData ? JSON.parse(configData) : {};
     const promptTemplates = config.promptTemplates || {};
+    const configProviders = config.providers || {};
+
+    // 确定使用的翻译提供商和模型
+    let prov = provider;
+    let useModel = model;
+
+    if (!prov) {
+      // 从管理员配置中获取第一个启用的第三方提供商
+      const enabledProviders = Object.entries(configProviders)
+        .filter(([pId, pConfig]) => pConfig?.enabled)
+        .map(([pId]) => pId);
+
+      if (enabledProviders.length > 0) {
+        prov = enabledProviders[0];
+      } else {
+        return errorResponse('请先在管理后台配置并启用第三方翻译 API Key', 401);
+      }
+    }
+
+    if (!useModel) {
+      // 从管理员配置中获取该提供商启用的第一个模型
+      const provConfig = configProviders[prov];
+      if (provConfig?.modelEnabled && provConfig.modelEnabled.length > 0) {
+        useModel = provConfig.modelEnabled[0];
+      } else {
+        useModel = PROVIDERS[prov]?.defaultModel || 'gpt-4o-mini';
+      }
+    }
 
     // 翻译缓存：尝试从缓存获取
     const cacheHash = simpleHash(text.trim().toLowerCase() + '|' + srcLang + '|' + targetLang + '|' + (mode || ''));
@@ -263,93 +369,91 @@ export async function onRequestPost(context) {
       }
     } catch {}
 
-    const prov = provider || 'cloudflare';
+    // 执行翻译
+    const apiKeysData = await env.SETTINGS.get('admin:apiKeys');
+    const adminKeys = apiKeysData ? JSON.parse(apiKeysData) : {};
+
     let result;
 
-    if (prov === 'cloudflare') {
-      result = await translateWithCloudflare(text, srcLang, targetLang, model, env, promptTemplates, mode);
-      await logAccess(env, clientIp, srcLang, targetLang, 'cloudflare', text.length, true, Date.now() - startTime, clientCountry);
-    } else {
-      // 智能路由：从admin:apiKeys获取所有启用的API Key，按优先级尝试
-      const apiKeysData = await env.SETTINGS.get('admin:apiKeys');
-      const adminKeys = apiKeysData ? JSON.parse(apiKeysData) : {};
-
-      // 如果指定了provider，尝试用该provider；否则智能路由
-      if (prov && adminKeys[prov]?.apiKey) {
-        try {
-          result = await translateWithExternal(
-            text, srcLang, targetLang, prov, model,
-            adminKeys[prov].apiKey,
-            adminKeys[prov].customEndpoint || '',
-            promptTemplates,
-            mode
-          );
-          await logAccess(env, clientIp, srcLang, targetLang, prov, text.length, true, Date.now() - startTime, clientCountry);
-        } catch (err) {
-          await logAccess(env, clientIp, srcLang, targetLang, prov, text.length, false, Date.now() - startTime, clientCountry);
-          // 故障转移：尝试其他启用的提供商
-          const configProviders = config.providers || {};
-          const fallbackKeys = Object.entries(adminKeys)
-            .filter(([pId]) => pId !== prov && configProviders[pId]?.enabled && adminKeys[pId]?.apiKey);
-          let translated = false;
-          for (const [fbId, fbKey] of fallbackKeys) {
-            try {
-              result = await translateWithExternal(
-                text, srcLang, targetLang, fbId,
-                PROVIDERS[fbId]?.defaultModel || 'gpt-4o-mini',
-                typeof fbKey === 'string' ? fbKey : fbKey.apiKey,
-                (typeof fbKey === 'object' ? fbKey.customEndpoint : '') || '',
-                promptTemplates,
-                mode
-              );
-              await logAccess(env, clientIp, srcLang, targetLang, fbId, text.length, true, Date.now() - startTime, clientCountry);
-              translated = true;
-              break;
-            } catch { continue; }
-          }
-          if (!translated) throw err;
-        }
-      } else {
-        // 智能路由：从启用的提供商中选择
-        const configProviders = config.providers || {};
-        const enabledKeys = Object.entries(adminKeys)
-          .filter(([pId]) => configProviders[pId]?.enabled && adminKeys[pId]?.apiKey);
-        if (enabledKeys.length === 0) {
-          return errorResponse('请先在管理后台配置并启用 API Key', 401);
-        }
+    // 如果指定了provider且有对应的API Key，直接使用该provider
+    if (prov && adminKeys[prov]?.apiKey) {
+      try {
+        result = await translateWithExternal(
+          text, srcLang, targetLang, prov, useModel,
+          adminKeys[prov].apiKey,
+          adminKeys[prov].customEndpoint || '',
+          promptTemplates,
+          mode
+        );
+        await logAccess(env, clientIp, srcLang, targetLang, prov, text.length, true, Date.now() - startTime, clientCountry);
+      } catch (err) {
+        await logAccess(env, clientIp, srcLang, targetLang, prov, text.length, false, Date.now() - startTime, clientCountry);
+        // 故障转移：尝试其他启用的第三方提供商
+        const fallbackKeys = Object.entries(adminKeys)
+          .filter(([pId]) => pId !== prov && configProviders[pId]?.enabled && adminKeys[pId]?.apiKey);
         let translated = false;
-        let lastError = null;
-        for (const [pId, k] of enabledKeys) {
+        for (const [fbId, fbKey] of fallbackKeys) {
           try {
-            const kd = typeof k === 'object' ? k : { apiKey: k, customEndpoint: '' };
-            const useModel = model || PROVIDERS[pId]?.defaultModel || 'gpt-4o-mini';
+            const fbModel = configProviders[fbId]?.modelEnabled?.[0] || PROVIDERS[fbId]?.defaultModel || 'gpt-4o-mini';
             result = await translateWithExternal(
-              text, srcLang, targetLang, pId, useModel,
-              kd.apiKey, kd.customEndpoint || '', promptTemplates, mode
+              text, srcLang, targetLang, fbId, fbModel,
+              typeof fbKey === 'string' ? fbKey : fbKey.apiKey,
+              (typeof fbKey === 'object' ? fbKey.customEndpoint : '') || '',
+              promptTemplates,
+              mode
             );
-            await logAccess(env, clientIp, srcLang, targetLang, pId, text.length, true, Date.now() - startTime, clientCountry);
+            await logAccess(env, clientIp, srcLang, targetLang, fbId, text.length, true, Date.now() - startTime, clientCountry);
             translated = true;
             break;
-          } catch (e) {
-            lastError = e;
-            continue;
-          }
+          } catch { continue; }
         }
-        if (!translated) {
-          await logAccess(env, clientIp, srcLang, targetLang, 'none', text.length, false, Date.now() - startTime, clientCountry);
-          throw lastError || new Error('所有可用的翻译服务均失败');
+        if (!translated) throw err;
+      }
+    } else {
+      // 智能路由：从启用的第三方提供商中选择
+      const enabledKeys = Object.entries(adminKeys)
+        .filter(([pId]) => configProviders[pId]?.enabled && adminKeys[pId]?.apiKey);
+      if (enabledKeys.length === 0) {
+        return errorResponse('请先在管理后台配置并启用第三方翻译 API Key', 401);
+      }
+      let translated = false;
+      let lastError = null;
+      for (const [pId, k] of enabledKeys) {
+        try {
+          const kd = typeof k === 'object' ? k : { apiKey: k, customEndpoint: '' };
+          const pModel = configProviders[pId]?.modelEnabled?.[0] || PROVIDERS[pId]?.defaultModel || 'gpt-4o-mini';
+          result = await translateWithExternal(
+            text, srcLang, targetLang, pId, pModel,
+            kd.apiKey, kd.customEndpoint || '', promptTemplates, mode
+          );
+          await logAccess(env, clientIp, srcLang, targetLang, pId, text.length, true, Date.now() - startTime, clientCountry);
+          translated = true;
+          break;
+        } catch (e) {
+          lastError = e;
+          continue;
         }
+      }
+      if (!translated) {
+        await logAccess(env, clientIp, srcLang, targetLang, 'none', text.length, false, Date.now() - startTime, clientCountry);
+        throw lastError || new Error('所有可用的翻译服务均失败');
       }
     }
 
     await recordStats(env, clientIp, result.tokens);
+
+    // 质量检查
+    const qualityIssues = checkTranslationQuality(result.translatedText, text, sourceLang, targetLang);
+    if (qualityIssues.length > 0) {
+      console.warn('翻译质量警告:', qualityIssues.join(', '), '| 原文:', text.slice(0, 100));
+    }
 
     // 写入翻译缓存（24小时过期）
     try {
       const cacheKey = `cache:translate:${cacheHash}`;
       await env.SETTINGS.put(cacheKey, JSON.stringify({
         translatedText: result.translatedText,
-        provider: provider || 'cloudflare',
+        provider: prov,
         createdAt: Date.now()
       }), { expirationTtl: 86400 });
     } catch {}
@@ -359,7 +463,8 @@ export async function onRequestPost(context) {
       sourceLang: result.detectedSourceLang || srcLang,
       targetLang,
       provider: prov,
-      model: model || (prov === 'cloudflare' ? '@cf/meta/m2m100-1.2b' : PROVIDERS[prov]?.defaultModel)
+      model: useModel,
+      qualityWarnings: qualityIssues
     });
   } catch (err) {
     // 记录错误日志

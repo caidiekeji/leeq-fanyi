@@ -35,10 +35,20 @@ function buildBody(provider, model) {
       model,
       messages: TEST_MESSAGES.filter(m => m.role !== 'system'),
       system: TEST_MESSAGES[0].content,
-      max_tokens: 256
+      max_tokens: 256,
+      temperature: 0.1,
+      top_p: 0.9
     };
   }
-  return { model, messages: TEST_MESSAGES, max_tokens: 256 };
+  return { 
+    model, 
+    messages: TEST_MESSAGES, 
+    max_tokens: 256,
+    temperature: 0.1,
+    top_p: 0.9,
+    frequency_penalty: 0.0,
+    presence_penalty: 0.0
+  };
 }
 
 async function testModelSpeed(provider, model, apiKey, customEndpoint) {

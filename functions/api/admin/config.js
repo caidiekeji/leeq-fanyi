@@ -1,6 +1,5 @@
 const DEFAULT_CONFIG = {
   providers: {
-    cloudflare: { name: 'Cloudflare Workers AI', enabled: false, models: [] },
     openai: { name: 'OpenAI', enabled: false, models: [] },
     anthropic: { name: 'Claude', enabled: false, models: [] },
     gemini: { name: 'Gemini', enabled: false, models: [] },
