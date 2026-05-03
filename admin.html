@@ -849,8 +849,24 @@
         if (!hasProvModels) return;
         hasModels = true;
 
+        // 计算已选模型数量
+        const enabledCount = prov.modelEnabled ? prov.modelEnabled.length : 0;
+
         // 初始化该提供商的分页状态
-        if (!(provId in modelPageState)) modelPageState[provId] = 1;
+        if (!(provId in modelPageState)) {
+          // 如果有已选模型，找到第一个已选模型所在的页面
+          if (enabledCount > 0 && prov.modelEnabled) {
+            const firstEnabledModel = prov.modelEnabled[0];
+            const modelIndex = prov.models.findIndex(m => m.id === firstEnabledModel);
+            if (modelIndex !== -1) {
+              modelPageState[provId] = Math.floor(modelIndex / MODELS_PER_PAGE) + 1;
+            } else {
+              modelPageState[provId] = 1;
+            }
+          } else {
+            modelPageState[provId] = 1;
+          }
+        }
         const currentPage = modelPageState[provId];
         const totalPages = Math.ceil(prov.models.length / MODELS_PER_PAGE);
         const startIdx = (currentPage - 1) * MODELS_PER_PAGE;
@@ -859,7 +875,7 @@
         list.innerHTML += `<div class="provider-group" data-provider="${provId}">
           <div class="provider-group-header">
             <strong>${prov.name}</strong>
-            <span class="provider-model-count">${prov.models.length} 个模型</span>
+            <span class="provider-model-count">${prov.models.length} 个模型${enabledCount > 0 ? ` <span style="color:var(--primary);font-weight:600">· 已选 ${enabledCount} 个</span>` : ''}</span>
             <div style="display:flex;align-items:center;gap:12px">
               <span id="testResult-${provId}" style="font-size:12px;color:var(--text-muted)"></span>
               <button class="btn btn-default btn-sm" onclick="handleFetchModels('${provId}')">刷新模型</button>
