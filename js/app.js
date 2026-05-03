@@ -4,9 +4,6 @@ const state = {
   status: 'idle',
   theme: loadLocal('theme', 'dark'),
   realtimeMode: loadLocal('realtimeMode', false),
-  preserveMarkdown: loadLocal('preserveMarkdown', false),
-  preserveHtml: loadLocal('preserveHtml', false),
-  codeCommentMode: loadLocal('codeCommentMode', false),
   historyPanel: false,
   favoritesPanel: false,
   maxCharLimit: 5000,
@@ -130,9 +127,6 @@ function bindEvents() {
   document.getElementById('clearBtn').addEventListener('click', handleClear);
   document.getElementById('themeBtn').addEventListener('click', toggleTheme);
   document.getElementById('realtimeBtn').addEventListener('click', toggleRealtimeMode);
-  document.getElementById('mdToggleBtn').addEventListener('click', toggleMarkdownMode);
-  document.getElementById('htmlToggleBtn').addEventListener('click', toggleHtmlMode);
-  document.getElementById('codeToggleBtn').addEventListener('click', toggleCodeCommentMode);
   document.getElementById('batchBtn').addEventListener('click', handleBatchTranslate);
   document.getElementById('favoriteBtn').addEventListener('click', handleFavorite);
   document.getElementById('exportBtn').addEventListener('click', showExportMenu);
@@ -221,16 +215,12 @@ async function handleTranslate(forceRefresh = false) {
   setState('translating');
   const startTime = Date.now();
   try {
-    const translatorMode = state.preserveMarkdown ? 'markdown'
-      : state.preserveHtml ? 'html'
-      : state.codeCommentMode ? 'code' : '';
     const result = await api('/api/translate', {
       method: 'POST',
       body: { 
         text, 
         sourceLang: state.sourceLang, 
         targetLang: state.targetLang, 
-        mode: translatorMode,
         provider: state.defaultProvider,
         model: state.defaultModel,
         nocache: forceRefresh
@@ -278,16 +268,12 @@ async function handleBatchTranslate() {
 
   for (let i = 0; i < lines.length; i++) {
     try {
-      const translatorMode = state.preserveMarkdown ? 'markdown'
-        : state.preserveHtml ? 'html'
-        : state.codeCommentMode ? 'code' : '';
       const result = await api('/api/translate', {
         method: 'POST',
         body: { 
           text: lines[i], 
           sourceLang: state.sourceLang, 
           targetLang: state.targetLang, 
-          mode: translatorMode,
           provider: state.defaultProvider,
           model: state.defaultModel
         }
@@ -390,49 +376,6 @@ function toggleRealtimeMode() {
   } else {
     showToast('实时翻译已关闭', 'info');
   }
-}
-
-function toggleMarkdownMode() {
-  // 切换Markdown模式时关闭其他格式保留模式
-  if (!state.preserveMarkdown) {
-    state.preserveHtml = false;
-    state.codeCommentMode = false;
-    document.getElementById('htmlToggleBtn').classList.remove('active');
-    document.getElementById('codeToggleBtn').classList.remove('active');
-  }
-  state.preserveMarkdown = !state.preserveMarkdown;
-  saveLocal('preserveMarkdown', state.preserveMarkdown);
-  const btn = document.getElementById('mdToggleBtn');
-  btn.classList.toggle('active', state.preserveMarkdown);
-  showToast(state.preserveMarkdown ? 'Markdown格式保留已开启' : 'Markdown格式保留已关闭', 'info');
-}
-
-function toggleHtmlMode() {
-  if (!state.preserveHtml) {
-    state.preserveMarkdown = false;
-    state.codeCommentMode = false;
-    document.getElementById('mdToggleBtn').classList.remove('active');
-    document.getElementById('codeToggleBtn').classList.remove('active');
-  }
-  state.preserveHtml = !state.preserveHtml;
-  saveLocal('preserveHtml', state.preserveHtml);
-  const btn = document.getElementById('htmlToggleBtn');
-  btn.classList.toggle('active', state.preserveHtml);
-  showToast(state.preserveHtml ? 'HTML格式保留已开启' : 'HTML格式保留已关闭', 'info');
-}
-
-function toggleCodeCommentMode() {
-  if (!state.codeCommentMode) {
-    state.preserveMarkdown = false;
-    state.preserveHtml = false;
-    document.getElementById('mdToggleBtn').classList.remove('active');
-    document.getElementById('htmlToggleBtn').classList.remove('active');
-  }
-  state.codeCommentMode = !state.codeCommentMode;
-  saveLocal('codeCommentMode', state.codeCommentMode);
-  const btn = document.getElementById('codeToggleBtn');
-  btn.classList.toggle('active', state.codeCommentMode);
-  showToast(state.codeCommentMode ? '代码注释翻译已开启' : '代码注释翻译已关闭', 'info');
 }
 
 async function handleFavorite() {
@@ -650,7 +593,4 @@ document.addEventListener('DOMContentLoaded', () => {
   loadShareContent();
   // 初始化按钮状态
   if (state.realtimeMode) document.getElementById('realtimeBtn').classList.add('active');
-  if (state.preserveMarkdown) document.getElementById('mdToggleBtn').classList.add('active');
-  if (state.preserveHtml) document.getElementById('htmlToggleBtn').classList.add('active');
-  if (state.codeCommentMode) document.getElementById('codeToggleBtn').classList.add('active');
 });

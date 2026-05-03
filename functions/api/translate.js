@@ -64,15 +64,10 @@ function sanitizeInput(text) {
 /**
  * 清洗LLM返回的翻译结果，去除多余内容
  */
-function cleanTranslationResult(text, originalText, mode, sourceLang, targetLang) {
+function cleanTranslationResult(text, originalText, sourceLang, targetLang) {
   if (!text) throw new Error('API 返回空结果');
 
   let cleaned = text.trim();
-
-  // 移除可能的Markdown代码块标记
-  if (mode !== 'code') {
-    cleaned = cleaned.replace(/^```[\s\S]*?\n([\s\S]*?)\n?```$/m, '$1').trim();
-  }
 
   // 移除常见的AI回复前缀
   const prefixesToRemove = [
@@ -88,9 +83,10 @@ function cleanTranslationResult(text, originalText, mode, sourceLang, targetLang
     }
   }
 
-  // 检查翻译结果是否与原文相同（当源语言和目标语言不同时）
-  if (cleaned === originalText.trim() && sourceLang !== targetLang) {
-    throw new Error(`翻译失败：返回结果与原文相同（${sourceLang} → ${targetLang}）`);
+  // 检查翻译结果是否与原文相同（翻译失败）
+  const originalTrimmed = originalText.trim();
+  if (cleaned === originalTrimmed) {
+    throw new Error('翻译失败：返回结果与原文完全相同');
   }
 
   return cleaned;
@@ -137,7 +133,7 @@ function checkTranslationQuality(translatedText, originalText, sourceLang, targe
 /**
  * 生成翻译提示词
  */
-function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName, mode) {
+function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName) {
   const customPrompt = promptTemplates?.translate;
   let base;
   if (customPrompt && customPrompt.trim()) {
@@ -153,14 +149,6 @@ function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName, mod
 3. 保持原文的段落结构和换行
 4. 专有名词、技术术语保留原文不翻译
 5. 语气和风格与原文保持一致`;
-  }
-
-  if (mode === 'markdown') {
-    base += '\n\n【格式要求】内容是Markdown格式，必须保留所有Markdown标记（#标题、**加粗**、*斜体*、-列表、```代码块`、[链接](url)等）不变，只翻译其中的文本内容。';
-  } else if (mode === 'html') {
-    base += '\n\n【格式要求】内容是HTML格式，必须保留所有HTML标签（<div>、<p>、<span>等）及其属性不变，只翻译标签之间的文本。';
-  } else if (mode === 'code') {
-    base += '\n\n【格式要求】内容是代码，只翻译注释部分（//、/* */、<!-- -->、#、--、;等开头的行），所有代码逻辑、变量名、函数名、语法结构必须保持不变。';
   }
 
   return base;
@@ -214,14 +202,14 @@ async function logAccess(env, ip, sourceLang, targetLang, provider, charCount, s
 /**
  * 调用第三方翻译API
  */
-async function translateWithExternal(text, sourceLang, targetLang, provider, model, apiKey, customEndpoint, promptTemplates, mode) {
+async function translateWithExternal(text, sourceLang, targetLang, provider, model, apiKey, customEndpoint, promptTemplates) {
   const sourceLangName = sourceLang === 'auto' ? '自动检测' : (LANG_NAMES[sourceLang] || sourceLang);
   const targetLangName = LANG_NAMES[targetLang] || targetLang;
   const prov = PROVIDERS[provider];
   const baseUrl = customEndpoint || prov?.baseUrl;
   if (!baseUrl) throw new Error('未配置 API 端点');
 
-  const systemPrompt = getTranslatePrompt(promptTemplates, sourceLangName, targetLangName, mode);
+  const systemPrompt = getTranslatePrompt(promptTemplates, sourceLangName, targetLangName);
 
   const messages = [
     { role: 'system', content: systemPrompt },
@@ -272,7 +260,7 @@ async function translateWithExternal(text, sourceLang, targetLang, provider, mod
 
   if (!rawText) throw new Error('API 返回格式异常');
   
-  const cleanedText = cleanTranslationResult(rawText, text, mode, sourceLang, targetLang);
+  const cleanedText = cleanTranslationResult(rawText, text, sourceLang, targetLang);
   const tokens = data.usage?.total_tokens || 0;
   return { translatedText: cleanedText, detectedSourceLang: null, tokens };
 }
@@ -288,7 +276,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    let { text, sourceLang, targetLang, provider, model, mode, nocache } = body;
+    let { text, sourceLang, targetLang, provider, model, nocache } = body;
 
     if (!text || !text.trim()) return errorResponse('文本不能为空');
 
@@ -358,7 +346,7 @@ export async function onRequestPost(context) {
     }
 
     // 缓存哈希（用于写入缓存）
-    const cacheHash = simpleHash(text.trim().toLowerCase() + '|' + srcLang + '|' + targetLang + '|' + (mode || ''));
+    const cacheHash = simpleHash(text.trim().toLowerCase() + '|' + srcLang + '|' + targetLang);
 
     // 执行翻译
     const apiKeysData = await env.SETTINGS.get('admin:apiKeys');
@@ -373,8 +361,7 @@ export async function onRequestPost(context) {
           text, srcLang, targetLang, prov, useModel,
           adminKeys[prov].apiKey,
           adminKeys[prov].customEndpoint || '',
-          promptTemplates,
-          mode
+          promptTemplates
         );
         await logAccess(env, clientIp, srcLang, targetLang, prov, text.length, true, Date.now() - startTime, clientCountry);
       } catch (err) {
@@ -390,8 +377,7 @@ export async function onRequestPost(context) {
               text, srcLang, targetLang, fbId, fbModel,
               typeof fbKey === 'string' ? fbKey : fbKey.apiKey,
               (typeof fbKey === 'object' ? fbKey.customEndpoint : '') || '',
-              promptTemplates,
-              mode
+              promptTemplates
             );
             await logAccess(env, clientIp, srcLang, targetLang, fbId, text.length, true, Date.now() - startTime, clientCountry);
             translated = true;
@@ -415,7 +401,7 @@ export async function onRequestPost(context) {
           const pModel = configProviders[pId]?.modelEnabled?.[0] || PROVIDERS[pId]?.defaultModel || 'gpt-4o-mini';
           result = await translateWithExternal(
             text, srcLang, targetLang, pId, pModel,
-            kd.apiKey, kd.customEndpoint || '', promptTemplates, mode
+            kd.apiKey, kd.customEndpoint || '', promptTemplates
           );
           await logAccess(env, clientIp, srcLang, targetLang, pId, text.length, true, Date.now() - startTime, clientCountry);
           translated = true;
