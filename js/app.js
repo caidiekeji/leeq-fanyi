@@ -118,7 +118,13 @@ function bindEvents() {
     if (state.realtimeMode) debouncedTranslate();
   });
 
-  document.getElementById('translateBtn').addEventListener('click', handleTranslate);
+  document.getElementById('translateBtn').addEventListener('click', e => {
+    const forceRefresh = e.ctrlKey || e.metaKey;
+    if (forceRefresh) {
+      showToast('强制重新翻译（跳过缓存）', 'info');
+    }
+    handleTranslate(forceRefresh);
+  });
   document.getElementById('swapBtn').addEventListener('click', handleSwap);
   document.getElementById('copyBtn').addEventListener('click', handleCopy);
   document.getElementById('clearBtn').addEventListener('click', handleClear);
@@ -204,7 +210,7 @@ function updateTranslateBtn() {
   btn.disabled = !text || state.status === 'translating';
 }
 
-async function handleTranslate() {
+async function handleTranslate(forceRefresh = false) {
   const text = document.getElementById('sourceText').value.trim();
   if (!text) return;
   if (text.length > state.maxCharLimit) {
@@ -226,7 +232,8 @@ async function handleTranslate() {
         targetLang: state.targetLang, 
         mode: translatorMode,
         provider: state.defaultProvider,
-        model: state.defaultModel
+        model: state.defaultModel,
+        nocache: forceRefresh
       }
     });
     const resultEl = document.getElementById('resultText');
