@@ -125,9 +125,7 @@ function bindEvents() {
   document.getElementById('clearBtn').addEventListener('click', handleClear);
   document.getElementById('themeBtn').addEventListener('click', toggleTheme);
   document.getElementById('realtimeBtn').addEventListener('click', toggleRealtimeMode);
-  document.getElementById('batchBtn').addEventListener('click', handleBatchTranslate);
   document.getElementById('exportBtn').addEventListener('click', showExportMenu);
-  document.getElementById('shareBtn').addEventListener('click', handleShare);
   document.getElementById('ttsBtn').addEventListener('click', handleTTS);
 }
 
@@ -240,51 +238,6 @@ async function handleTranslate(forceRefresh = false) {
     resultEl.innerHTML = `<div style="text-align:center;color:var(--error)"><p>翻译失败</p><p style="font-size:13px;margin-top:4px;opacity:0.8">${err.message}</p></div>`;
     setState('error');
   }
-}
-
-async function handleBatchTranslate() {
-  const text = document.getElementById('sourceText').value.trim();
-  if (!text) return;
-  const lines = text.split('\n').filter(l => l.trim());
-  if (lines.length < 2) {
-    showToast('批量翻译需要至少2行文本', 'warning');
-    return;
-  }
-  if (lines.length > 20) {
-    showToast('最多支持20行批量翻译', 'error');
-    return;
-  }
-
-  setState('translating');
-  const results = [];
-  let errors = 0;
-
-  for (let i = 0; i < lines.length; i++) {
-    try {
-      const result = await api('/api/translate', {
-        method: 'POST',
-        body: { 
-          text: lines[i], 
-          sourceLang: state.sourceLang, 
-          targetLang: state.targetLang, 
-          provider: state.defaultProvider,
-          model: state.defaultModel
-        }
-      });
-      results.push(result.translatedText);
-    } catch (err) {
-      results.push(`[翻译失败: ${err.message}]`);
-      errors++;
-    }
-    if (i < lines.length - 1) await new Promise(r => setTimeout(r, 300));
-  }
-
-  const resultEl = document.getElementById('resultText');
-  resultEl.textContent = results.join('\n');
-  resultEl.classList.remove('empty');
-  updateCharCount('result');
-  setState('success');
-  if (errors > 0) showToast(`批量翻译完成，${errors}行失败`, 'warning');
 }
 
 function setState(s) {
@@ -429,20 +382,6 @@ function downloadFile(content, filename, mime) {
   showToast(`已导出 ${filename}`, 'success');
 }
 
-function handleShare() {
-  const source = document.getElementById('sourceText').value.trim();
-  const result = document.getElementById('resultText').textContent;
-  if (!result) { showToast('没有可分享的内容', 'warning'); return; }
-
-  const baseUrl = window.location.origin + window.location.pathname;
-  const shareUrl = `${baseUrl}?text=${encodeURIComponent(result)}&source=${state.sourceLang}&target=${state.targetLang}`;
-  navigator.clipboard.writeText(shareUrl).then(() => {
-    showToast('分享链接已复制到剪贴板', 'success');
-  }).catch(() => {
-    showToast('复制失败', 'error');
-  });
-}
-
 function handleTTS() {
   const result = document.getElementById('resultText').textContent;
   if (!result) { showToast('没有可朗读的内容', 'warning'); return; }
@@ -459,25 +398,8 @@ function handleTTS() {
   showToast('正在朗读...', 'info');
 }
 
-// 从URL参数加载分享内容
-function loadShareContent() {
-  const params = new URLSearchParams(window.location.search);
-  const text = params.get('text');
-  if (text) {
-    document.getElementById('sourceText').value = decodeURIComponent(text);
-    const source = params.get('source');
-    const target = params.get('target');
-    if (source) { state.sourceLang = source; document.getElementById('sourceLang').value = source; }
-    if (target) { state.targetLang = target; document.getElementById('targetLang').value = target; }
-    updateCharCount('source');
-    updateTranslateBtn();
-    setTimeout(handleTranslate, 300);
-  }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
-  loadShareContent();
   // 初始化按钮状态
   if (state.realtimeMode) document.getElementById('realtimeBtn').classList.add('active');
 });
