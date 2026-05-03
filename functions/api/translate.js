@@ -64,8 +64,8 @@ function sanitizeInput(text) {
 /**
  * 清洗LLM返回的翻译结果，去除多余内容
  */
-function cleanTranslationResult(text, originalText, mode) {
-  if (!text) return '';
+function cleanTranslationResult(text, originalText, mode, sourceLang, targetLang) {
+  if (!text) throw new Error('API 返回空结果');
 
   let cleaned = text.trim();
 
@@ -86,6 +86,11 @@ function cleanTranslationResult(text, originalText, mode) {
       cleaned = cleaned.slice(prefix.length).trim();
       break;
     }
+  }
+
+  // 检查翻译结果是否与原文相同（当源语言和目标语言不同时）
+  if (cleaned === originalText.trim() && sourceLang !== targetLang) {
+    throw new Error(`翻译失败：返回结果与原文相同（${sourceLang} → ${targetLang}）`);
   }
 
   return cleaned;
@@ -140,12 +145,14 @@ function getTranslatePrompt(promptTemplates, sourceLangName, targetLangName, mod
       .replace(/\[{source_lang}\]/g, sourceLangName)
       .replace(/\[{target_lang}\]/g, targetLangName);
   } else {
-    base = `你是一个专业翻译。将以下${sourceLangName}文本翻译为${targetLangName}。
-【规则】
-1. 只输出翻译结果，不要任何解释、前缀或后缀
-2. 保持原文的段落结构和换行
-3. 专有名词、技术术语保留原文不翻译
-4. 语气和风格与原文保持一致`;
+    base = `你是一个专业翻译。请严格将以下${sourceLangName}文本翻译为${targetLangName}。
+
+【重要规则】
+1. 只输出翻译后的${targetLangName}结果，绝对不要输出原文
+2. 不要添加任何解释、前言或后缀
+3. 保持原文的段落结构和换行
+4. 专有名词、技术术语保留原文不翻译
+5. 语气和风格与原文保持一致`;
   }
 
   if (mode === 'markdown') {
@@ -265,7 +272,7 @@ async function translateWithExternal(text, sourceLang, targetLang, provider, mod
 
   if (!rawText) throw new Error('API 返回格式异常');
   
-  const cleanedText = cleanTranslationResult(rawText, text, mode);
+  const cleanedText = cleanTranslationResult(rawText, text, mode, sourceLang, targetLang);
   const tokens = data.usage?.total_tokens || 0;
   return { translatedText: cleanedText, detectedSourceLang: null, tokens };
 }
