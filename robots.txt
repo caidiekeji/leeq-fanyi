@@ -1,0 +1,14 @@
+# robots.txt - 允许所有搜索引擎爬取
+# https://leeq-fanyi.pages.dev/robots.txt
+
+# 默认规则：允许所有爬虫
+User-agent: *
+Allow: /
+
+# 允许 LeeQBot 爬取
+User-agent: leeqbot
+Allow: /
+Crawl-delay: 1
+
+# Sitemap 位置
+Sitemap: https://leeq-fanyi.pages.dev/sitemap.xml
