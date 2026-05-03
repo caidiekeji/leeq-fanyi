@@ -44,42 +44,38 @@ function loadSharedContent() {
 
 async function loadSystemConfig() {
   try {
-    const res = await fetch('/api/admin/system');
-    if (res.ok) {
-      const data = await res.json();
-      if (data.code === 200 && data.data) {
-        state.maxCharLimit = data.data.maxCharLimit || 5000;
-        state.sourceLang = data.data.defaultSourceLang || 'auto';
-        state.targetLang = data.data.defaultTargetLang || 'zh';
-        document.getElementById('sourceLang').value = state.sourceLang;
-        document.getElementById('targetLang').value = state.targetLang;
-        if (data.data.siteName) {
-          document.getElementById('siteName').textContent = data.data.siteName;
-        }
-        if (data.data.announcement) {
-          document.getElementById('announcementBar').style.display = 'block';
-          document.getElementById('announcementText').textContent = data.data.announcement;
-        }
-        if (data.data.footer) {
-          document.getElementById('footerText').textContent = data.data.footer;
-        }
-        updateCharCount('source');
-      }
-    }
-  } catch(e) { console.error('加载系统配置失败:', e); }
-
-  // 加载翻译配置（默认提供商和模型）
-  try {
+    // 加载系统配置和翻译配置（公开接口，无需认证）
     const res = await fetch('/api/translateConfig');
     if (res.ok) {
       const data = await res.json();
       if (data.code === 200 && data.data) {
-        state.defaultProvider = data.data.defaultProvider;
-        state.defaultModel = data.data.defaultModel;
-        console.log('翻译配置加载成功:', data.data.defaultProvider, data.data.defaultModel);
+        const config = data.data;
+        
+        // 系统配置
+        state.maxCharLimit = config.maxCharLimit || 5000;
+        state.sourceLang = config.defaultSourceLang || 'auto';
+        state.targetLang = config.defaultTargetLang || 'zh';
+        document.getElementById('sourceLang').value = state.sourceLang;
+        document.getElementById('targetLang').value = state.targetLang;
+        if (config.siteName) {
+          document.getElementById('siteName').textContent = config.siteName;
+        }
+        if (config.announcement) {
+          document.getElementById('announcementBar').style.display = 'block';
+          document.getElementById('announcementText').textContent = config.announcement;
+        }
+        if (config.footer) {
+          document.getElementById('footerText').textContent = config.footer;
+        }
+        updateCharCount('source');
+        
+        // 翻译配置
+        state.defaultProvider = config.defaultProvider;
+        state.defaultModel = config.defaultModel;
+        console.log('配置加载成功:', config.defaultProvider, config.defaultModel);
       }
     }
-  } catch(e) { console.error('加载翻译配置失败:', e); }
+  } catch(e) { console.error('加载配置失败:', e); }
 }
 
 function applyTheme(theme) {

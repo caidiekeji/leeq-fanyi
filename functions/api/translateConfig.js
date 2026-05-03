@@ -23,6 +23,10 @@ export async function onRequestGet(context) {
   const { env } = context;
 
   try {
+    // 读取系统公开配置（无需认证）
+    const systemData = await env.SETTINGS.get('admin:system');
+    const systemConfig = systemData ? JSON.parse(systemData) : {};
+    
     // 读取管理员配置
     const configData = await env.SETTINGS.get('admin:config');
     const config = configData ? JSON.parse(configData) : {};
@@ -55,30 +59,22 @@ export async function onRequestGet(context) {
       }
     }
 
-    // 如果没有配置任何第三方提供商，返回null
-    if (!defaultProvider) {
-      return new Response(JSON.stringify({
-        code: 200,
-        data: {
-          defaultProvider: null,
-          defaultModel: null,
-          availableProviders: [],
-          message: '请先在管理后台配置并启用第三方翻译服务'
-        },
-        message: '未配置翻译服务'
-      }), {
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
     return new Response(JSON.stringify({
       code: 200,
       data: {
+        // 系统公开配置
+        siteName: systemConfig.siteName || null,
+        announcement: systemConfig.announcement || null,
+        footer: systemConfig.footer || null,
+        maxCharLimit: systemConfig.maxCharLimit || 5000,
+        defaultSourceLang: systemConfig.defaultSourceLang || 'auto',
+        defaultTargetLang: systemConfig.defaultTargetLang || 'zh',
+        // 翻译配置
         defaultProvider,
         defaultModel,
-        availableProviders
-      },
-      message: 'success'
+        availableProviders,
+        message: defaultProvider ? 'success' : '请先在管理后台配置并启用第三方翻译服务'
+      }
     }), {
       headers: { 'Content-Type': 'application/json' }
     });
