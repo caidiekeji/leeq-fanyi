@@ -12,6 +12,29 @@
   <meta property="og:site_name" content="LeeQ 翻译">
   <meta name="robots" content="index, follow">
   <meta name="author" content="LeeQ">
+  <!-- 规范链接，防止重复内容问题 -->
+  <link rel="canonical" href="https://lq-26k.pages.dev/">
+  <!-- JSON-LD 结构化数据，帮助搜索引擎理解站点类型 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "LeeQ 翻译",
+    "url": "https://lq-26k.pages.dev/",
+    "description": "基于大语言模型（LLM）的智能多语言翻译工具，支持 20+ 种语言互译，智能语言检测，格式完美保留。",
+    "applicationCategory": "UtilityApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "CNY"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "LeeQ"
+    }
+  }
+  </script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231387c0'><path d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z'/></svg>">
   <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -114,7 +137,7 @@
         if (res.ok) {
           const data = await res.json();
           if (data.code === 200 && data.data) {
-            const { title, description, keywords } = data.data;
+            const { title, description, keywords, ogImage } = data.data;
             if (title) {
               document.title = title;
               const sn = document.getElementById('siteName');
@@ -122,6 +145,22 @@
             }
             if (description) document.querySelector('meta[name="description"]').content = description;
             if (keywords) document.querySelector('meta[name="keywords"]').content = keywords;
+            // 动态更新规范链接
+            if (title) {
+              const canonical = document.querySelector('link[rel="canonical"]');
+              if (canonical) canonical.href = 'https://lq-26k.pages.dev/';
+              // 动态更新 JSON-LD 结构化数据
+              const ld = document.querySelector('script[type="application/ld+json"]');
+              if (ld) {
+                try {
+                  const json = JSON.parse(ld.textContent);
+                  json.name = title;
+                  json.description = description || json.description;
+                  if (ogImage) json.image = ogImage;
+                  ld.textContent = JSON.stringify(json);
+                } catch {}
+              }
+            }
           }
         }
       } catch {}
