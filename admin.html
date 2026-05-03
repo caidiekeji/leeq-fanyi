@@ -868,13 +868,18 @@
           } else {
             speedHtml = `<button class="model-test-btn" data-prov="${provId}" data-mid="${m.id}" title="测试此模型">测试</button>`;
           }
-          list.innerHTML += `<label class="model-item ${enabled ? 'active' : ''}">
+          list.innerHTML += `<div class="model-item ${enabled ? 'active' : ''}">
             <div class="model-item-left">
               <input type="checkbox" class="model-cb" data-provider="${provId}" data-model="${m.id}" ${enabled ? 'checked' : ''}>
               <span class="model-name" title="${m.id}">${m.name || m.id}</span>
             </div>
-            ${speedHtml}
-          </label>`;
+            <div class="model-item-actions">
+              ${speedHtml}
+              <button class="model-del-btn" data-provider="${provId}" data-model="${m.id}" title="删除模型">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </div>`;
         });
         list.innerHTML += `</div></div>`;
       });
@@ -1003,6 +1008,19 @@
           const prov = btn.dataset.prov;
           const mid = btn.dataset.mid;
           await handleTestSingleModel(prov, mid, btn);
+        });
+      });
+      document.querySelectorAll('.model-del-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const provId = btn.dataset.provider;
+          const modelId = btn.dataset.model;
+          if (!confirm(`确定删除模型 "${modelId}"？`)) return;
+          if (!currentProviders[provId] || !currentProviders[provId].models) return;
+          currentProviders[provId].models = currentProviders[provId].models.filter(m => m.id !== modelId);
+          currentProviders[provId].modelEnabled = (currentProviders[provId].modelEnabled || []).filter(id => id !== modelId);
+          saveConfigAuto();
+          renderModels(currentProviders);
         });
       });
     }
