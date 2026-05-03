@@ -357,26 +357,8 @@ export async function onRequestPost(context) {
       }
     }
 
-    // 翻译缓存：尝试从缓存获取（nocache 时跳过）
+    // 缓存哈希（用于写入缓存）
     const cacheHash = simpleHash(text.trim().toLowerCase() + '|' + srcLang + '|' + targetLang + '|' + (mode || ''));
-    if (!nocache) {
-      try {
-        const cacheKey = `cache:translate:${cacheHash}`;
-        const cached = await env.SETTINGS.get(cacheKey);
-        if (cached) {
-          const cachedResult = JSON.parse(cached);
-          await logAccess(env, clientIp, srcLang, targetLang, 'cache', text.length, true, Date.now() - startTime, clientCountry);
-          return jsonResponse({
-            translatedText: cachedResult.translatedText,
-            sourceLang: srcLang,
-            targetLang,
-            provider: 'cache',
-            model: 'cached',
-            fromCache: true
-          });
-        }
-      } catch {}
-    }
 
     // 执行翻译
     const apiKeysData = await env.SETTINGS.get('admin:apiKeys');
