@@ -1017,10 +1017,12 @@
           const modelId = btn.dataset.model;
           if (!confirm(`确定删除模型 "${modelId}"？`)) return;
           if (!currentProviders[provId] || !currentProviders[provId].models) return;
+          // 从模型列表和已启用列表中移除
           currentProviders[provId].models = currentProviders[provId].models.filter(m => m.id !== modelId);
           currentProviders[provId].modelEnabled = (currentProviders[provId].modelEnabled || []).filter(id => id !== modelId);
-          saveConfigAuto();
-          renderModels(currentProviders);
+          // 保存配置并刷新UI
+          saveAllProviders();
+          renderProviders(currentProviders);
         });
       });
     }
