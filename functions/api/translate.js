@@ -1,11 +1,11 @@
 const LANG_NAMES = {
-  zh: '中文', en: '英语', ja: '日语', ko: '韩语',
-  fr: '法语', de: '德语', es: '西班牙语', ru: '俄语',
-  pt: '葡萄牙语', it: '意大利语', ar: '阿拉伯语', hi: '印地语',
-  th: '泰语', vi: '越南语', id: '印尼语', nl: '荷兰语',
-  pl: '波兰语', tr: '土耳其语', sv: '瑞典语', da: '丹麦语',
-  fi: '芬兰语', el: '希腊语', cs: '捷克语', ro: '罗马尼亚语',
-  hu: '匈牙利语', uk: '乌克兰语', bg: '保加利亚语'
+  zh: '中文(Chinese)', en: '英语(English)', ja: '日语(Japanese)', ko: '韩语(Korean)',
+  fr: '法语(French)', de: '德语(German)', es: '西班牙语(Spanish)', ru: '俄语(Russian)',
+  pt: '葡萄牙语(Portuguese)', it: '意大利语(Italian)', ar: '阿拉伯语(Arabic)', hi: '印地语(Hindi)',
+  th: '泰语(Thai)', vi: '越南语(Vietnamese)', id: '印尼语(Indonesian)', nl: '荷兰语(Dutch)',
+  pl: '波兰语(Polish)', tr: '土耳其语(Turkish)', sv: '瑞典语(Swedish)', da: '丹麦语(Danish)',
+  fi: '芬兰语(Finnish)', el: '希腊语(Greek)', cs: '捷克语(Czech)', ro: '罗马尼亚语(Romanian)',
+  hu: '匈牙利语(Hungarian)', uk: '乌克兰语(Ukrainian)', bg: '保加利亚语(Bulgarian)'
 };
 
 const PROVIDERS = {
@@ -209,7 +209,11 @@ async function translateWithExternal(text, sourceLang, targetLang, provider, mod
   const baseUrl = customEndpoint || prov?.baseUrl;
   if (!baseUrl) throw new Error('未配置 API 端点');
 
+  // 调试日志：验证参数正确传递
+  console.log(`[翻译调试] sourceLang=${sourceLang}, targetLang=${targetLang}, sourceLangName=${sourceLangName}, targetLangName=${targetLangName}, provider=${provider}, model=${model}`);
+
   const systemPrompt = getTranslatePrompt(promptTemplates, sourceLangName, targetLangName);
+  console.log(`[翻译调试] 系统提示词: ${systemPrompt.slice(0, 150)}...`);
 
   const messages = [
     { role: 'system', content: systemPrompt },

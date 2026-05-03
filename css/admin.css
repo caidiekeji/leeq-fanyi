@@ -591,6 +591,30 @@ body {
 
 .section-body { padding: 20px; }
 
+.section-body-scroll {
+  max-height: calc(100vh - 180px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.section-body-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.section-body-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.section-body-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.section-body-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
 /* Form */
 .form-grid {
   display: grid;
@@ -766,21 +790,21 @@ body {
 
 .model-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 6px;
 }
 
 .model-card {
   display: flex;
   flex-direction: column;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.15s;
   font-size: 13px;
   background: var(--bg-white);
-  gap: 6px;
+  gap: 4px;
 }
 
 .model-card:hover { border-color: var(--primary-light); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
