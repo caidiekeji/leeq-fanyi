@@ -4,7 +4,7 @@
   --primary: #0c8fa3;
   --primary-light: #0eb0c9;
   --primary-dark: #0a7a8c;
-  --secondary: #ffffff;
+  --secondary: #000000;
   --secondary-light: #f0fbfd;
   --secondary-dark: #d4f1f7;
   --accent: #0c8fa3;
@@ -55,9 +55,9 @@
   --border-default: #d0d0d0;
   --border-strong: #b0b0b0;
   --text-primary: #000000;
-  --text-secondary: #333333;
-  --text-tertiary: #666666;
-  --secondary: #0eb0c9;
+  --text-secondary: #000000;
+  --text-tertiary: #000000;
+  --secondary: #000000;
   --accent-gradient: linear-gradient(135deg, #0c8fa3 0%, #0eb0c9 100%);
   --accent-gradient-hover: linear-gradient(135deg, #0eb0c9 0%, #0a7a8c 100%);
   --primary-gradient: linear-gradient(135deg, #0c8fa3 0%, #0eb0c9 100%);
@@ -355,7 +355,7 @@ body {
   outline: none !important;
   font-size: 16px;
   line-height: 1.7;
-  color: var(--text-primary);
+  color: #888888;
   font-family: var(--font-sans);
   resize: none;
   box-shadow: none !important;
