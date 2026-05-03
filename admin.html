@@ -847,8 +847,8 @@
       let hasModels = false;
       
       // 构建统一的头部操作栏
-      let headerHtml = '<button class="btn btn-primary" onclick="handleSaveConfig()" style="flex-shrink:0">保存配置</button>';
-      headerHtml += '<div style="display:flex;align-items:center;gap:6px;overflow-x:auto;padding-left:8px">';
+      let headerHtml = '<button class="btn btn-primary" onclick="handleSaveConfig()" style="flex-shrink:0;height:28px;padding:2px 10px;font-size:11px">保存配置</button>';
+      headerHtml += '<div style="display:flex;align-items:center;gap:4px;overflow-x:auto;padding-left:6px">';
       
       Object.entries(providers).forEach(([provId, prov]) => {
         const hasProvModels = prov.models && prov.models.length > 0;
@@ -879,15 +879,15 @@
 
         // 添加供应商到头部操作栏
         const isActive = currentPage === 1 || Object.keys(modelPageState).length === 1;
-        headerHtml += `<span data-prov-tab="${provId}" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:${isActive ? 'var(--primary-light)' : 'var(--bg-secondary)'};border-radius:6px;font-size:12px;cursor:pointer;border:1px solid ${isActive ? 'var(--primary)' : 'var(--border-light)'};white-space:nowrap" onclick="switchProvTab('${provId}')">
+        headerHtml += `<span data-prov-tab="${provId}" style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:${isActive ? 'var(--primary-light)' : 'var(--bg-secondary)'};border-radius:4px;font-size:11px;cursor:pointer;border:1px solid ${isActive ? 'var(--primary)' : 'var(--border-light)'};white-space:nowrap;line-height:1.4;height:24px" onclick="switchProvTab('${provId}')">
           <strong style="font-weight:600">${prov.name}</strong>
-          <span style="color:var(--text-muted);font-size:11px">${prov.models.length}个${enabledCount > 0 ? `·<span style="color:var(--primary);font-weight:600">${enabledCount}</span>` : ''}</span>
+          <span style="color:var(--text-muted);font-size:10px">${prov.models.length}个${enabledCount > 0 ? `·<span style="color:var(--primary);font-weight:600">${enabledCount}</span>` : ''}</span>
         </span>
-        <span style="display:inline-flex;gap:3px;white-space:nowrap">
-          <button class="btn btn-default btn-sm" onclick="handleFetchModels('${provId}')" style="height:24px;padding:1px 6px;font-size:10px" title="刷新模型">刷新</button>
-          <button class="btn btn-primary btn-sm" onclick="handleTestAllModels('${provId}')" style="height:24px;padding:1px 6px;font-size:10px" title="一键测速">测速</button>
-          <label class="provider-toggle" style="font-size:11px;margin:0 2px" title="启用/禁用">
-            <input type="checkbox" class="provider-enable-cb" data-provider="${provId}" ${prov.enabled ? 'checked' : ''} style="width:13px;height:13px">
+        <span style="display:inline-flex;gap:2px;white-space:nowrap">
+          <button class="btn btn-default btn-sm" onclick="handleFetchModels('${provId}')" style="height:22px;padding:0 5px;font-size:10px;line-height:1.2" title="刷新模型">刷新</button>
+          <button class="btn btn-primary btn-sm" onclick="handleTestAllModels('${provId}')" style="height:22px;padding:0 5px;font-size:10px;line-height:1.2" title="一键测速">测速</button>
+          <label class="provider-toggle" style="font-size:10px;margin:0 1px;display:inline-flex;align-items:center;gap:2px;height:22px" title="启用/禁用">
+            <input type="checkbox" class="provider-enable-cb" data-provider="${provId}" ${prov.enabled ? 'checked' : ''} style="width:12px;height:12px;flex-shrink:0">
           </label>
         </span>`;
 
