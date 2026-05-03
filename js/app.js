@@ -208,7 +208,6 @@ async function handleTranslate(forceRefresh = false) {
   setState('translating');
   const startTime = Date.now();
   try {
-    console.log('[翻译调试] 发送请求:', { text: text.slice(0, 50), sourceLang: state.sourceLang, targetLang: state.targetLang, provider: state.defaultProvider, model: state.defaultModel });
     const result = await api('/api/translate', {
       method: 'POST',
       body: { 
