@@ -20,6 +20,15 @@ async function initApp() {
   bindShortcuts();
   bindDragDrop();
   updateTranslateBtn();
+  bindNavbarScroll();
+}
+
+function bindNavbarScroll() {
+  const navbar = document.querySelector('.navbar');
+  if (!navbar) return;
+  window.addEventListener('scroll', function () {
+    navbar.classList.toggle('scrolled', window.scrollY > 0);
+  }, { passive: true });
 }
 
 function loadSharedContent() {

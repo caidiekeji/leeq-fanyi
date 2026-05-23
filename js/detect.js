@@ -13,6 +13,14 @@
 
   let isDetecting = false;
 
+  // 导航栏滚动阴影
+  const navbar = document.querySelector('.navbar');
+  if (navbar) {
+    window.addEventListener('scroll', function () {
+      navbar.classList.toggle('scrolled', window.scrollY > 0);
+    }, { passive: true });
+  }
+
   // 主题管理
   const theme = localStorage.getItem('theme') || 'light';
   applyTheme(theme);

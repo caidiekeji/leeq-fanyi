@@ -14,11 +14,11 @@
   border: 3px solid var(--color-border);
   border-top-color: var(--color-primary);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 12px;
+  animation: detectSpin 0.7s linear infinite;
+  will-change: transform;
 }
 
-@keyframes spin {
+@keyframes detectSpin {
   to { transform: rotate(360deg); }
 }
 

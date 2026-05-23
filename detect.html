@@ -37,9 +37,9 @@
       <div class="control-bar">
         <div class="control-left">
           <select id="detectType" class="lang-select" aria-label="检测类型">
+            <option value="aiDetection">AI生成检测</option>
             <option value="compliance">合规检测</option>
             <option value="quality">质量评估</option>
-            <option value="aiDetection">AI生成检测</option>
             <option value="sensitiveInfo">敏感信息检测</option>
           </select>
         </div>
@@ -72,9 +72,9 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <p>选择检测类型，粘贴内容后点击检测</p>
             </div>
-            <div id="detectLoading" class="result-display" style="display:none">
+            <div id="detectLoading" class="result-display" style="display:none; flex-direction:column; align-items:center; justify-content:center">
               <div class="loading-spinner"></div>
-              <p>AI 正在分析您的内容...</p>
+              <p style="color:var(--color-text-muted);margin-top:12px;font-size:13px">AI 正在分析您的内容...</p>
             </div>
             <div id="detectReport" class="detect-report" style="display:none"></div>
           </div>
