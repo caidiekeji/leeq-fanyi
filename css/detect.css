@@ -54,6 +54,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
 }
 
 .report-summary.status-pass {
@@ -181,10 +182,15 @@
 }
 
 .dimension-item {
-  padding: 12px 14px;
+  padding: 14px 16px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.dimension-item:hover {
+  box-shadow: var(--shadow-xs);
 }
 
 .dimension-item.pass {
@@ -331,10 +337,11 @@
 
 /* 结论区域 */
 .report-conclusion {
-  padding: 16px;
+  padding: 20px;
   background: linear-gradient(135deg, var(--color-primary-bg), rgba(37, 99, 235, 0.02));
   border: 1px solid rgba(37, 99, 235, 0.12);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
 }
 
 .report-conclusion h3 {
