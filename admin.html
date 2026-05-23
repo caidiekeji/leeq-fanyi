@@ -1293,7 +1293,13 @@
       });
       const body = {
         providers,
-        promptTemplates: { translate: promptData.translate, detect: promptData.detect }
+        promptTemplates: { translate: promptData.translate, detect: promptData.detect },
+        aigcPrompts: {
+          compliance: promptData.aigcCompliance,
+          quality: promptData.aigcQuality,
+          aiDetection: promptData.aigcAiDetection,
+          sensitiveInfo: promptData.aigcSensitiveInfo
+        }
       };
       try {
         const res = await fetch('/api/admin/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify(body) });
