@@ -535,6 +535,22 @@
                     <label class="form-label">语言检测提示词</label>
                     <textarea id="detectPrompt" class="form-textarea" rows="4" placeholder="你是一个语言检测助手..."></textarea>
                   </div>
+                  <div class="form-group full-width">
+                    <label class="form-label">AIGC 合规检测提示词</label>
+                    <textarea id="aigcCompliancePrompt" class="form-textarea" rows="4" placeholder="你是一名资深的内容合规审查专家..."></textarea>
+                  </div>
+                  <div class="form-group full-width">
+                    <label class="form-label">AIGC 质量评估提示词</label>
+                    <textarea id="aigcQualityPrompt" class="form-textarea" rows="4" placeholder="你是一名资深内容编辑和写作专家..."></textarea>
+                  </div>
+                  <div class="form-group full-width">
+                    <label class="form-label">AIGC AI生成检测提示词</label>
+                    <textarea id="aigcAiDetectionPrompt" class="form-textarea" rows="4" placeholder="你是一名顶尖的AI内容检测和数字取证专家..."></textarea>
+                  </div>
+                  <div class="form-group full-width">
+                    <label class="form-label">AIGC 敏感信息检测提示词</label>
+                    <textarea id="aigcSensitiveInfoPrompt" class="form-textarea" rows="4" placeholder="你是一名资深的信息安全与数据隐私保护专家..."></textarea>
+                  </div>
                 </div>
               </div>
             </div>
@@ -830,6 +846,11 @@
           renderProviders(currentProviders, true);
           document.getElementById('translatePrompt').value = data.data.promptTemplates?.translate || '';
           document.getElementById('detectPrompt').value = data.data.promptTemplates?.detect || '';
+          const ap = data.data.aigcPrompts || {};
+          document.getElementById('aigcCompliancePrompt').value = ap.compliance || '';
+          document.getElementById('aigcQualityPrompt').value = ap.quality || '';
+          document.getElementById('aigcAiDetectionPrompt').value = ap.aiDetection || '';
+          document.getElementById('aigcSensitiveInfoPrompt').value = ap.sensitiveInfo || '';
         }
       } catch {}
     }
@@ -1060,7 +1081,13 @@
       });
       const body = {
         providers,
-        promptTemplates: { translate: document.getElementById('translatePrompt').value, detect: document.getElementById('detectPrompt').value }
+        promptTemplates: { translate: document.getElementById('translatePrompt').value, detect: document.getElementById('detectPrompt').value },
+        aigcPrompts: {
+          compliance: document.getElementById('aigcCompliancePrompt').value,
+          quality: document.getElementById('aigcQualityPrompt').value,
+          aiDetection: document.getElementById('aigcAiDetectionPrompt').value,
+          sensitiveInfo: document.getElementById('aigcSensitiveInfoPrompt').value
+        }
       };
       try { await fetch('/api/admin/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify(body) }); } catch (err) { console.error('自动保存配置失败:', err); }
     }

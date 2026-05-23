@@ -17,6 +17,12 @@ const DEFAULT_CONFIG = {
   promptTemplates: {
     translate: '',
     detect: ''
+  },
+  aigcPrompts: {
+    compliance: '',
+    quality: '',
+    aiDetection: '',
+    sensitiveInfo: ''
   }
 };
 
