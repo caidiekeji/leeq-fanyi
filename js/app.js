@@ -2,7 +2,7 @@ const state = {
   sourceLang: 'auto',
   targetLang: 'zh',
   status: 'idle',
-  theme: loadLocal('theme', 'dark'),
+  theme: loadLocal('theme', 'light'),
   realtimeMode: loadLocal('realtimeMode', false),
   maxCharLimit: 5000,
   defaultProvider: null,
