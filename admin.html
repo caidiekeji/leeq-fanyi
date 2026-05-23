@@ -526,36 +526,84 @@
                 <span class="section-title">提示词配置</span>
               </div>
               <div class="section-body">
-                <div class="form-grid">
-                  <div class="form-group full-width">
-                    <label class="form-label">翻译提示词</label>
-                    <textarea id="translatePrompt" class="form-textarea" rows="4" placeholder="你是一个专业的翻译助手..."></textarea>
+                <div class="prompt-list">
+                  <div class="prompt-item" data-key="translate" onclick="openPromptEditor('translate', '翻译提示词', this)">
+                    <div class="prompt-item-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
+                    </div>
+                    <div class="prompt-item-body">
+                      <span class="prompt-item-name">翻译提示词</span>
+                      <span class="prompt-item-preview" id="preview-translate">未配置</span>
+                    </div>
+                    <div class="prompt-item-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
                   </div>
-                  <div class="form-group full-width">
-                    <label class="form-label">语言检测提示词</label>
-                    <textarea id="detectPrompt" class="form-textarea" rows="4" placeholder="你是一个语言检测助手..."></textarea>
+                  <div class="prompt-item" data-key="detect" onclick="openPromptEditor('detect', '语言检测提示词', this)">
+                    <div class="prompt-item-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </div>
+                    <div class="prompt-item-body">
+                      <span class="prompt-item-name">语言检测提示词</span>
+                      <span class="prompt-item-preview" id="preview-detect">未配置</span>
+                    </div>
+                    <div class="prompt-item-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
                   </div>
-                  <div class="form-group full-width">
-                    <label class="form-label">AIGC 合规检测提示词</label>
-                    <textarea id="aigcCompliancePrompt" class="form-textarea" rows="4" placeholder="你是一名资深的内容合规审查专家..."></textarea>
+                </div>
+                <div class="prompt-section-title">AIGC 检测提示词</div>
+                <div class="prompt-list">
+                  <div class="prompt-item" data-key="aigcCompliance" onclick="openPromptEditor('aigcCompliance', 'AIGC 合规检测提示词', this)">
+                    <div class="prompt-item-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <div class="prompt-item-body">
+                      <span class="prompt-item-name">合规检测提示词</span>
+                      <span class="prompt-item-preview" id="preview-aigcCompliance">未配置</span>
+                    </div>
+                    <div class="prompt-item-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
                   </div>
-                  <div class="form-group full-width">
-                    <label class="form-label">AIGC 质量评估提示词</label>
-                    <textarea id="aigcQualityPrompt" class="form-textarea" rows="4" placeholder="你是一名资深内容编辑和写作专家..."></textarea>
+                  <div class="prompt-item" data-key="aigcQuality" onclick="openPromptEditor('aigcQuality', 'AIGC 质量评估提示词', this)">
+                    <div class="prompt-item-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    </div>
+                    <div class="prompt-item-body">
+                      <span class="prompt-item-name">质量评估提示词</span>
+                      <span class="prompt-item-preview" id="preview-aigcQuality">未配置</span>
+                    </div>
+                    <div class="prompt-item-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
                   </div>
-                  <div class="form-group full-width">
-                    <label class="form-label">AIGC AI生成检测提示词</label>
-                    <textarea id="aigcAiDetectionPrompt" class="form-textarea" rows="4" placeholder="你是一名顶尖的AI内容检测和数字取证专家..."></textarea>
+                  <div class="prompt-item" data-key="aigcAiDetection" onclick="openPromptEditor('aigcAiDetection', 'AIGC AI生成检测提示词', this)">
+                    <div class="prompt-item-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>
+                    </div>
+                    <div class="prompt-item-body">
+                      <span class="prompt-item-name">AI生成检测提示词</span>
+                      <span class="prompt-item-preview" id="preview-aigcAiDetection">未配置</span>
+                    </div>
+                    <div class="prompt-item-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
                   </div>
-                  <div class="form-group full-width">
-                    <label class="form-label">AIGC 敏感信息检测提示词</label>
-                    <textarea id="aigcSensitiveInfoPrompt" class="form-textarea" rows="4" placeholder="你是一名资深的信息安全与数据隐私保护专家..."></textarea>
+                  <div class="prompt-item" data-key="aigcSensitiveInfo" onclick="openPromptEditor('aigcSensitiveInfo', 'AIGC 敏感信息检测提示词', this)">
+                    <div class="prompt-item-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div class="prompt-item-body">
+                      <span class="prompt-item-name">敏感信息检测提示词</span>
+                      <span class="prompt-item-preview" id="preview-aigcSensitiveInfo">未配置</span>
+                    </div>
+                    <div class="prompt-item-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div style="display:flex;justify-content:flex-end;margin-top:24px">
-              <button class="btn btn-primary" onclick="handleSaveConfig()">保存全部配置</button>
             </div>
           </div>
 
@@ -844,13 +892,15 @@
             }
           });
           renderProviders(currentProviders, true);
-          document.getElementById('translatePrompt').value = data.data.promptTemplates?.translate || '';
-          document.getElementById('detectPrompt').value = data.data.promptTemplates?.detect || '';
-          const ap = data.data.aigcPrompts || {};
-          document.getElementById('aigcCompliancePrompt').value = ap.compliance || '';
-          document.getElementById('aigcQualityPrompt').value = ap.quality || '';
-          document.getElementById('aigcAiDetectionPrompt').value = ap.aiDetection || '';
-          document.getElementById('aigcSensitiveInfoPrompt').value = ap.sensitiveInfo || '';
+          promptData.translate = data.data.promptTemplates?.translate || '';
+          promptData.detect = data.data.promptTemplates?.detect || '';
+          var ap = data.data.aigcPrompts || {};
+          promptData.aigcCompliance = ap.compliance || '';
+          promptData.aigcQuality = ap.quality || '';
+          promptData.aigcAiDetection = ap.aiDetection || '';
+          promptData.aigcSensitiveInfo = ap.sensitiveInfo || '';
+          // 更新列表预览
+          ['translate', 'detect', 'aigcCompliance', 'aigcQuality', 'aigcAiDetection', 'aigcSensitiveInfo'].forEach(updatePromptPreview);
         }
       } catch {}
     }
@@ -1081,12 +1131,12 @@
       });
       const body = {
         providers,
-        promptTemplates: { translate: document.getElementById('translatePrompt').value, detect: document.getElementById('detectPrompt').value },
+        promptTemplates: { translate: promptData.translate, detect: promptData.detect },
         aigcPrompts: {
-          compliance: document.getElementById('aigcCompliancePrompt').value,
-          quality: document.getElementById('aigcQualityPrompt').value,
-          aiDetection: document.getElementById('aigcAiDetectionPrompt').value,
-          sensitiveInfo: document.getElementById('aigcSensitiveInfoPrompt').value
+          compliance: promptData.aigcCompliance,
+          quality: promptData.aigcQuality,
+          aiDetection: promptData.aigcAiDetection,
+          sensitiveInfo: promptData.aigcSensitiveInfo
         }
       };
       try { await fetch('/api/admin/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify(body) }); } catch (err) { console.error('自动保存配置失败:', err); }
@@ -1243,7 +1293,7 @@
       });
       const body = {
         providers,
-        promptTemplates: { translate: document.getElementById('translatePrompt').value, detect: document.getElementById('detectPrompt').value }
+        promptTemplates: { translate: promptData.translate, detect: promptData.detect }
       };
       try {
         const res = await fetch('/api/admin/config', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` }, body: JSON.stringify(body) });
@@ -1909,12 +1959,81 @@
 
     function showToast(msg, type) {
       const container = document.getElementById('toastContainer');
+      if (!container) return;
       const toast = document.createElement('div');
       toast.className = 'toast ' + (type || 'info');
       toast.textContent = msg;
       container.appendChild(toast);
       setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
     }
+
+    /* ====== 提示词弹窗编辑器 ====== */
+    var promptData = {
+      translate: '', detect: '',
+      aigcCompliance: '', aigcQuality: '', aigcAiDetection: '', aigcSensitiveInfo: ''
+    };
+
+    function openPromptEditor(key, title, el) {
+      document.getElementById('promptModalTitle').textContent = '编辑 ' + title;
+      document.getElementById('promptModalTextarea').value = promptData[key] || '';
+      document.getElementById('promptModalSave').setAttribute('data-key', key);
+      document.getElementById('promptModal').classList.add('active');
+    }
+
+    function closePromptModal() {
+      document.getElementById('promptModal').classList.remove('active');
+    }
+
+    document.getElementById('promptModalClose').addEventListener('click', closePromptModal);
+    document.getElementById('promptModalCancel').addEventListener('click', closePromptModal);
+    document.getElementById('promptModalOverlay').addEventListener('click', closePromptModal);
+    document.getElementById('promptModalSave').addEventListener('click', function () {
+      var key = this.getAttribute('data-key');
+      var value = document.getElementById('promptModalTextarea').value;
+      promptData[key] = value;
+      updatePromptPreview(key);
+      closePromptModal();
+    });
+
+    // ESC 关闭
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && document.getElementById('promptModal').classList.contains('active')) {
+        closePromptModal();
+      }
+    });
+
+    function updatePromptPreview(key) {
+      var el = document.getElementById('preview-' + key);
+      if (!el) return;
+      var v = promptData[key] || '';
+      if (v) {
+        el.textContent = v.substring(0, 60).replace(/\n/g, ' ') + (v.length > 60 ? '...' : '');
+        el.className = 'prompt-item-preview has-content';
+      } else {
+        el.textContent = '未配置';
+        el.className = 'prompt-item-preview';
+      }
+    }
   </script>
+
+  <!-- 提示词编辑弹窗 -->
+  <div id="promptModal" class="modal-overlay">
+    <div class="modal-backdrop" id="promptModalOverlay"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="promptModalTitle">编辑提示词</h3>
+        <button class="modal-close" id="promptModalClose" title="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <textarea id="promptModalTextarea" class="form-textarea" rows="16" placeholder="在此输入提示词内容..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="promptModalCancel">取消</button>
+        <button class="btn btn-primary" id="promptModalSave">保存提示词</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
