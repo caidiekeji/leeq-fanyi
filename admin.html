@@ -1440,6 +1440,10 @@
           headers: { 'Authorization': `Bearer ${adminToken}` }
         });
         const data = await res.json();
+        if (data.code === 401) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:48px;color:var(--warning)">认证已过期，请刷新页面重新登录</td></tr>';
+          return;
+        }
         if (data.code === 200 && data.data.logs.length > 0) {
           tbody.innerHTML = data.data.logs.map(log => {
             const time = new Date(log.timestamp).toLocaleString('zh-CN');
@@ -1481,6 +1485,11 @@
           headers: { 'Authorization': `Bearer ${adminToken}` }
         });
         const data = await res.json();
+        
+        if (data.code === 401) {
+          statsEl.innerHTML = '<div style="text-align:center;padding:48px;color:var(--warning)">认证已过期，请刷新页面重新登录</div>';
+          return;
+        }
         
         if (data.code === 200) {
           const { spiderStats, logs } = data.data;
@@ -1540,6 +1549,7 @@
       origSwitchSection(name);
       if (name === 'system') loadSystemConfig();
       if (name === 'logs') loadLogs();
+      if (name === 'spider') loadSpiderLogs();
       if (name === 'health') checkHealth();
       if (name === 'usage') loadUsage();
       if (name === 'analytics') loadAnalytics();
