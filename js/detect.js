@@ -1,15 +1,16 @@
 /**
- * 内容检测页面 JS - 内容检测交互逻辑
+ * AIGC 内容检测页面 JS - 与翻译页面一致的交互逻辑
  */
 (function () {
   const textEl = document.getElementById('detectText');
   const detectBtn = document.getElementById('detectBtn');
-  const charCountEl = document.getElementById('charCount');
+  const detectType = document.getElementById('detectType');
+  const sourceCount = document.getElementById('sourceCount');
+  const placeholder = document.getElementById('detectPlaceholder');
   const loadingEl = document.getElementById('detectLoading');
   const reportEl = document.getElementById('detectReport');
-  const typeBtns = document.querySelectorAll('.detect-type-btn');
+  const resultCount = document.getElementById('resultCount');
 
-  let currentType = 'compliance';
   let isDetecting = false;
 
   // 主题管理
@@ -33,66 +34,55 @@
     applyTheme(next);
   });
 
-  // 检测类型切换
-  typeBtns.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      typeBtns.forEach(function (b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      currentType = btn.dataset.type;
-      // 检测类型变化时重置报告
-      if (textEl.value.trim()) {
-        reportEl.style.display = 'none';
-      }
-    });
-  });
-
   // 字符计数
   textEl.addEventListener('input', function () {
-    var len = textEl.value.length;
-    charCountEl.textContent = len;
+    const len = textEl.value.length;
+    sourceCount.textContent = '输入 ' + len + ' / 10000';
     detectBtn.disabled = len === 0 || isDetecting;
-    if (len > 9000) {
-      charCountEl.style.color = 'var(--color-warning, #F97316)';
-    } else {
-      charCountEl.style.color = '';
-    }
   });
 
   // 开始检测
   detectBtn.addEventListener('click', startDetection);
   textEl.addEventListener('keydown', function (e) {
     if (e.ctrlKey && e.key === 'Enter' && !detectBtn.disabled) {
+      e.preventDefault();
       startDetection();
     }
   });
 
   async function startDetection() {
-    var text = textEl.value.trim();
+    const text = textEl.value.trim();
     if (!text || isDetecting) return;
 
     isDetecting = true;
     detectBtn.disabled = true;
+    placeholder.style.display = 'none';
     reportEl.style.display = 'none';
+    resultCount.style.display = 'none';
     loadingEl.style.display = 'flex';
 
+    const type = detectType.value;
+
     try {
-      var res = await fetch('/api/detect', {
+      const res = await fetch('/api/detect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text, type: currentType })
+        body: JSON.stringify({ text: text, type: type })
       });
 
-      var data = await res.json();
+      const data = await res.json();
 
       if (data.code === 200) {
         renderReport(data.data);
-      } else if (data.code === 500 || data.code === 400) {
-        showError(data.message || '检测失败');
+        resultCount.style.display = 'block';
+        sourceCount.textContent = '输入 ' + text.length + ' / 10000';
       } else {
-        showError('检测服务异常，请稍后重试');
+        showError(data.message || '检测失败');
+        resultCount.style.display = 'block';
       }
     } catch (e) {
       showError('网络请求失败：' + e.message);
+      resultCount.style.display = 'block';
     } finally {
       isDetecting = false;
       detectBtn.disabled = textEl.value.trim().length === 0;
@@ -102,21 +92,21 @@
 
   function showError(msg) {
     reportEl.style.display = 'block';
-    reportEl.innerHTML = '<div class="report-error">' + escapeHtml(msg) + '</div>';
+    reportEl.innerHTML = '<div class="report-section"><p style="color:var(--color-error);text-align:center;padding:24px">' + escapeHtml(msg) + '</p></div>';
   }
 
   function escapeHtml(str) {
-    var div = document.createElement('div');
+    const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
   }
 
   // 渲染报告
   function renderReport(data) {
-    var report = data.report;
+    const report = data.report;
     reportEl.style.display = 'block';
 
-    var html = '';
+    let html = '';
 
     // 报告头部
     html += '<div class="report-header">';
@@ -125,32 +115,27 @@
     html += '</div>';
 
     if (report.raw) {
-      // 无法解析 JSON，显示原始报告
-      html += '<div class="report-raw">' + formatMarkdown(report.raw) + '</div>';
-    } else if (currentType === 'compliance') {
+      html += '<div class="report-section"><div style="padding:16px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:13px;line-height:1.8;color:var(--color-text-secondary);white-space:pre-wrap;word-break:break-word">' + formatMarkdown(report.raw) + '</div></div>';
+    } else if (data.type === 'compliance') {
       html += renderComplianceReport(report);
-    } else if (currentType === 'quality') {
+    } else if (data.type === 'quality') {
       html += renderQualityReport(report);
-    } else if (currentType === 'aiDetection') {
+    } else if (data.type === 'aiDetection') {
       html += renderAIDetectionReport(report);
-    } else if (currentType === 'sensitiveInfo') {
+    } else if (data.type === 'sensitiveInfo') {
       html += renderSensitiveReport(report);
     }
 
     reportEl.innerHTML = html;
-
-    // 滚动到报告区域
-    setTimeout(function () {
-      reportEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+    reportEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   function renderComplianceReport(report) {
-    var html = '';
-    var overall = report.overall || '未知';
-    var score = report.score || 0;
-    var scoreClass = score >= 80 ? 'score-high' : score >= 60 ? 'score-mid' : 'score-low';
-    var statusClass = overall === '合规' ? 'status-pass' : 'status-fail';
+    let html = '';
+    const overall = report.overall || '未知';
+    const score = report.score || 0;
+    const scoreClass = score >= 80 ? 'score-high' : score >= 60 ? 'score-mid' : 'score-low';
+    const statusClass = overall === '合规' ? 'status-pass' : 'status-fail';
 
     html += '<div class="report-summary ' + statusClass + '">';
     html += '<div class="summary-score ' + scoreClass + '">' + score + '<span>分</span></div>';
@@ -160,8 +145,7 @@
     html += '</div></div>';
 
     if (report.dimensions && report.dimensions.length) {
-      html += '<div class="report-section"><h3>各维度检测详情</h3>';
-      html += '<div class="dimension-list">';
+      html += '<div class="report-section"><h3>各维度检测详情</h3><div class="dimension-list">';
       report.dimensions.forEach(function (dim) {
         html += '<div class="dimension-item ' + (dim.pass ? 'pass' : 'fail') + '">';
         html += '<div class="dim-header">';
@@ -178,7 +162,7 @@
     if (report.risks && report.risks.length) {
       html += '<div class="report-section"><h3>风险项</h3>';
       report.risks.forEach(function (risk) {
-        var levelClass = risk.level === '高' ? 'risk-high' : risk.level === '中' ? 'risk-mid' : 'risk-low';
+        const levelClass = risk.level === '高' ? 'risk-high' : risk.level === '中' ? 'risk-mid' : 'risk-low';
         html += '<div class="risk-item ' + levelClass + '">';
         html += '<span class="risk-level">' + escapeHtml(risk.level) + '风险</span>';
         html += '<div class="risk-body">';
@@ -190,20 +174,17 @@
     }
 
     if (report.conclusion) {
-      html += '<div class="report-section report-conclusion">';
-      html += '<h3>综合结论</h3>';
-      html += '<p>' + escapeHtml(report.conclusion) + '</p>';
-      html += '</div>';
+      html += '<div class="report-section report-conclusion"><h3>综合结论</h3><p>' + escapeHtml(report.conclusion) + '</p></div>';
     }
 
     return html;
   }
 
   function renderQualityReport(report) {
-    var html = '';
-    var overall = report.overall || '未知';
-    var score = report.score || 0;
-    var scoreClass = score >= 80 ? 'score-high' : score >= 60 ? 'score-mid' : 'score-low';
+    let html = '';
+    const overall = report.overall || '未知';
+    const score = report.score || 0;
+    const scoreClass = score >= 80 ? 'score-high' : score >= 60 ? 'score-mid' : 'score-low';
 
     html += '<div class="report-summary">';
     html += '<div class="summary-score ' + scoreClass + '">' + score + '<span>分</span></div>';
@@ -213,8 +194,7 @@
     html += '</div></div>';
 
     if (report.dimensions && report.dimensions.length) {
-      html += '<div class="report-section"><h3>各维度评估</h3>';
-      html += '<div class="dimension-list">';
+      html += '<div class="report-section"><h3>各维度评估</h3><div class="dimension-list">';
       report.dimensions.forEach(function (dim) {
         html += '<div class="dimension-item">';
         html += '<div class="dim-header">';
@@ -241,18 +221,16 @@
     }
 
     if (report.conclusion) {
-      html += '<div class="report-section report-conclusion">';
-      html += '<h3>综合评价</h3><p>' + escapeHtml(report.conclusion) + '</p>';
-      html += '</div>';
+      html += '<div class="report-section report-conclusion"><h3>综合评价</h3><p>' + escapeHtml(report.conclusion) + '</p></div>';
     }
 
     return html;
   }
 
   function renderAIDetectionReport(report) {
-    var html = '';
-    var isAI = report.isAI;
-    var confidence = report.confidence || 0;
+    let html = '';
+    const isAI = report.isAI;
+    const confidence = report.confidence || 0;
 
     html += '<div class="report-summary ' + (isAI ? 'status-fail' : 'status-pass') + '">';
     html += '<div class="ai-result-badge">';
@@ -264,8 +242,7 @@
     html += '</div>';
 
     if (report.indicators && report.indicators.length) {
-      html += '<div class="report-section"><h3>检测指标详情</h3>';
-      html += '<div class="dimension-list">';
+      html += '<div class="report-section"><h3>检测指标详情</h3><div class="dimension-list">';
       report.indicators.forEach(function (ind) {
         html += '<div class="dimension-item">';
         html += '<div class="dim-header">';
@@ -279,24 +256,20 @@
     }
 
     if (report.explanation) {
-      html += '<div class="report-section"><h3>分析说明</h3>';
-      html += '<p>' + escapeHtml(report.explanation) + '</p>';
-      html += '</div>';
+      html += '<div class="report-section"><h3>分析说明</h3><p>' + escapeHtml(report.explanation) + '</p></div>';
     }
 
     if (report.conclusion) {
-      html += '<div class="report-section report-conclusion">';
-      html += '<h3>最终结论</h3><p>' + escapeHtml(report.conclusion) + '</p>';
-      html += '</div>';
+      html += '<div class="report-section report-conclusion"><h3>最终结论</h3><p>' + escapeHtml(report.conclusion) + '</p></div>';
     }
 
     return html;
   }
 
   function renderSensitiveReport(report) {
-    var html = '';
-    var hasSensitive = report.hasSensitive;
-    var totalCount = report.totalCount || 0;
+    let html = '';
+    const hasSensitive = report.hasSensitive;
+    const totalCount = report.totalCount || 0;
 
     html += '<div class="report-summary ' + (hasSensitive ? 'status-fail' : 'status-pass') + '">';
     html += '<div class="sensitive-summary-row">';
@@ -307,10 +280,9 @@
     html += '</div></div></div>';
 
     if (report.items && report.items.length) {
-      html += '<div class="report-section"><h3>敏感信息详情</h3>';
-      html += '<div class="sensitive-list">';
+      html += '<div class="report-section"><h3>敏感信息详情</h3><div class="sensitive-list">';
       report.items.forEach(function (item) {
-        var riskClass = item.risk === '高' ? 'risk-high' : item.risk === '中' ? 'risk-mid' : 'risk-low';
+        const riskClass = item.risk === '高' ? 'risk-high' : item.risk === '中' ? 'risk-mid' : 'risk-low';
         html += '<div class="sensitive-item ' + riskClass + '">';
         html += '<div class="sensitive-header">';
         html += '<span class="sensitive-type">' + escapeHtml(item.type) + '</span>';
@@ -326,15 +298,13 @@
     }
 
     if (report.conclusion) {
-      html += '<div class="report-section report-conclusion">';
-      html += '<h3>安全建议</h3><p>' + escapeHtml(report.conclusion) + '</p>';
-      html += '</div>';
+      html += '<div class="report-section report-conclusion"><h3>安全建议</h3><p>' + escapeHtml(report.conclusion) + '</p></div>';
     }
 
     return html;
   }
 
-  // 简单的 Markdown 渲染（处理标题、加粗、列表）
+  // 简单的 Markdown 渲染
   function formatMarkdown(text) {
     if (!text) return '';
     return escapeHtml(text)

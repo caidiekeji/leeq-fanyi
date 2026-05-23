@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>内容检测 - LeeQ AI 智能内容分析</title>
-  <meta name="description" content="LeeQ 内容检测 - 基于大语言模型的智能内容分析工具，支持合规检测、质量评估、AI生成检测、敏感信息检测">
-  <meta name="keywords" content="内容检测，AI检测，合规检测，质量评估，敏感信息检测，AIGC检测">
+  <title>AIGC检测 - LeeQ AI 智能内容分析</title>
+  <meta name="description" content="LeeQ AIGC检测 - 基于大语言模型的智能内容分析工具，支持合规检测、质量评估、AI生成检测、敏感信息检测">
+  <meta name="keywords" content="AIGC检测，内容检测，AI检测，合规检测，质量评估，敏感信息检测">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://lq-26k.pages.dev/detect">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231387c0'><path d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z'/></svg>">
@@ -21,7 +21,7 @@
     <div class="navbar-inner">
       <a href="/" class="navbar-brand">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
-        <span>LeeQ 内容检测</span>
+        <span>LeeQ AIGC检测</span>
       </a>
       <div class="navbar-actions">
         <a href="/" class="nav-link" title="返回翻译">翻译</a>
@@ -33,53 +33,56 @@
   </nav>
 
   <main class="main-container" id="detector">
-    <div class="detect-wrapper">
-      <!-- 检测类型选择 -->
-      <div class="detect-types">
-        <button class="detect-type-btn active" data-type="compliance">
-          <span class="type-icon">&#x1F6E1;</span>
-          <span class="type-label">合规检测</span>
-          <span class="type-desc">检测内容是否合规合法</span>
-        </button>
-        <button class="detect-type-btn" data-type="quality">
-          <span class="type-icon">&#x2B50;</span>
-          <span class="type-label">质量评估</span>
-          <span class="type-desc">评估内容写作质量</span>
-        </button>
-        <button class="detect-type-btn" data-type="aiDetection">
-          <span class="type-icon">&#x1F916;</span>
-          <span class="type-label">AI生成检测</span>
-          <span class="type-desc">判断是否由AI生成</span>
-        </button>
-        <button class="detect-type-btn" data-type="sensitiveInfo">
-          <span class="type-icon">&#x1F512;</span>
-          <span class="type-label">敏感信息检测</span>
-          <span class="type-desc">发现泄露的敏感信息</span>
-        </button>
-      </div>
-
-      <!-- 输入区域 -->
-      <div class="detect-input-area">
-        <textarea id="detectText" class="text-input detect-textarea"
-          placeholder="在此粘贴需要检测的内容...&#10;支持文章、评论、文案、代码片段等各种文本格式&#10;最多支持 10000 字符"
-          maxlength="10000"></textarea>
-        <div class="detect-input-footer">
-          <span class="char-count"><span id="charCount">0</span> / 10000</span>
-          <button id="detectBtn" class="detect-submit-btn" disabled>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <div class="translate-wrapper">
+      <div class="control-bar">
+        <div class="control-left">
+          <select id="detectType" class="lang-select" aria-label="检测类型">
+            <option value="compliance">合规检测</option>
+            <option value="quality">质量评估</option>
+            <option value="aiDetection">AI生成检测</option>
+            <option value="sensitiveInfo">敏感信息检测</option>
+          </select>
+        </div>
+        <div class="control-right">
+          <button id="detectBtn" class="translate-btn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <span>开始检测</span>
           </button>
         </div>
       </div>
 
-      <!-- 加载状态 -->
-      <div id="detectLoading" class="detect-loading" style="display:none">
-        <div class="loading-spinner"></div>
-        <p>AI 正在分析您的内容...</p>
-      </div>
+      <div class="split-panels">
+        <section class="panel panel-source">
+          <div class="panel-body">
+            <textarea id="detectText" class="text-input"
+              placeholder="在此粘贴需要检测的内容...&#10;支持文章、评论、文案、代码片段等&#10;最多 10000 字符 · Ctrl+Enter 开始检测"
+              maxlength="10000"></textarea>
+          </div>
+          <div class="panel-footer">
+            <div class="shortcut-hints">
+              <span><kbd>Ctrl+Enter</kbd> 开始检测</span>
+            </div>
+            <span id="sourceCount" class="char-count">输入 0 / 10000</span>
+          </div>
+        </section>
 
-      <!-- 检测报告 -->
-      <div id="detectReport" class="detect-report" style="display:none"></div>
+        <section class="panel panel-result">
+          <div class="panel-body">
+            <div id="detectPlaceholder" class="result-display empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <p>选择检测类型，粘贴内容后点击检测</p>
+            </div>
+            <div id="detectLoading" class="result-display" style="display:none">
+              <div class="loading-spinner"></div>
+              <p>AI 正在分析您的内容...</p>
+            </div>
+            <div id="detectReport" class="detect-report" style="display:none"></div>
+          </div>
+          <div class="panel-footer">
+            <span id="resultCount" class="char-count" style="display:none">检测完成</span>
+          </div>
+        </section>
+      </div>
     </div>
   </main>
 
