@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文字转语音 - LeeQ AI 智能语音合成</title>
+  <meta name="description" content="LeeQ 文字转语音 - 基于 AI 的智能语音合成工具，支持多种音色，可调节语速，导出多种音频格式">
+  <meta name="keywords" content="文字转语音，TTS，语音合成，AI语音，文本朗读，在线语音合成">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://lq-26k.pages.dev/tts">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231387c0'><path d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z'/></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/tts.css">
+</head>
+<body>
+  <div class="app-bg"></div>
+
+  <a href="#tts-main" class="skip-link">跳到主内容</a>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="/" class="navbar-brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
+        <span>LeeQ 文字转语音</span>
+      </a>
+      <div class="navbar-actions">
+        <a href="/" class="nav-link" title="翻译">翻译</a>
+        <a href="/detect" class="nav-link" title="AIGC检测">AIGC检测</a>
+        <button class="icon-btn" id="themeBtn" title="切换主题">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-container" id="tts-main">
+    <div class="translate-wrapper">
+      <!-- 语音参数控制栏 -->
+      <div class="voice-controls">
+        <select id="voiceSelect" class="voice-select" aria-label="选择音色">
+          <option value="zh-CN-XiaoxiaoNeural">晓晓（女·温柔）</option>
+          <option value="zh-CN-YunxiNeural">云希（男·新闻）</option>
+          <option value="zh-CN-YunjianNeural">云健（男·运动）</option>
+          <option value="zh-CN-XiaoyiNeural">晓伊（女·活泼）</option>
+          <option value="zh-CN-YunyangNeural">云扬（男·专业）</option>
+          <option value="zh-CN-XiaochenNeural">晓辰（女·温柔）</option>
+          <option value="zh-CN-XiaohanNeural">晓涵（女·知性）</option>
+          <option value="zh-CN-XiaomengNeural">晓萌（女·可爱）</option>
+          <option value="zh-CN-XiaomoNeural">晓墨（女·正式）</option>
+          <option value="zh-CN-XiaoqiuNeural">晓秋（女·温润）</option>
+          <option value="zh-CN-XiaoruiNeural">晓睿（女·干练）</option>
+          <option value="zh-CN-XiaoshuangNeural">晓双（女·甜美）</option>
+          <option value="zh-CN-XiaoxuanNeural">晓萱（女·自信）</option>
+          <option value="zh-CN-XiaoyanNeural">晓颜（女·优雅）</option>
+          <option value="zh-CN-XiaozhenNeural">晓甄（女·温和）</option>
+        </select>
+
+        <div class="speed-control">
+          <span class="speed-label">语速</span>
+          <input type="range" id="speedSlider" class="speed-slider" min="0.25" max="4" step="0.05" value="1">
+          <span class="speed-value" id="speedValue">1.0x</span>
+        </div>
+
+        <select id="formatSelect" class="format-select" aria-label="音频格式">
+          <option value="mp3">MP3</option>
+          <option value="opus">Opus</option>
+          <option value="aac">AAC</option>
+          <option value="flac">FLAC</option>
+          <option value="wav">WAV</option>
+          <option value="pcm">PCM</option>
+        </select>
+
+        <button id="ttsBtn" class="translate-btn tts-generate-btn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <span>生成语音</span>
+        </button>
+      </div>
+
+      <div class="split-panels">
+        <section class="panel panel-source">
+          <div class="panel-body">
+            <textarea id="ttsText" class="text-input"
+              placeholder="在此输入要转换为语音的文字内容...&#10;支持中文、英文等多语言文本&#10;最多 5000 字符 · Ctrl+Enter 开始生成"
+              maxlength="5000"></textarea>
+          </div>
+          <div class="panel-footer">
+            <div class="shortcut-hints">
+              <span><kbd>Ctrl+Enter</kbd> 开始生成</span>
+            </div>
+            <span id="ttsCharCount" class="char-count">输入 0 / 5000</span>
+          </div>
+        </section>
+
+        <section class="panel panel-result">
+          <div class="panel-body">
+            <!-- 空状态提示 -->
+            <div id="ttsPlaceholder" class="result-display empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+              <p>输入文字，选择音色和语速后点击生成</p>
+            </div>
+            <!-- 生成中提示 -->
+            <div id="ttsLoading" class="generating-hint hidden">
+              <div class="loading-spinner"></div>
+              <span>AI 正在合成语音...</span>
+            </div>
+            <!-- 音频播放器 -->
+            <div id="ttsPlayer" class="audio-player hidden">
+              <audio id="ttsAudio" controls></audio>
+              <button id="ttsDownload" class="download-btn" title="下载音频文件">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>下载</span>
+              </button>
+            </div>
+          </div>
+          <div class="panel-footer">
+            <span id="ttsResultHint" class="char-count hidden">生成完成</span>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/tts.js"></script>
+</body>
+</html>

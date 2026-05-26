@@ -1,0 +1,146 @@
+/* ====== 文字转语音页面样式 ====== */
+
+/* 语音控制栏 - 音色选择和速度 */
+.voice-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.voice-select {
+  padding: 7px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  min-width: 180px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.voice-select:focus {
+  border-color: var(--color-primary);
+}
+
+.speed-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.speed-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.speed-slider {
+  width: 120px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.speed-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+  min-width: 36px;
+  text-align: center;
+}
+
+.format-select {
+  padding: 7px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  min-width: 100px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.format-select:focus {
+  border-color: var(--color-primary);
+}
+
+/* TTS 生成按钮 */
+.tts-generate-btn {
+  margin-left: auto;
+}
+
+/* 音频播放器区域 */
+.audio-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-top: 12px;
+}
+
+.audio-player.hidden {
+  display: none;
+}
+
+.audio-player audio {
+  flex: 1;
+  height: 40px;
+  min-width: 0;
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.download-btn:hover {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+}
+
+.download-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 生成中状态 */
+.generating-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  margin-top: 12px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.generating-hint.hidden {
+  display: none;
+}
