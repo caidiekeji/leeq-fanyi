@@ -1,7 +1,7 @@
 /**
  * TTS 语音合成代理 - 转发请求到内网 TTS 服务
  */
-var TTS_API_URL = 'http://123.156.40.66:5050/v1/audio/speech';
+var TTS_API_URL = 'http://123.156.40.66:8080/v1/audio/speech';
 var TTS_API_KEY = 'Bearer leeq-12311';
 
 var MIME_MAP = {
