@@ -18,9 +18,8 @@
   const resultHint = document.getElementById('ttsResultHint');
   const previewBtn = document.getElementById('voicePreviewBtn');
 
-  // TTS API 配置
-  var TTS_API_URL = 'http://123.156.40.66:5050/v1/audio/speech';
-  var TTS_API_KEY = 'Bearer leeq-12311';
+  // TTS API 配置 - 通过同源代理避免 Mixed Content 问题
+  var TTS_API_URL = '/api/tts';
 
   var isGenerating = false;
   var currentBlob = null;
@@ -113,8 +112,7 @@
       var res = await fetch(TTS_API_URL, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': TTS_API_KEY
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           input: previewText,
@@ -174,8 +172,7 @@
       var res = await fetch(TTS_API_URL, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': TTS_API_KEY
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           input: text,
