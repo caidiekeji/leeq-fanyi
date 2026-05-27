@@ -1,19 +1,19 @@
 /**
- * TTS 语音合成代理 - 转发请求到内网 TTS 服务
+ * TTS 语音合成代理 - 通过 nip.io 域名绕过 Cloudflare 禁止直连 IP 的限制
  */
-var TTS_API_URL = 'http://123.156.40.66:8080/v1/audio/speech';
-var TTS_API_KEY = 'Bearer leeq-12311';
-
-var MIME_MAP = {
-  mp3: 'audio/mpeg',
-  opus: 'audio/opus',
-  aac: 'audio/aac',
-  flac: 'audio/flac',
-  wav: 'audio/wav',
-  pcm: 'audio/l16'
-};
-
 export async function onRequest(context) {
+  var TTS_API_URL = 'http://123-156-40-66.nip.io:8080/v1/audio/speech';
+  var TTS_API_KEY = 'Bearer leeq-12311';
+
+  var MIME_MAP = {
+    mp3: 'audio/mpeg',
+    opus: 'audio/opus',
+    aac: 'audio/aac',
+    flac: 'audio/flac',
+    wav: 'audio/wav',
+    pcm: 'audio/l16'
+  };
+
   var request = context.request;
 
   if (request.method !== 'POST') {
@@ -61,7 +61,7 @@ export async function onRequest(context) {
       })
     });
   } catch (e) {
-    return new Response(JSON.stringify({ code: 502, data: null, message: 'TTS 服务连接失败' }), {
+    return new Response(JSON.stringify({ code: 502, data: null, message: 'TTS 服务连接失败: ' + e.message }), {
       status: 502,
       headers: { 'Content-Type': 'application/json' }
     });
