@@ -135,7 +135,7 @@ function bindEvents() {
   document.getElementById('themeBtn').addEventListener('click', toggleTheme);
   document.getElementById('realtimeBtn').addEventListener('click', toggleRealtimeMode);
   document.getElementById('exportBtn').addEventListener('click', showExportMenu);
-  document.getElementById('ttsBtn').addEventListener('click', handleTTS);
+  
 }
 
 function bindShortcuts() {
@@ -391,21 +391,7 @@ function downloadFile(content, filename, mime) {
   showToast(`已导出 ${filename}`, 'success');
 }
 
-function handleTTS() {
-  const result = document.getElementById('resultText').textContent;
-  if (!result) { showToast('没有可朗读的内容', 'warning'); return; }
-  if (!('speechSynthesis' in window)) {
-    showToast('浏览器不支持语音朗读', 'error');
-    return;
-  }
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(result);
-  const langMap = { zh: 'zh-CN', en: 'en-US', ja: 'ja-JP', ko: 'ko-KR', fr: 'fr-FR', de: 'de-DE', es: 'es-ES', ru: 'ru-RU', pt: 'pt-BR', it: 'it-IT', ar: 'ar-SA', hi: 'hi-IN', th: 'th-TH', vi: 'vi-VN', id: 'id-ID', nl: 'nl-NL', pl: 'pl-PL', tr: 'tr-TR', sv: 'sv-SE', da: 'da-DK', fi: 'fi-FI', el: 'el-GR', cs: 'cs-CZ', ro: 'ro-RO', hu: 'hu-HU', uk: 'uk-UA', bg: 'bg-BG' };
-  utterance.lang = langMap[state.targetLang] || 'zh-CN';
-  utterance.rate = 0.9;
-  window.speechSynthesis.speak(utterance);
-  showToast('正在朗读...', 'info');
-}
+
 
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
