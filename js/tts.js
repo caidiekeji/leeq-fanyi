@@ -19,7 +19,7 @@
   const previewBtn = document.getElementById('voicePreviewBtn');
 
   // TTS API 配置 - 通过同源代理避免 Mixed Content 问题
-  var TTS_API_URL = '/api/tts';
+  var TTS_API_URL = '/api/speech';
 
   var isGenerating = false;
   var currentBlob = null;

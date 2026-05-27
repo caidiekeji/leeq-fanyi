@@ -1,6 +1,5 @@
 /**
- * TTS 语音合成代理
- * 使用目录路由 functions/api/tts/index.js → /api/tts
+ * TTS 语音合成代理 - 转发请求到内网 TTS 服务
  */
 var TTS_API_URL = 'http://123.156.40.66:5050/v1/audio/speech';
 var TTS_API_KEY = 'Bearer leeq-12311';
@@ -46,7 +45,6 @@ export async function onRequest(context) {
   var format = body.response_format || 'mp3';
   var speed = parseFloat(body.speed) || 1;
 
-  // 转发到 TTS API
   var ttsRes;
   try {
     ttsRes = await fetch(TTS_API_URL, {
@@ -78,18 +76,13 @@ export async function onRequest(context) {
     });
   }
 
-  // 将音频二进制数据转为 base64 字符串，通过 JSON 返回
   var audioBuffer = await ttsRes.arrayBuffer();
   var base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(audioBuffer)));
   var contentType = MIME_MAP[format] || 'audio/mpeg';
 
   return new Response(JSON.stringify({
     code: 200,
-    data: {
-      audio: base64,
-      contentType: contentType,
-      format: format
-    },
+    data: { audio: base64, contentType: contentType, format: format },
     message: 'success'
   }), {
     status: 200,
