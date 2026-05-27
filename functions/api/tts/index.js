@@ -1,11 +1,10 @@
 /**
- * TTS 语音合成代理 - 解决 HTTPS 页面无法请求 HTTP API 的问题
- * 接收前端请求，转发到内网 TTS 服务，返回 base64 编码的音频数据
+ * TTS 语音合成代理
+ * 使用目录路由 functions/api/tts/index.js → /api/tts
  */
 var TTS_API_URL = 'http://123.156.40.66:5050/v1/audio/speech';
 var TTS_API_KEY = 'Bearer leeq-12311';
 
-// 音频格式对应的 MIME 类型
 var MIME_MAP = {
   mp3: 'audio/mpeg',
   opus: 'audio/opus',
@@ -16,7 +15,9 @@ var MIME_MAP = {
 };
 
 export async function onRequest(context) {
-  if (context.request.method !== 'POST') {
+  var request = context.request;
+
+  if (request.method !== 'POST') {
     return new Response(JSON.stringify({ code: 405, data: null, message: 'Method Not Allowed' }), {
       status: 405,
       headers: { 'Content-Type': 'application/json' }
@@ -25,7 +26,7 @@ export async function onRequest(context) {
 
   var body;
   try {
-    body = await context.request.json();
+    body = await request.json();
   } catch (e) {
     return new Response(JSON.stringify({ code: 400, data: null, message: '请求体格式错误' }), {
       status: 400,
