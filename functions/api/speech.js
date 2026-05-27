@@ -1,9 +1,9 @@
 /**
- * TTS 语音合成代理 - 通过 nip.io 域名绕过 Cloudflare 禁止直连 IP 的限制
+ * TTS 语音合成代理 - 代理到 https://tts1.lequ.pw
  */
 export async function onRequest(context) {
-  var TTS_BASE = 'http://123-156-40-66.nip.io:8080/v1/audio/speech';
-  var VOICES_URL = 'http://123-156-40-66.nip.io:8080/v1/voices';
+  var TTS_BASE = 'https://tts1.lequ.pw/v1/audio/speech';
+  var VOICES_URL = 'https://tts1.lequ.pw/v1/voices';
   var TTS_API_KEY = 'Bearer leeq-12311';
 
   var MIME_MAP = {
@@ -74,6 +74,7 @@ export async function onRequest(context) {
         'Authorization': TTS_API_KEY
       },
       body: JSON.stringify({
+        model: 'tts-1',
         input: input,
         voice: voice,
         response_format: format,

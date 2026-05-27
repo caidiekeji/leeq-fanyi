@@ -18,11 +18,8 @@
   const resultHint = document.getElementById('ttsResultHint');
   const previewBtn = document.getElementById('voicePreviewBtn');
 
-  // TTS API 配置 - 直接调用 TTS 服务器，绕过 Cloudflare 代理（Cloudflare Workers 限制只能访问 80/443 端口）
-  var TTS_BASE_URL = 'http://123.156.40.66:8080';
-  var TTS_VOICES_URL = TTS_BASE_URL + '/v1/voices';
-  var TTS_SPEECH_URL = TTS_BASE_URL + '/v1/audio/speech';
-  var TTS_API_KEY = 'Bearer leeq-12311';
+  // TTS API 配置 - 通过同源代理避免 Mixed Content 问题
+  var TTS_API_URL = '/api/speech';
 
   var isGenerating = false;
   var currentBlob = null;
@@ -34,16 +31,13 @@
   var GENDER_MAP = { Female: '女', Male: '男' };
 
   /**
-   * 页面初始化时直接从 TTS 服务器获取音色列表
+   * 页面初始化时从代理获取音色列表
    */
   loadVoices();
 
   async function loadVoices() {
     try {
-      var res = await fetch(TTS_VOICES_URL, {
-        method: 'GET',
-        headers: { 'Authorization': TTS_API_KEY }
-      });
+      var res = await fetch(TTS_API_URL, { method: 'GET' });
       var data = await res.json();
       voiceList = data.voices || [];
       renderVoiceOptions();
@@ -85,33 +79,41 @@
   };
 
   /**
-   * 调用 TTS API 直接获取原始音频数据，返回 { blob, contentType }
+   * 将 base64 字符串解码为 Blob 对象
+   */
+  function base64ToBlob(base64, contentType) {
+    var binary = atob(base64);
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: contentType });
+  }
+
+  /**
+   * 调用 TTS API 并处理 base64 响应，返回 { blob, contentType }
    */
   async function callTTSAPI(body) {
-    var format = body.response_format || 'mp3';
-    var contentType = MIME_MAP[format] || 'audio/mpeg';
-
-    var res = await fetch(TTS_SPEECH_URL, {
+    var res = await fetch(TTS_API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': TTS_API_KEY
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
 
     if (!res.ok) {
       var errText = '';
-      try { errText = await res.text(); } catch (e) {}
+      try { var errData = await res.json(); errText = errData.message || JSON.stringify(errData); } catch (e) {}
       throw new Error(errText || '请求失败 (' + res.status + ')');
     }
 
-    var audioBuffer = await res.arrayBuffer();
-    var blob = new Blob([audioBuffer], { type: contentType });
+    var json = await res.json();
+    if (json.code !== 200) {
+      throw new Error(json.message || '语音合成失败');
+    }
 
     return {
-      blob: blob,
-      contentType: contentType
+      blob: base64ToBlob(json.data.audio, json.data.contentType),
+      contentType: json.data.contentType
     };
   }
 
@@ -153,7 +155,7 @@
   // 字符计数 & 按钮状态
   textEl.addEventListener('input', function () {
     var len = textEl.value.length;
-    charCount.textContent = '输入 ' + len + ' / 5000';
+    charCount.textContent = '输入 ' + len + ' / 4096';
     ttsBtn.disabled = len === 0 || isGenerating;
   });
 
@@ -201,6 +203,7 @@
 
     try {
       var result = await callTTSAPI({
+        model: 'tts-1',
         input: previewText,
         voice: voice,
         response_format: 'mp3',
@@ -247,6 +250,7 @@
 
     try {
       var result = await callTTSAPI({
+        model: 'tts-1',
         input: text,
         voice: voiceSelect.value,
         response_format: formatSelect.value,
