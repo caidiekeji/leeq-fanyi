@@ -133,12 +133,17 @@ body {
 .navbar-inner {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 28px;
-  max-width: 720px;
+  justify-content: space-between;
+  max-width: 780px;
   margin: 0 auto;
   padding: 0 24px;
   height: 52px;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .navbar-brand {
