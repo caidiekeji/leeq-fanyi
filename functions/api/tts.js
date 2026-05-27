@@ -15,12 +15,18 @@ var MIME_MAP = {
   pcm: 'audio/l16'
 };
 
-export async function onRequestPost(context) {
-  var request = context.request;
-  var body;
+// 使用 onRequest 统一处理所有方法，避免 Cloudflare Pages 方法路由问题
+export async function onRequest(context) {
+  if (context.request.method !== 'POST') {
+    return new Response(JSON.stringify({ code: 405, data: null, message: 'Method Not Allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 
+  var body;
   try {
-    body = await request.json();
+    body = await context.request.json();
   } catch (e) {
     return new Response(JSON.stringify({ code: 400, data: null, message: '请求体格式错误' }), {
       status: 400,
