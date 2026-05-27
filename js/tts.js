@@ -16,9 +16,10 @@
   const audioEl = document.getElementById('ttsAudio');
   const downloadBtn = document.getElementById('ttsDownload');
   const resultHint = document.getElementById('ttsResultHint');
+  const previewBtn = document.getElementById('voicePreviewBtn');
 
   // TTS API 配置
-  var TTS_API_URL = 'http://192.168.31.18:5050/v1/audio/speech';
+  var TTS_API_URL = 'http://192.168.31.154:5050/v1/audio/speech';
   var TTS_API_KEY = 'Bearer leeq-12311';
 
   var isGenerating = false;
@@ -90,6 +91,70 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   });
+
+  // 音色试听按钮
+  previewBtn.addEventListener('click', previewVoice);
+
+  /**
+   * 音色试听 - 用一段示例文字生成语音并播放
+   */
+  async function previewVoice() {
+    var voice = voiceSelect.value;
+    var voiceName = voiceSelect.options[voiceSelect.selectedIndex].text;
+    var previewText = '你好，我是' + voiceName.split('（')[0] + '，这是我的声音示例。今天天气真好，非常适合出去走走。';
+
+    var isDisabled = previewBtn.disabled;
+    if (isDisabled) return;
+
+    previewBtn.disabled = true;
+    previewBtn.classList.add('loading');
+
+    try {
+      var res = await fetch(TTS_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': TTS_API_KEY
+        },
+        body: JSON.stringify({
+          input: previewText,
+          voice: voice,
+          response_format: 'mp3',
+          speed: 1
+        })
+      });
+
+      if (!res.ok) {
+        var errText = '';
+        try { var errData = await res.json(); errText = errData.message || JSON.stringify(errData); } catch (e) {}
+        throw new Error(errText || '试听失败 (' + res.status + ')');
+      }
+
+      var blob = await res.blob();
+      var audioUrl = URL.createObjectURL(blob);
+
+      // 释放之前试听的 URL
+      if (audioEl.dataset.prevPreviewUrl) {
+        URL.revokeObjectURL(audioEl.dataset.prevPreviewUrl);
+      }
+      audioEl.dataset.prevPreviewUrl = audioUrl;
+
+      // 显示播放器并播放
+      audioEl.src = audioUrl;
+      placeholder.style.display = 'none';
+      playerEl.classList.remove('hidden');
+      resultHint.classList.remove('hidden');
+      resultHint.textContent = '音色试听：' + voiceName + '（示例语音，非正式生成结果）';
+      audioEl.play().catch(function () {});
+
+      // 试听不覆盖正式生成的 currentBlob
+    } catch (err) {
+      showToast(err.message || '试听失败，请重试', 'error');
+    } finally {
+      previewBtn.disabled = false;
+      previewBtn.classList.remove('loading');
+    }
+  }
 
   /**
    * 开始语音合成

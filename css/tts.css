@@ -13,6 +13,12 @@
   border-radius: var(--radius-md);
 }
 
+.voice-select-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .voice-select {
   padding: 7px 12px;
   border: 1px solid var(--color-border);
@@ -29,6 +35,37 @@
 
 .voice-select:focus {
   border-color: var(--color-primary);
+}
+
+.preview-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.preview-btn:hover {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+}
+
+.preview-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.preview-btn.loading {
+  color: var(--color-text-muted);
+  pointer-events: none;
 }
 
 .speed-control {
