@@ -24,6 +24,50 @@
   var isGenerating = false;
   var currentBlob = null;
 
+  // 音色列表缓存
+  var voiceList = [];
+
+  // 性别映射
+  var GENDER_MAP = { Female: '女', Male: '男' };
+
+  /**
+   * 页面初始化时从 API 获取音色列表
+   */
+  loadVoices();
+
+  async function loadVoices() {
+    try {
+      var res = await fetch(TTS_API_URL, { method: 'GET' });
+      var data = await res.json();
+      voiceList = data.voices || [];
+      renderVoiceOptions();
+    } catch (e) {
+      showToast('音色列表加载失败: ' + (e.message || '网络错误'), 'error');
+    }
+  }
+
+  /**
+   * 渲染音色下拉选项
+   */
+  function renderVoiceOptions() {
+    voiceSelect.innerHTML = '';
+
+    if (voiceList.length === 0) {
+      voiceSelect.innerHTML = '<option value="">暂无可用音色</option>';
+      return;
+    }
+
+    voiceList.forEach(function (v) {
+      var gender = GENDER_MAP[v.gender] || v.gender;
+      var displayName = v.name + '（' + gender + '·' + v.language + '）';
+      voiceSelect.innerHTML += '<option value="' + v.name + '">' + displayName + '</option>';
+    });
+
+    // 启用音色选择和试听按钮
+    voiceSelect.disabled = false;
+    previewBtn.disabled = false;
+  }
+
   /**
    * 将 base64 字符串解码为 Blob 对象
    */
@@ -139,7 +183,7 @@
   async function previewVoice() {
     var voice = voiceSelect.value;
     var voiceName = voiceSelect.options[voiceSelect.selectedIndex].text;
-    var previewText = '你好，我是' + voiceName.split('（')[0] + '，这是我的声音示例。今天天气真好，非常适合出去走走。';
+    var previewText = 'Hello, this is a voice preview. The weather is nice today, perfect for a walk outside.';
 
     var isDisabled = previewBtn.disabled;
     if (isDisabled) return;

@@ -2,7 +2,8 @@
  * TTS 语音合成代理 - 通过 nip.io 域名绕过 Cloudflare 禁止直连 IP 的限制
  */
 export async function onRequest(context) {
-  var TTS_API_URL = 'http://123-156-40-66.nip.io:8080/v1/audio/speech';
+  var TTS_BASE = 'http://123-156-40-66.nip.io:8080/v1/audio/speech';
+  var VOICES_URL = 'http://123-156-40-66.nip.io:8080/v1/voices';
   var TTS_API_KEY = 'Bearer leeq-12311';
 
   var MIME_MAP = {
@@ -15,6 +16,25 @@ export async function onRequest(context) {
   };
 
   var request = context.request;
+
+  // GET: 代理获取音色列表
+  if (request.method === 'GET') {
+    try {
+      var voicesRes = await fetch(VOICES_URL, {
+        headers: { 'Authorization': TTS_API_KEY }
+      });
+      var voicesData = await voicesRes.json();
+      return new Response(JSON.stringify(voicesData), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: '获取音色列表失败: ' + e.message }), {
+        status: 502,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+  }
 
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ code: 405, data: null, message: 'Method Not Allowed' }), {
@@ -47,7 +67,7 @@ export async function onRequest(context) {
 
   var ttsRes;
   try {
-    ttsRes = await fetch(TTS_API_URL, {
+    ttsRes = await fetch(TTS_BASE, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
