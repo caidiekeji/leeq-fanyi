@@ -18,8 +18,11 @@
   const resultHint = document.getElementById('ttsResultHint');
   const previewBtn = document.getElementById('voicePreviewBtn');
 
-  // TTS API 配置 - 通过同源代理避免 Mixed Content 问题
-  var TTS_API_URL = '/api/speech';
+  // TTS API 配置 - 直接调用 TTS 服务器，绕过 Cloudflare 代理（Cloudflare Workers 限制只能访问 80/443 端口）
+  var TTS_BASE_URL = 'http://123.156.40.66:8080';
+  var TTS_VOICES_URL = TTS_BASE_URL + '/v1/voices';
+  var TTS_SPEECH_URL = TTS_BASE_URL + '/v1/audio/speech';
+  var TTS_API_KEY = 'Bearer leeq-12311';
 
   var isGenerating = false;
   var currentBlob = null;
@@ -31,13 +34,16 @@
   var GENDER_MAP = { Female: '女', Male: '男' };
 
   /**
-   * 页面初始化时从 API 获取音色列表
+   * 页面初始化时直接从 TTS 服务器获取音色列表
    */
   loadVoices();
 
   async function loadVoices() {
     try {
-      var res = await fetch(TTS_API_URL, { method: 'GET' });
+      var res = await fetch(TTS_VOICES_URL, {
+        method: 'GET',
+        headers: { 'Authorization': TTS_API_KEY }
+      });
       var data = await res.json();
       voiceList = data.voices || [];
       renderVoiceOptions();
@@ -68,42 +74,44 @@
     previewBtn.disabled = false;
   }
 
-  /**
-   * 将 base64 字符串解码为 Blob 对象
-   */
-  function base64ToBlob(base64, contentType) {
-    var binary = atob(base64);
-    var bytes = new Uint8Array(binary.length);
-    for (var i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return new Blob([bytes], { type: contentType });
-  }
+  // 音频格式对应的 MIME 类型
+  var MIME_MAP = {
+    mp3: 'audio/mpeg',
+    opus: 'audio/opus',
+    aac: 'audio/aac',
+    flac: 'audio/flac',
+    wav: 'audio/wav',
+    pcm: 'audio/l16'
+  };
 
   /**
-   * 调用 TTS API 并处理 base64 响应，返回 { blob, contentType }
+   * 调用 TTS API 直接获取原始音频数据，返回 { blob, contentType }
    */
   async function callTTSAPI(body) {
-    var res = await fetch(TTS_API_URL, {
+    var format = body.response_format || 'mp3';
+    var contentType = MIME_MAP[format] || 'audio/mpeg';
+
+    var res = await fetch(TTS_SPEECH_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': TTS_API_KEY
+      },
       body: JSON.stringify(body)
     });
 
     if (!res.ok) {
       var errText = '';
-      try { var errData = await res.json(); errText = errData.message || JSON.stringify(errData); } catch (e) {}
+      try { errText = await res.text(); } catch (e) {}
       throw new Error(errText || '请求失败 (' + res.status + ')');
     }
 
-    var json = await res.json();
-    if (json.code !== 200) {
-      throw new Error(json.message || '语音合成失败');
-    }
+    var audioBuffer = await res.arrayBuffer();
+    var blob = new Blob([audioBuffer], { type: contentType });
 
     return {
-      blob: base64ToBlob(json.data.audio, json.data.contentType),
-      contentType: json.data.contentType
+      blob: blob,
+      contentType: contentType
     };
   }
 
