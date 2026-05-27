@@ -24,6 +24,45 @@
   var isGenerating = false;
   var currentBlob = null;
 
+  /**
+   * 将 base64 字符串解码为 Blob 对象
+   */
+  function base64ToBlob(base64, contentType) {
+    var binary = atob(base64);
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: contentType });
+  }
+
+  /**
+   * 调用 TTS API 并处理 base64 响应，返回 { blob, contentType }
+   */
+  async function callTTSAPI(body) {
+    var res = await fetch(TTS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      var errText = '';
+      try { var errData = await res.json(); errText = errData.message || JSON.stringify(errData); } catch (e) {}
+      throw new Error(errText || '请求失败 (' + res.status + ')');
+    }
+
+    var json = await res.json();
+    if (json.code !== 200) {
+      throw new Error(json.message || '语音合成失败');
+    }
+
+    return {
+      blob: base64ToBlob(json.data.audio, json.data.contentType),
+      contentType: json.data.contentType
+    };
+  }
+
   // 导航栏滚动阴影
   var navbar = document.querySelector('.navbar');
   if (navbar) {
@@ -109,27 +148,14 @@
     previewBtn.classList.add('loading');
 
     try {
-      var res = await fetch(TTS_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          input: previewText,
-          voice: voice,
-          response_format: 'mp3',
-          speed: 1
-        })
+      var result = await callTTSAPI({
+        input: previewText,
+        voice: voice,
+        response_format: 'mp3',
+        speed: 1
       });
 
-      if (!res.ok) {
-        var errText = '';
-        try { var errData = await res.json(); errText = errData.message || JSON.stringify(errData); } catch (e) {}
-        throw new Error(errText || '试听失败 (' + res.status + ')');
-      }
-
-      var blob = await res.blob();
-      var audioUrl = URL.createObjectURL(blob);
+      var audioUrl = URL.createObjectURL(result.blob);
 
       // 释放之前试听的 URL
       if (audioEl.dataset.prevPreviewUrl) {
@@ -145,7 +171,6 @@
       resultHint.textContent = '音色试听：' + voiceName + '（示例语音，非正式生成结果）';
       audioEl.play().catch(function () {});
 
-      // 试听不覆盖正式生成的 currentBlob
     } catch (err) {
       showToast(err.message || '试听失败，请重试', 'error');
     } finally {
@@ -169,27 +194,14 @@
     loadingEl.classList.remove('hidden');
 
     try {
-      var res = await fetch(TTS_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          input: text,
-          voice: voiceSelect.value,
-          response_format: formatSelect.value,
-          speed: parseFloat(speedSlider.value)
-        })
+      var result = await callTTSAPI({
+        input: text,
+        voice: voiceSelect.value,
+        response_format: formatSelect.value,
+        speed: parseFloat(speedSlider.value)
       });
 
-      if (!res.ok) {
-        var errText = '';
-        try { var errData = await res.json(); errText = errData.message || JSON.stringify(errData); } catch (e) {}
-        throw new Error(errText || '语音合成失败 (' + res.status + ')');
-      }
-
-      // 获取音频二进制数据
-      currentBlob = await res.blob();
+      currentBlob = result.blob;
       var audioUrl = URL.createObjectURL(currentBlob);
 
       // 释放之前的 URL（如果存在）

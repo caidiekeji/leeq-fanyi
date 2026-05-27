@@ -1,6 +1,6 @@
 /**
  * TTS 语音合成代理 - 解决 HTTPS 页面无法请求 HTTP API 的问题
- * 接收前端请求，转发到内网 TTS 服务，返回音频二进制数据
+ * 接收前端请求，转发到内网 TTS 服务，返回 base64 编码的音频数据
  */
 var TTS_API_URL = 'http://123.156.40.66:5050/v1/audio/speech';
 var TTS_API_KEY = 'Bearer leeq-12311';
@@ -15,7 +15,6 @@ var MIME_MAP = {
   pcm: 'audio/l16'
 };
 
-// 使用 onRequest 统一处理所有方法，避免 Cloudflare Pages 方法路由问题
 export async function onRequest(context) {
   if (context.request.method !== 'POST') {
     return new Response(JSON.stringify({ code: 405, data: null, message: 'Method Not Allowed' }), {
@@ -78,15 +77,21 @@ export async function onRequest(context) {
     });
   }
 
-  // 直接透传音频二进制数据
-  var audioData = await ttsRes.arrayBuffer();
+  // 将音频二进制数据转为 base64 字符串，通过 JSON 返回
+  var audioBuffer = await ttsRes.arrayBuffer();
+  var base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(audioBuffer)));
   var contentType = MIME_MAP[format] || 'audio/mpeg';
 
-  return new Response(audioData, {
+  return new Response(JSON.stringify({
+    code: 200,
+    data: {
+      audio: base64,
+      contentType: contentType,
+      format: format
+    },
+    message: 'success'
+  }), {
     status: 200,
-    headers: {
-      'Content-Type': contentType,
-      'Cache-Control': 'no-cache'
-    }
+    headers: { 'Content-Type': 'application/json' }
   });
 }
