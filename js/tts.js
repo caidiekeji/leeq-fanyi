@@ -19,7 +19,7 @@
   const previewBtn = document.getElementById('voicePreviewBtn');
 
   // TTS API 配置
-  var TTS_API_URL = 'http://192.168.31.154:5050/v1/audio/speech';
+  var TTS_API_URL = 'http://123.156.40.66:5050/v1/audio/speech';
   var TTS_API_KEY = 'Bearer leeq-12311';
 
   var isGenerating = false;
