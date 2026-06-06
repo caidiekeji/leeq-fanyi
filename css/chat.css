@@ -995,6 +995,12 @@ body {
   background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2);
   color: #b45309; font-size: 12px; line-height: 1.5;
 }
+
+/* 移动端汉堡菜单按钮 - 桌面端隐藏 */
+.mobile-menu-btn {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .chat-sidebar {
     position: fixed;
@@ -1004,6 +1010,7 @@ body {
     z-index: 100;
     transform: translateX(-100%);
     box-shadow: var(--shadow-lg);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .chat-sidebar.open {
@@ -1017,10 +1024,41 @@ body {
     inset: 0;
     background: rgba(0, 0, 0, 0.35);
     z-index: 99;
+    backdrop-filter: blur(2px);
   }
 
   .mobile-overlay.show {
     display: block;
+  }
+
+  /* 移动端汉堡菜单按钮 */
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    z-index: 20;
+    transition: all var(--transition-fast);
+  }
+
+  .mobile-menu-btn:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .mobile-menu-btn svg {
+    width: 18px;
+    height: 18px;
   }
 
   /* 消息气泡响应式 - DeepSeek 风格 */
@@ -1045,4 +1083,100 @@ body {
   .ds-bottom-wrapper {
     max-width: 100%;
   }
+}
+
+/* 480px 及以下 - 移动端 */
+@media (max-width: 480px) {
+  .chat-welcome {
+    padding: 16px 16px 32px;
+  }
+  .welcome-content {
+    max-width: 100%;
+  }
+  .ds-input-box {
+    border-radius: 12px;
+    border-width: 1px;
+  }
+  .ds-textarea {
+    padding: 14px 14px 10px;
+    font-size: 14px;
+    min-height: 56px;
+  }
+  .ds-toolbar {
+    padding: 6px 10px 10px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ds-toolbar-left {
+    flex-wrap: wrap;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+  .ds-tool-btn {
+    width: 30px;
+    height: 30px;
+  }
+  .ds-tool-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  .ds-filename {
+    max-width: 80px;
+    font-size: 11px;
+  }
+  .ds-send-btn {
+    width: 32px;
+    height: 32px;
+  }
+  .ds-send-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+  .ds-bottom-wrapper {
+    padding: 0;
+  }
+  .chat-input-bottom {
+    padding: 8px 12px;
+  }
+  .chat-message {
+    max-width: 95%;
+  }
+  .chat-message.user { margin-right: 8px; }
+  .chat-message.assistant { margin-left: 8px; }
+  .chat-bubble {
+    font-size: 14px !important;
+    padding: 11px 14px !important;
+  }
+  .chat-loading {
+    margin-left: 8px;
+    padding: 10px 14px;
+  }
+  .mobile-menu-btn {
+    top: 10px;
+    left: 10px;
+    width: 32px;
+    height: 32px;
+  }
+  .chat-sidebar {
+    width: 240px;
+    min-width: 240px;
+  }
+}
+
+/* 360px 及以下 - 极小屏 */
+@media (max-width: 360px) {
+  .chat-sidebar { width: 220px; min-width: 220px; }
+  .chat-welcome { padding: 12px 10px 24px; }
+  .ds-textarea { padding: 12px 12px 8px; font-size: 13px; min-height: 48px; }
+  .ds-toolbar { padding: 4px 8px 8px; }
+  .ds-tool-btn { width: 28px; height: 28px; }
+  .ds-tool-btn svg { width: 14px; height: 14px; }
+  .ds-send-btn { width: 30px; height: 30px; }
+  .ds-send-btn svg { width: 14px; height: 14px; }
+  .mobile-menu-btn { top: 8px; left: 8px; width: 30px; height: 30px; }
+  .chat-message { max-width: 98%; }
+  .chat-message.user .chat-bubble { font-size: 13px !important; padding: 10px 12px !important; }
+  .chat-message.assistant .chat-bubble { font-size: 13px !important; padding: 10px 12px !important; }
+  .ds-select { max-width: 90px; font-size: 11px; }
 }

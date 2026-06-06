@@ -1,10 +1,12 @@
-/* ====== AIGC 内容检测页面专用样式 ====== */
+/* ====== AIGC 内容检测页面专用样式 - 工具优先布局 ====== */
 
-/* 主容器 - navbar fixed，顶部加大 padding */
+/* 主容器 - 撑满视口剩余空间 */
 .detect-main {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 40px 24px 60px;
+  padding: 20px 24px 40px;
+  /* 让容器有足够高度容纳大输入区 */
+  min-height: calc(100vh - var(--nav-height) - 120px);
 }
 
 /* 检测类型快速选择标签 */
@@ -42,20 +44,19 @@
   border-color: var(--color-primary);
 }
 
-/* 输入卡片 */
+/* 输入卡片 - 无边框阴影卡片 */
 .detect-input-card {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius-lg);
-  padding: 24px;
-  margin-bottom: 20px;
+  padding: 28px;
+  margin-bottom: 24px;
   box-shadow: var(--shadow-sm);
   transition: box-shadow var(--transition-fast);
 }
 
 .detect-input-card:focus-within {
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary), var(--shadow-sm);
 }
 
 /* 卡片内标题行 */
@@ -112,19 +113,19 @@
   color: var(--color-text);
 }
 
-/* 文本输入区域 */
+/* 文本输入区域 - 更大更突出 */
 .detect-textarea {
   width: 100%;
-  padding: 16px 20px;
+  padding: 20px 24px;
   background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: 15px;
-  line-height: 1.7;
+  line-height: 1.8;
   color: var(--color-text);
   font-family: var(--font-sans);
   resize: vertical;
-  min-height: 180px;
+  min-height: 280px;
   outline: none;
   transition: all var(--transition-fast);
 }
@@ -159,23 +160,23 @@
   color: var(--color-error);
 }
 
-/* 检测按钮 - 渐变蓝 */
+/* 检测按钮 - 更大更醒目 */
 .detect-submit-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 28px;
+  padding: 12px 32px;
   border: none;
   border-radius: var(--radius-md);
   background: var(--gradient-primary);
   color: #FFFFFF;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   font-family: var(--font-sans);
   cursor: pointer;
   transition: all var(--transition-base);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.28);
   letter-spacing: 0.01em;
 }
 
@@ -718,11 +719,13 @@
 /* ====== 响应式 ====== */
 @media (max-width: 768px) {
   .detect-main {
-    padding: 24px 16px 40px;
+    padding: 16px 16px 32px;
+    min-height: calc(100vh - var(--nav-height) - 80px);
   }
 
   .detect-type-tabs {
     gap: 6px;
+    margin-bottom: 16px;
   }
 
   .detect-type-tab {
@@ -731,7 +734,7 @@
   }
 
   .detect-input-card {
-    padding: 18px;
+    padding: 20px;
   }
 
   .detect-card-header {
@@ -741,7 +744,7 @@
   }
 
   .detect-textarea {
-    min-height: 140px;
+    min-height: 200px;
     font-size: 14px;
   }
 
@@ -765,7 +768,8 @@
 
 @media (max-width: 480px) {
   .detect-main {
-    padding: 20px 12px 32px;
+    padding: 12px 12px 24px;
+    min-height: calc(100vh - var(--nav-height) - 60px);
   }
 
   .detect-type-tabs {
@@ -780,7 +784,43 @@
     flex-shrink: 0;
   }
 
+  .detect-input-card {
+    padding: 16px;
+  }
+
+  .detect-textarea {
+    min-height: 160px;
+  }
+
   .detect-result-body {
     padding: 14px 16px;
   }
+}
+
+/* 360px 及以下 - 极小屏 */
+@media (max-width: 360px) {
+  .detect-main {
+    padding: 10px 8px 20px;
+    min-height: calc(100vh - var(--nav-height) - 40px);
+  }
+  .detect-type-tabs { gap: 4px; }
+  .detect-type-tab { padding: 5px 10px; font-size: 11px; }
+  .detect-input-card { padding: 12px; }
+  .detect-card-label { font-size: 13px; }
+  .detect-card-label svg { width: 16px; height: 16px; }
+  .detect-type-select { font-size: 12px; min-width: 120px; padding: 6px 10px; }
+  .detect-textarea { padding: 14px 16px; font-size: 14px; min-height: 130px; }
+  .detect-input-footer { flex-wrap: wrap; gap: 8px; }
+  .detect-shortcut { font-size: 10px; }
+  .detect-char-count { font-size: 11px; }
+  .detect-submit-btn { padding: 10px 20px; font-size: 13px; }
+  .detect-loading-card { padding: 36px 16px; }
+  .detect-empty-card { padding: 36px 16px; }
+  .detect-empty-card svg { width: 36px; height: 36px; }
+  .detect-empty-card p { font-size: 13px; }
+  .detect-result-header { padding: 12px 16px; }
+  .detect-result-body { padding: 12px 14px; }
+  .report-summary { padding: 14px; gap: 10px; }
+  .summary-score { width: 48px; height: 48px; font-size: 22px; }
+  .dimension-item { padding: 10px 12px; }
 }

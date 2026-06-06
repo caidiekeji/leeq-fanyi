@@ -1,22 +1,25 @@
-/* ====== 翻译页面专用样式 ====== */
+/* ====== 翻译页面专用样式 - 工具优先布局 ====== */
 
-/* 主容器 - 翻译页面 */
+/* 主容器 - 撑满视口剩余空间 */
 .translate-main {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px 40px;
+  padding: 0 24px 24px;
+  /* 减去 navbar 高度 + Hero 区域 + 底部间距，让工作区最大化 */
+  min-height: calc(100vh - var(--nav-height) - 140px);
 }
 
-/* 翻译工作区 - Tool Card 风格 */
+/* 翻译工作区 - 无边框阴影卡片 */
 .translate-workspace {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius-lg);
   background: var(--color-surface);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
-  min-height: 420px;
+  box-shadow: var(--shadow-sm);
+  height: calc(100vh - var(--nav-height) - 160px);
+  min-height: 480px;
 }
 
 /* 控制栏 */
@@ -25,7 +28,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-light);
   background: var(--color-surface);
   flex-shrink: 0;
 }
@@ -343,11 +346,12 @@
 /* 768px 及以下：面板垂直排列，控制栏换行 */
 @media (max-width: 768px) {
   .translate-main {
-    padding: 0 16px 32px;
+    padding: 0 16px 20px;
+    min-height: calc(100vh - var(--nav-height) - 100px);
   }
 
   .translate-workspace {
-    min-height: calc(100vh - 180px);
+    min-height: calc(100vh - var(--nav-height) - 120px);
     border-radius: var(--radius-md);
   }
 
@@ -403,7 +407,8 @@
 /* 480px 及以下：缩小字体和内边距 */
 @media (max-width: 480px) {
   .translate-main {
-    padding: 0 12px 24px;
+    padding: 0 12px 16px;
+    min-height: calc(100vh - var(--nav-height) - 80px);
   }
 
   .translate-control-bar {
@@ -455,4 +460,42 @@
   .panel-footer {
     padding: 8px 12px;
   }
+}
+
+/* 360px 及以下 - 极小屏 */
+@media (max-width: 360px) {
+  .translate-main {
+    padding: 0 8px 12px;
+    min-height: calc(100vh - var(--nav-height) - 60px);
+  }
+  .translate-workspace {
+    height: calc(100vh - var(--nav-height) - 120px);
+    min-height: 380px;
+  }
+  .translate-control-bar {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .translate-control-left {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .lang-select {
+    font-size: 11px;
+    padding: 4px 6px;
+    min-width: 80px;
+  }
+  .swap-btn {
+    width: 30px;
+    height: 30px;
+  }
+  .swap-btn svg { width: 14px; height: 14px; }
+  .tool-btn { width: 30px; height: 30px; }
+  .translate-btn { padding: 6px 12px; font-size: 12px; }
+  .translate-btn span { font-size: 12px; }
+  .text-input { padding: 12px 14px; font-size: 13px; }
+  .result-display { padding: 12px 14px; font-size: 13px; }
+  .panel-footer { padding: 6px 10px; }
+  .shortcut-hints span { font-size: 10px; }
+  .char-count { font-size: 11px; }
 }

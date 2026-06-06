@@ -51,6 +51,9 @@
   <!-- 整体布局：左侧边栏 + 右侧聊天区 -->
   <div class="chat-layout">
 
+    <!-- 移动端遮罩层 -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
     <!-- ====== 左侧边栏 ====== -->
     <aside class="chat-sidebar" id="chatSidebar">
       <!-- 侧边栏顶部：品牌 + 折叠按钮 -->
@@ -121,6 +124,11 @@
 
     <!-- ====== 右侧主内容区 ====== -->
     <main class="chat-main" id="chatMain">
+      <!-- 移动端汉堡菜单按钮 -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+
       <!-- 消息列表区域 -->
       <div class="chat-messages" id="chatMessages">
         <!-- 空状态：居中显示输入框（DeepSeek 极简风格） -->
