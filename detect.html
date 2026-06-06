@@ -25,6 +25,7 @@
       </a>
       <div class="navbar-actions">
         <a href="/" class="nav-link" title="返回翻译">翻译</a>
+        <a href="/chat" class="nav-link" title="AI聊天">AI聊天</a>
         
         <button class="icon-btn" id="themeBtn" title="切换主题">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -33,57 +34,70 @@
     </div>
   </nav>
 
-  <main class="main-container" id="detector">
-    <h2 class="page-title">AIGC 内容检测</h2>
-    <div class="translate-wrapper">
-      <div class="control-bar">
-        <div class="control-left">
-          <select id="detectType" class="lang-select" aria-label="检测类型">
-            <option value="aiDetection">AI生成检测</option>
-            <option value="compliance">合规检测</option>
-            <option value="quality">质量评估</option>
-            <option value="sensitiveInfo">敏感信息检测</option>
-          </select>
-        </div>
-        <div class="control-right">
-          <button id="detectBtn" class="translate-btn" disabled>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span>开始检测</span>
-          </button>
-        </div>
+  <main class="detect-main" id="detector">
+    <!-- 页面头部 -->
+    <div class="detect-header">
+      <h1 class="page-title">AIGC 内容检测</h1>
+      <p class="page-subtitle">基于大语言模型的智能内容分析，支持合规检测、质量评估、AI生成检测、敏感信息检测</p>
+    </div>
+
+    <!-- 检测类型快速选择标签 -->
+    <div class="detect-type-tabs" id="detectTypeTabs">
+      <button class="detect-type-tab active" data-type="aiDetection">AI生成检测</button>
+      <button class="detect-type-tab" data-type="compliance">合规检测</button>
+      <button class="detect-type-tab" data-type="quality">质量评估</button>
+      <button class="detect-type-tab" data-type="sensitiveInfo">敏感信息检测</button>
+    </div>
+
+    <!-- 输入卡片 -->
+    <div class="detect-input-card">
+      <div class="detect-card-header">
+        <span class="detect-card-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          输入待检测内容
+        </span>
+        <select id="detectType" class="detect-type-select" aria-label="检测类型">
+          <option value="aiDetection">AI生成检测</option>
+          <option value="compliance">合规检测</option>
+          <option value="quality">质量评估</option>
+          <option value="sensitiveInfo">敏感信息检测</option>
+        </select>
       </div>
+      <textarea id="detectText" class="detect-textarea"
+        placeholder="在此粘贴需要检测的内容...&#10;支持文章、评论、文案、代码片段等，最多 10000 字符"
+        maxlength="10000"></textarea>
+      <div class="detect-input-footer">
+        <div class="detect-shortcut">
+          <kbd>Ctrl+Enter</kbd> 开始检测
+        </div>
+        <span id="sourceCount" class="detect-char-count">输入 0 / 10000</span>
+        <button id="detectBtn" class="detect-submit-btn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>开始检测</span>
+        </button>
+      </div>
+    </div>
 
-      <div class="split-panels">
-        <section class="panel panel-source">
-          <div class="panel-body">
-            <textarea id="detectText" class="text-input"
-              placeholder="在此粘贴需要检测的内容...&#10;支持文章、评论、文案、代码片段等&#10;最多 10000 字符 · Ctrl+Enter 开始检测"
-              maxlength="10000"></textarea>
-          </div>
-          <div class="panel-footer">
-            <div class="shortcut-hints">
-              <span><kbd>Ctrl+Enter</kbd> 开始检测</span>
-            </div>
-            <span id="sourceCount" class="char-count">输入 0 / 10000</span>
-          </div>
-        </section>
+    <!-- 加载状态 -->
+    <div id="detectLoading" class="detect-loading-card" style="display:none">
+      <div class="detect-loading-spinner"></div>
+      <p class="detect-loading-text">AI 正在分析您的内容...</p>
+    </div>
 
-        <section class="panel panel-result">
-          <div class="panel-body">
-            <div id="detectPlaceholder" class="result-display empty">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <p>选择检测类型，粘贴内容后点击检测</p>
-            </div>
-            <div id="detectLoading" class="result-display" style="display:none; flex-direction:column; align-items:center; justify-content:center">
-              <div class="loading-spinner"></div>
-              <p style="color:var(--color-text-muted);margin-top:12px;font-size:13px">AI 正在分析您的内容...</p>
-            </div>
-            <div id="detectReport" class="detect-report" style="display:none"></div>
-          </div>
-          <div class="panel-footer">
-            <span id="resultCount" class="char-count" style="display:none">检测完成</span>
-          </div>
-        </section>
+    <!-- 空状态提示 -->
+    <div id="detectPlaceholder" class="detect-empty-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <p>选择检测类型，粘贴内容后点击检测，结果将显示在这里</p>
+    </div>
+
+    <!-- 检测结果卡片 -->
+    <div id="detectReport" class="detect-result-card" style="display:none">
+      <div class="detect-result-header">
+        <span class="detect-result-title">检测报告</span>
+        <span id="resultCount" class="detect-result-meta" style="display:none">检测完成</span>
+      </div>
+      <div class="detect-result-body">
+        <!-- 报告内容由 JS 动态填充 -->
       </div>
     </div>
   </main>

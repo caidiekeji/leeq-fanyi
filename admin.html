@@ -98,6 +98,18 @@
             </svg>
             提示词模板
           </div>
+          <div class="nav-item" data-section="search" onclick="switchSection('search')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            搜索配置
+          </div>
+          <div class="nav-item" data-section="skills" onclick="switchSection('skills')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            技能管理
+          </div>
           <div class="nav-item" data-section="system" onclick="switchSection('system')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -607,6 +619,92 @@
             </div>
           </div>
 
+          <!-- Search Config Section -->
+          <div id="section-search" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">搜索引擎配置</span>
+              </div>
+              <div class="section-body">
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">设置搜索引擎 API Key 和启用状态。搜索功能通过 AI 模型模拟搜索，无需额外 API Key。</p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+                  <div class="search-engine-card">
+                    <div class="search-engine-card-header">
+                      <span class="search-engine-name">必应 (Bing)</span>
+                      <label class="provider-toggle">
+                        <input type="checkbox" id="searchBingEnabled" onchange="saveSearchConfig()">
+                        <span class="provider-toggle-label">已启用</span>
+                      </label>
+                    </div>
+                    <div class="search-engine-card-body">
+                      <p class="search-engine-desc">Microsoft Bing 搜索，通过 AI 模拟搜索</p>
+                    </div>
+                  </div>
+                  <div class="search-engine-card">
+                    <div class="search-engine-card-header">
+                      <span class="search-engine-name">百度 (Baidu)</span>
+                      <label class="provider-toggle">
+                        <input type="checkbox" id="searchBaiduEnabled" onchange="saveSearchConfig()">
+                        <span class="provider-toggle-label">已启用</span>
+                      </label>
+                    </div>
+                    <div class="search-engine-card-body">
+                      <p class="search-engine-desc">百度搜索，通过 AI 模拟搜索</p>
+                    </div>
+                  </div>
+                  <div class="search-engine-card">
+                    <div class="search-engine-card-header">
+                      <span class="search-engine-name">搜狗 (Sogou)</span>
+                      <label class="provider-toggle">
+                        <input type="checkbox" id="searchSogouEnabled" onchange="saveSearchConfig()">
+                        <span class="provider-toggle-label">已启用</span>
+                      </label>
+                    </div>
+                    <div class="search-engine-card-body">
+                      <p class="search-engine-desc">搜狗搜索，通过 AI 模拟搜索</p>
+                    </div>
+                  </div>
+                  <div class="search-engine-card">
+                    <div class="search-engine-card-header">
+                      <span class="search-engine-name">Yandex</span>
+                      <label class="provider-toggle">
+                        <input type="checkbox" id="searchYandexEnabled" onchange="saveSearchConfig()">
+                        <span class="provider-toggle-label">已启用</span>
+                      </label>
+                    </div>
+                    <div class="search-engine-card-body">
+                      <p class="search-engine-desc">Yandex 搜索，通过 AI 模拟搜索</p>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top:16px;padding:12px;background:var(--bg-secondary);border-radius:8px;font-size:12px;color:var(--text-muted)">
+                  <strong>说明：</strong>搜索功能通过 AI 模型模拟搜索引擎行为。开启/关闭开关后自动保存，聊天页面仅显示已启用的搜索引擎。
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills Management Section -->
+          <div id="section-skills" style="display:none">
+            <div class="section-card">
+              <div class="section-header">
+                <span class="section-title">技能管理</span>
+                <button class="btn btn-primary btn-sm" onclick="openSkillEditor()">添加技能</button>
+              </div>
+              <div class="section-body">
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">技能是预设的提示词模板，用户在聊天界面可以选择技能来改变 AI 的行为模式。</p>
+                <div id="skillsList">
+                  <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <p>暂无技能，点击"添加技能"创建</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- System Section -->
           <div id="section-system" style="display:none">
             <div class="section-card">
@@ -819,6 +917,8 @@
         usage: 'API 用量',
         analytics: '高级分析',
         prompt: '提示词模板',
+        search: '搜索配置',
+        skills: '技能管理',
         system: '系统设置',
         logs: '访问日志',
         spider: '爬虫日志',
@@ -830,6 +930,8 @@
       if (name === 'usage') loadUsage();
       if (name === 'analytics') loadAnalytics();
       if (name === 'health') checkHealth();
+      if (name === 'search') loadSearchConfig();
+      if (name === 'skills') loadSkills();
       if (name === 'logs') loadAccessLogs();
       if (name === 'spider') loadSpiderLogs();
       if (window.innerWidth <= 768) toggleSidebar();
@@ -2047,6 +2149,233 @@
       if (e.ctrlKey && e.key === 'Enter') {
         e.preventDefault();
         savePromptFromModal();
+      }
+    });
+
+    // ====== 搜索配置 ======
+    function loadSearchConfig() {
+      const adminToken = localStorage.getItem('admin_token');
+      if (!adminToken) return;
+      fetch('/api/admin/search-config', {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.code === 200 && data.data.config) {
+            const config = data.data.config;
+            // 更新复选框状态
+            const engineIds = {
+              bing: 'searchBingEnabled',
+              baidu: 'searchBaiduEnabled',
+              sogou: 'searchSogouEnabled',
+              yandex: 'searchYandexEnabled'
+            };
+            Object.entries(engineIds).forEach(([key, id]) => {
+              const el = document.getElementById(id);
+              if (el) {
+                el.checked = config[key]?.enabled !== false;
+                // 更新标签文字
+                const label = el.nextElementSibling;
+                if (label) label.textContent = config[key]?.enabled !== false ? '已启用' : '已禁用';
+              }
+            });
+          }
+        })
+        .catch(() => {});
+    }
+
+    async function saveSearchConfig() {
+      const adminToken = localStorage.getItem('admin_token');
+      if (!adminToken) return;
+      const config = {
+        bing: { name: '必应', enabled: document.getElementById('searchBingEnabled')?.checked ?? true },
+        baidu: { name: '百度', enabled: document.getElementById('searchBaiduEnabled')?.checked ?? true },
+        sogou: { name: '搜狗', enabled: document.getElementById('searchSogouEnabled')?.checked ?? true },
+        yandex: { name: 'Yandex', enabled: document.getElementById('searchYandexEnabled')?.checked ?? true }
+      };
+      // 更新标签文字
+      const engineIds = ['searchBingEnabled', 'searchBaiduEnabled', 'searchSogouEnabled', 'searchYandexEnabled'];
+      engineIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          const label = el.nextElementSibling;
+          if (label) label.textContent = el.checked ? '已启用' : '已禁用';
+        }
+      });
+      try {
+        const res = await fetch('/api/admin/search-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+          body: JSON.stringify(config)
+        });
+        const data = await res.json();
+        if (data.code === 200) {
+          showToast('搜索配置已保存', 'success');
+        }
+      } catch (err) {
+        showToast('保存失败: ' + err.message, 'error');
+      }
+    }
+
+    // ====== 技能管理 ======
+    let skillsData = [];
+
+    async function loadSkills() {
+      try {
+        const res = await fetch('/api/skill');
+        const data = await res.json();
+        if (data.code === 200 && Array.isArray(data.data)) {
+          skillsData = data.data;
+          renderSkillsList();
+        }
+      } catch (err) {
+        console.error('加载技能列表失败:', err);
+      }
+    }
+
+    function renderSkillsList() {
+      const list = document.getElementById('skillsList');
+      if (!skillsData || skillsData.length === 0) {
+        list.innerHTML = `<div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <p>暂无技能，点击"添加技能"创建</p>
+        </div>`;
+        return;
+      }
+      list.innerHTML = skillsData.map((skill, index) => `
+        <div class="skill-card">
+          <div class="skill-card-header">
+            <span class="skill-card-name">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              ${skill.name}
+            </span>
+            <div class="skill-card-actions">
+              <button class="btn btn-default btn-sm" onclick="openSkillEditor(${index})">编辑</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteSkill(${index})">删除</button>
+            </div>
+          </div>
+          ${skill.description ? `<div class="skill-card-desc">${skill.description}</div>` : ''}
+          <div class="skill-card-prompt">${skill.prompt ? skill.prompt.slice(0, 100) + (skill.prompt.length > 100 ? '...' : '') : '未设置提示词'}</div>
+        </div>
+      `).join('');
+    }
+
+    function openSkillEditor(index) {
+      const skill = index !== undefined ? skillsData[index] : null;
+      document.getElementById('skillModalTitle').textContent = skill ? '编辑技能' : '添加技能';
+      document.getElementById('skillName').value = skill ? skill.name : '';
+      document.getElementById('skillDesc').value = skill ? skill.description || '' : '';
+      document.getElementById('skillPrompt').value = skill ? skill.prompt || '' : '';
+      document.getElementById('skillModalSaveBtn').setAttribute('data-index', index !== undefined ? index : -1);
+      document.getElementById('skillModal').classList.add('active');
+    }
+
+    function closeSkillModal() {
+      document.getElementById('skillModal').classList.remove('active');
+    }
+
+    async function saveSkill() {
+      const btn = document.getElementById('skillModalSaveBtn');
+      const index = parseInt(btn.getAttribute('data-index'));
+      const name = document.getElementById('skillName').value.trim();
+      const description = document.getElementById('skillDesc').value.trim();
+      const prompt = document.getElementById('skillPrompt').value.trim();
+
+      if (!name) return showToast('请输入技能名称', 'error');
+      if (!prompt) return showToast('请输入提示词内容', 'error');
+
+      const skill = { name, description, prompt };
+
+      if (index >= 0) {
+        skillsData[index] = skill;
+      } else {
+        skillsData.push(skill);
+      }
+
+      try {
+        const res = await fetch('/api/skill', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+          body: JSON.stringify(skillsData)
+        });
+        const data = await res.json();
+        if (data.code === 200) {
+          showToast('技能已保存', 'success');
+          renderSkillsList();
+          closeSkillModal();
+        } else {
+          showToast('保存失败: ' + data.message, 'error');
+        }
+      } catch (err) {
+        showToast('保存失败: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteSkill(index) {
+      if (!confirm('确定要删除该技能吗？')) return;
+      skillsData.splice(index, 1);
+      try {
+        const res = await fetch('/api/skill', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+          body: JSON.stringify(skillsData)
+        });
+        const data = await res.json();
+        if (data.code === 200) {
+          showToast('技能已删除', 'success');
+          renderSkillsList();
+        }
+      } catch (err) {
+        showToast('删除失败: ' + err.message, 'error');
+      }
+    }
+  </script>
+
+  <!-- 技能编辑弹窗 -->
+  <div id="skillModal" class="prompt-modal-overlay" onclick="if(event.target===this)closeSkillModal()">
+    <div class="prompt-modal-dialog">
+      <div class="prompt-modal-header">
+        <h3 class="prompt-modal-title" id="skillModalTitle">添加技能</h3>
+        <button class="prompt-modal-close" onclick="closeSkillModal()" title="关闭（ESC）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="prompt-modal-body">
+        <div class="form-group">
+          <label class="form-label">技能名称</label>
+          <input id="skillName" class="form-input" placeholder="例如：翻译助手、代码审查、写作助手">
+        </div>
+        <div class="form-group">
+          <label class="form-label">技能描述（可选）</label>
+          <input id="skillDesc" class="form-input" placeholder="简短描述该技能的功能">
+        </div>
+        <div class="form-group">
+          <label class="form-label">System Prompt（提示词）</label>
+          <textarea id="skillPrompt" class="prompt-modal-textarea" style="min-height:200px" placeholder="在此输入技能的 System Prompt...&#10;&#10;该提示词将在用户选择此技能后作为系统提示词发送给 AI 模型"></textarea>
+        </div>
+      </div>
+      <div class="prompt-modal-footer">
+        <span class="prompt-modal-hint">Ctrl+Enter 保存  ·  ESC 关闭</span>
+        <button class="btn btn-secondary" onclick="closeSkillModal()">取消</button>
+        <button class="btn btn-primary" id="skillModalSaveBtn" onclick="saveSkill()">保存技能</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ESC 关闭技能弹窗
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && document.getElementById('skillModal').classList.contains('active')) {
+        closeSkillModal();
+      }
+    });
+    // Ctrl+Enter 保存技能
+    document.getElementById('skillPrompt').addEventListener('keydown', function (e) {
+      if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        saveSkill();
       }
     });
   </script>

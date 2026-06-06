@@ -1,0 +1,462 @@
+/* ====== 翻译页面专属样式 - Swiss Modernism 风格 ====== */
+
+/* 页面头部 */
+.translate-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 0 16px;
+}
+
+.translate-header .page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.translate-header .page-subtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+/* 主容器 - 翻译页面 */
+.translate-main {
+  max-width: 1200px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 24px;
+  height: calc(100vh - 73px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 翻译工作区 */
+.translate-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  min-height: 0;
+}
+
+/* 控制栏 */
+.translate-control-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.translate-control-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.translate-control-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 语言选择器 */
+.lang-select {
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-fast);
+  min-width: 120px;
+}
+
+.lang-select:hover {
+  color: var(--color-primary);
+}
+
+.lang-select option {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* 语言互换按钮 */
+.swap-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+.swap-btn:hover {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  transform: rotate(180deg);
+}
+
+.swap-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 翻译按钮 */
+.translate-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 22px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--gradient-primary);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  letter-spacing: 0.01em;
+}
+
+.translate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+}
+
+.translate-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.translate-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.translate-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 工具按钮 */
+.tool-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tool-btn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  border-color: var(--color-primary);
+}
+
+.tool-btn:active {
+  transform: scale(0.92);
+}
+
+.tool-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.tool-btn.active {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* 分栏面板 */
+.split-panels {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.panel-source {
+  border-right: 1px solid var(--color-border);
+}
+
+.panel-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.panel-footer {
+  padding: 10px 18px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: var(--color-bg);
+  flex-shrink: 0;
+}
+
+/* 文本输入框 */
+.text-input {
+  flex: 1;
+  width: 100%;
+  padding: 20px 24px;
+  background: transparent;
+  border: none;
+  outline: none !important;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  resize: none;
+  box-shadow: none !important;
+}
+
+.text-input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.text-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* 结果展示区 */
+.result-display {
+  flex: 1;
+  padding: 20px 24px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-text);
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.result-display.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  gap: 12px;
+}
+
+.result-display.empty svg {
+  width: 48px;
+  height: 48px;
+  opacity: 0.2;
+  color: var(--color-primary);
+}
+
+/* 字符计数 */
+.char-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.char-count.over {
+  color: var(--color-error);
+}
+
+/* 快捷键提示 */
+.shortcut-hints {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.shortcut-hints span {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.shortcut-hints kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  color: var(--color-text-secondary);
+}
+
+/* 拖拽高亮 */
+.panel-body.drag-over {
+  background: var(--color-primary-bg);
+  outline: 2px dashed var(--color-primary);
+  outline-offset: -4px;
+}
+
+/* 导出菜单 */
+.export-menu {
+  position: fixed;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 4px;
+  z-index: 9999;
+  min-width: 180px;
+}
+
+.export-item {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  transition: all var(--transition-fast);
+}
+
+.export-item:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-primary);
+}
+
+/* ====== 响应式 - 翻译页面 ====== */
+@media (max-width: 768px) {
+  .translate-main {
+    padding: 12px;
+    height: auto;
+  }
+
+  .translate-workspace {
+    min-height: calc(100vh - 140px);
+  }
+
+  .translate-header {
+    margin-bottom: 16px;
+  }
+
+  .translate-header .page-title {
+    font-size: 20px;
+  }
+
+  .translate-control-bar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .translate-control-left,
+  .translate-control-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .translate-control-right {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tool-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .translate-btn {
+    flex: 1;
+    padding: 10px 20px;
+  }
+
+  .split-panels {
+    flex-direction: column;
+  }
+
+  .panel-source {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .panel {
+    min-height: 200px;
+  }
+
+  .shortcut-hints {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .translate-control-right {
+    gap: 4px;
+  }
+
+  .tool-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .tool-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .translate-btn span {
+    font-size: 13px;
+  }
+
+  .translate-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .lang-select {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+
+  .panel-footer {
+    padding: 8px 12px;
+  }
+}

@@ -37,6 +37,7 @@
   </script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231387c0'><path d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z'/></svg>">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/translate.css">
 </head>
 <body>
   <div class="app-bg"></div>
@@ -55,6 +56,7 @@
       </a>
       <div class="navbar-actions">
         <a href="/detect" class="nav-link" title="AIGC内容检测">AIGC检测</a>
+        <a href="/chat" class="nav-link" title="AI聊天">AI聊天</a>
         
         <button class="icon-btn" id="themeBtn" title="切换主题">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -63,17 +65,23 @@
     </div>
   </nav>
 
-  <main class="main-container" id="translator">
-    <div class="translate-wrapper">
-      <div class="control-bar">
-        <div class="control-left">
+  <main class="translate-main" id="translator">
+    <!-- 页面头部 -->
+    <div class="translate-header">
+      <h1 class="page-title">智能翻译</h1>
+      <p class="page-subtitle">基于大语言模型的多语言智能翻译，支持 20+ 种语言互译，格式完美保留</p>
+    </div>
+
+    <div class="translate-workspace">
+      <div class="translate-control-bar">
+        <div class="translate-control-left">
           <select id="sourceLang" class="lang-select"></select>
           <button class="swap-btn" id="swapBtn" title="互换语言">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
           </button>
           <select id="targetLang" class="lang-select"></select>
         </div>
-        <div class="control-right">
+        <div class="translate-control-right">
           <button class="tool-btn" id="realtimeBtn" title="实时翻译" aria-label="实时翻译">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </button>
@@ -84,7 +92,6 @@
           <button class="tool-btn" id="exportBtn" title="导出" aria-label="导出">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </button>
-          
           <button class="tool-btn" id="copyBtn" title="复制" aria-label="复制">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           </button>

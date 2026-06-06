@@ -1,38 +1,318 @@
-/* ====== AIGC 内容检测页面样式 ====== */
+/* ====== AIGC 内容检测页面专属样式 - 单列卡片布局 ====== */
 
-/* 页面标题 */
-.page-title {
-  font-size: 18px;
+/* 页面主容器 */
+.detect-main {
+  max-width: 900px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+/* 页面头部 */
+.detect-header {
+  text-align: center;
+  margin-bottom: 28px;
+  padding: 0 16px;
+}
+
+.detect-header .page-title {
+  font-size: 24px;
   font-weight: 700;
   color: var(--color-text);
-  text-align: center;
-  margin-bottom: 16px;
   letter-spacing: -0.02em;
+  margin-bottom: 6px;
 }
 
-/* 检测报告容器 - 在 .panel-body 内可滚动 */
-.detect-report {
-  padding: 4px;
-  overflow-y: auto;
-  max-height: 100%;
+.detect-header .page-subtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  line-height: 1.6;
 }
 
-/* 加载动画 */
-.loading-spinner {
-  width: 36px;
-  height: 36px;
+/* 检测类型快速选择标签 */
+.detect-type-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.detect-type-tab {
+  padding: 8px 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.detect-type-tab:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+
+.detect-type-tab.active {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border-color: var(--color-primary);
+}
+
+/* 输入卡片 */
+.detect-input-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast);
+}
+
+.detect-input-card:focus-within {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
+/* 卡片内标题行 */
+.detect-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.detect-card-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detect-card-label svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary);
+  opacity: 0.7;
+}
+
+/* 检测类型下拉选择器 */
+.detect-type-select {
+  padding: 8px 14px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-fast);
+  min-width: 150px;
+}
+
+.detect-type-select:hover {
+  border-color: var(--color-primary);
+}
+
+.detect-type-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.detect-type-select option {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* 文本输入区域 */
+.detect-textarea {
+  width: 100%;
+  padding: 16px 20px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  resize: vertical;
+  min-height: 180px;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.detect-textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.detect-textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* 输入卡片底部操作栏 */
+.detect-input-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.detect-char-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.detect-char-count.over {
+  color: var(--color-error);
+}
+
+/* 检测按钮 */
+.detect-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 28px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--gradient-primary);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  letter-spacing: 0.01em;
+}
+
+.detect-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+}
+
+.detect-submit-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.detect-submit-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.detect-submit-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 快捷键提示 */
+.detect-shortcut {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.detect-shortcut kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  color: var(--color-text-secondary);
+}
+
+/* 加载状态 */
+.detect-loading-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.detect-loading-spinner {
+  width: 40px;
+  height: 40px;
   border: 3px solid var(--color-border);
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: detectSpin 0.7s linear infinite;
   will-change: transform;
+  margin-bottom: 16px;
 }
 
 @keyframes detectSpin {
   to { transform: rotate(360deg); }
 }
 
-/* 报告头部 */
+.detect-loading-text {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* 结果卡片 */
+.detect-result-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+/* 结果卡片头部 */
+.detect-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.detect-result-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.detect-result-meta {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* 结果卡片内容 */
+.detect-result-body {
+  padding: 20px 24px;
+}
+
+/* 报告头部（JS 动态生成） */
 .report-header {
   display: flex;
   align-items: center;
@@ -54,17 +334,16 @@
   color: var(--color-text-muted);
 }
 
-/* 报告摘要卡片 */
+/* 报告摘要 */
 .report-summary {
   display: flex;
   align-items: flex-start;
   gap: 16px;
   padding: 20px;
-  background: var(--color-surface);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   margin-bottom: 20px;
-  box-shadow: var(--shadow-sm);
 }
 
 .report-summary.status-pass {
@@ -193,7 +472,7 @@
 
 .dimension-item {
   padding: 14px 16px;
-  background: var(--color-surface);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
@@ -282,7 +561,7 @@
 }
 
 .risk-item.risk-low {
-  background: var(--color-surface);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
 }
 
@@ -389,7 +668,7 @@
 }
 
 .sensitive-item.risk-low {
-  background: var(--color-surface);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
 }
 
@@ -431,12 +710,103 @@
   margin-top: 4px;
 }
 
-/* 检测类型下拉框加宽 */
-#detectType.lang-select {
-  min-width: 150px;
+/* 空状态提示 */
+.detect-empty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text-muted);
 }
 
-/* 报告容器滚动 */
-.panel-result .panel-body {
-  overflow-y: auto;
+.detect-empty-card svg {
+  width: 48px;
+  height: 48px;
+  opacity: 0.15;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+}
+
+.detect-empty-card p {
+  font-size: 14px;
+}
+
+/* ====== 响应式 ====== */
+@media (max-width: 768px) {
+  .detect-main {
+    padding: 16px 12px 32px;
+    width: 100%;
+  }
+
+  .detect-header {
+    margin-bottom: 20px;
+  }
+
+  .detect-header .page-title {
+    font-size: 20px;
+  }
+
+  .detect-type-tabs {
+    gap: 6px;
+  }
+
+  .detect-type-tab {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  .detect-input-card {
+    padding: 18px;
+  }
+
+  .detect-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .detect-textarea {
+    min-height: 140px;
+    font-size: 14px;
+  }
+
+  .detect-input-footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .detect-submit-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .report-summary {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .detect-type-tabs {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .detect-type-tab {
+    flex-shrink: 0;
+  }
+
+  .detect-result-body {
+    padding: 14px 16px;
+  }
 }

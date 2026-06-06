@@ -10,6 +10,8 @@
   const loadingEl = document.getElementById('detectLoading');
   const reportEl = document.getElementById('detectReport');
   const resultCount = document.getElementById('resultCount');
+  // 检测报告内容区域
+  const reportBody = reportEl.querySelector('.detect-result-body');
 
   let isDetecting = false;
 
@@ -47,6 +49,30 @@
     const len = textEl.value.length;
     sourceCount.textContent = '输入 ' + len + ' / 10000';
     detectBtn.disabled = len === 0 || isDetecting;
+  });
+
+  // 检测类型标签切换
+  const detectTypeTabs = document.getElementById('detectTypeTabs');
+  if (detectTypeTabs) {
+    detectTypeTabs.addEventListener('click', function (e) {
+      const tab = e.target.closest('.detect-type-tab');
+      if (!tab) return;
+      // 更新标签激活状态
+      detectTypeTabs.querySelectorAll('.detect-type-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      // 同步下拉选择器
+      const type = tab.dataset.type;
+      if (type) detectType.value = type;
+    });
+  }
+
+  // 下拉选择器变化时同步标签
+  detectType.addEventListener('change', function () {
+    if (detectTypeTabs) {
+      detectTypeTabs.querySelectorAll('.detect-type-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.type === detectType.value);
+      });
+    }
   });
 
   // 开始检测
@@ -100,7 +126,8 @@
 
   function showError(msg) {
     reportEl.style.display = 'block';
-    reportEl.innerHTML = '<div class="report-section"><p style="color:var(--color-error);text-align:center;padding:24px">' + escapeHtml(msg) + '</p></div>';
+    placeholder.style.display = 'none';
+    reportBody.innerHTML = '<div class="report-section"><p style="color:var(--color-error);text-align:center;padding:24px">' + escapeHtml(msg) + '</p></div>';
   }
 
   function escapeHtml(str) {
@@ -113,6 +140,7 @@
   function renderReport(data) {
     const report = data.report;
     reportEl.style.display = 'block';
+    placeholder.style.display = 'none';
 
     let html = '';
 
@@ -123,7 +151,7 @@
     html += '</div>';
 
     if (report.raw) {
-      html += '<div class="report-section"><div style="padding:16px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:13px;line-height:1.8;color:var(--color-text-secondary);white-space:pre-wrap;word-break:break-word">' + formatMarkdown(report.raw) + '</div></div>';
+      html += '<div class="report-section"><div style="padding:16px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:13px;line-height:1.8;color:var(--color-text-secondary);white-space:pre-wrap;word-break:break-word">' + formatMarkdown(report.raw) + '</div></div>';
     } else if (data.type === 'compliance') {
       html += renderComplianceReport(report);
     } else if (data.type === 'quality') {
@@ -134,7 +162,7 @@
       html += renderSensitiveReport(report);
     }
 
-    reportEl.innerHTML = html;
+    reportBody.innerHTML = html;
     reportEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 

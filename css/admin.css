@@ -1742,3 +1742,126 @@ body {
   color: var(--color-text-muted);
   margin-right: auto;
 }
+
+/* ====== 搜索引擎配置卡片 ====== */
+.search-engine-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  transition: all 0.2s;
+}
+
+.search-engine-card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.search-engine-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.search-engine-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.search-engine-desc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ====== 技能管理卡片 ====== */
+.skill-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+.skill-card:hover {
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-xs);
+}
+
+.skill-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.skill-card-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.skill-card-name svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.skill-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skill-card-desc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.skill-card-prompt {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono, monospace);
+  background: var(--color-bg);
+  padding: 8px 12px;
+  border-radius: 6px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* 技能弹窗中的表单 */
+#skillModal .form-group {
+  margin-bottom: 16px;
+}
+
+#skillModal .form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+
+#skillModal .form-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+#skillModal .form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
