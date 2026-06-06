@@ -64,6 +64,16 @@ function initChat() {
   loadSearchEngines();
   bindEvents();
   updateSendButtons();
+
+  // 初始化 Mermaid 图表库配置
+  if (typeof mermaid !== 'undefined') {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: chatState.theme === 'dark' ? 'dark' : 'default',
+      securityLevel: 'loose',
+      fontFamily: 'inherit'
+    });
+  }
 }
 
 /**
@@ -323,23 +333,20 @@ function updateCharCount() {
 }
 
 /**
- * 切换搜索模式
+ * 切换搜索模式（不显示下拉框，自动使用后台配置的搜索引擎）
  */
 function toggleSearchMode() {
   chatState.searchMode = !chatState.searchMode;
   if (chatState.searchMode) {
     els.searchModeBtn.classList.add('search-active');
     if (els.searchModeBtn2) els.searchModeBtn2.classList.add('search-active');
-    els.searchEngineSelect.style.display = '';
-    if (els.searchEngineSelect2) els.searchEngineSelect2.style.display = '';
+    // 不再显示下拉框，直接使用后台配置的默认引擎
     chatState.activeSkill = null;
     els.skillPanel.style.display = 'none';
     renderSkillPanel();
   } else {
     els.searchModeBtn.classList.remove('search-active');
     if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
-    els.searchEngineSelect.style.display = 'none';
-    if (els.searchEngineSelect2) els.searchEngineSelect2.style.display = 'none';
   }
   updatePlaceholder();
 }
@@ -397,8 +404,6 @@ function handleNewChat() {
   chatState.uploadedFileName = null;
   els.searchModeBtn.classList.remove('search-active');
   if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
-  els.searchEngineSelect.style.display = 'none';
-  if (els.searchEngineSelect2) els.searchEngineSelect2.style.display = 'none';
   els.uploadFilename.style.display = 'none';
   els.uploadFilename.textContent = '';
   if (els.uploadFilename2) { els.uploadFilename2.style.display = 'none'; els.uploadFilename2.textContent = ''; }
@@ -423,8 +428,6 @@ function handleClear() {
   chatState.uploadedFileName = null;
   els.searchModeBtn.classList.remove('search-active');
   if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
-  els.searchEngineSelect.style.display = 'none';
-  if (els.searchEngineSelect2) els.searchEngineSelect2.style.display = 'none';
   els.uploadFilename.style.display = 'none';
   els.uploadFilename.textContent = '';
   if (els.uploadFilename2) { els.uploadFilename2.style.display = 'none'; els.uploadFilename2.textContent = ''; }
@@ -580,8 +583,6 @@ async function handleSend() {
       chatState.searchMode = false;
       els.searchModeBtn.classList.remove('search-active');
       if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
-      els.searchEngineSelect.style.display = 'none';
-      if (els.searchEngineSelect2) els.searchEngineSelect2.style.display = 'none';
       updatePlaceholder();
     } else {
       reply = await sendChatRequest(userContent);
@@ -643,23 +644,14 @@ async function sendSearchRequest(payload) {
 
   // 新版 API 返回 answer 字段（LLM 提纯后的最终答案）
   if (data.answer) {
-    // 构建带来源信息的完整回答
-    let reply = data.answer;
-
-    // 如果有来源信息，附加来源列表
-    if (data.sources && data.sources.length > 0 && data.pipeline === 'real-search') {
-      const sourceLinks = data.sources.map((s, i) =>
-        `${i + 1}. [${s.title}](${s.url || '#'})${s.snippet ? ` - ${s.snippet.slice(0, 60)}` : ''}`
-      ).join('\n');
-      reply += `\n\n---\n**来源 (${data.sourceCount} 条结果来自 ${data.engine})：**\n\n${sourceLinks}`;
-    }
-
-    // 标记是否为降级模式
-    if (data.pipeline === 'ai-fallback') {
-      reply += '\n\n> ⚠️ 无法连接到真实搜索引擎，以上答案由 AI 基于知识库生成，建议确认关键信息。';
-    }
-
-    return reply;
+    // 返回结构化数据（答案 + 来源信息分开），供打字机和渲染使用
+    return {
+      text: data.answer,
+      sources: data.sources || [],
+      sourceCount: data.sourceCount || 0,
+      engine: data.engine || '',
+      pipeline: data.pipeline || ''
+    };
   }
 
   // 兼容旧格式
@@ -667,12 +659,19 @@ async function sendSearchRequest(payload) {
 }
 
 /**
- * 打字机效果：逐字显示 AI 回复
- * @param {string} fullText - 完整回复文本
- * @param {number} speed - 每字间隔毫秒（默认 20ms）
+ * 打字机效果：逐字显示 AI 回复，完成后渲染 Markdown + 添加复制按钮和引用源
+ * @param {string|Object} replyData - 纯文本或结构化数据 {text, sources, sourceCount, engine, pipeline}
+ * @param {number} speed - 每字间隔毫秒（默认 18ms）
  */
-function typewriterEffect(fullText, speed = 20) {
-  // 先创建 AI 消息气泡（空内容，带打字光标）
+function typewriterEffect(replyData, speed = 18) {
+  // 兼容纯文本和结构化对象
+  const fullText = typeof replyData === 'string' ? replyData : (replyData.text || '');
+  const sources = typeof replyData === 'object' ? (replyData.sources || []) : [];
+  const sourceCount = typeof replyData === 'object' ? (replyData.sourceCount || 0) : 0;
+  const engineName = typeof replyData === 'object' ? (replyData.engine || '') : '';
+  const pipeline = typeof replyData === 'object' ? (replyData.pipeline || '') : '';
+
+  // 创建 AI 消息气泡
   const msgEl = document.createElement('div');
   msgEl.className = 'chat-message assistant';
 
@@ -681,7 +680,7 @@ function typewriterEffect(fullText, speed = 20) {
   avatarEl.className = 'chat-avatar';
   avatarEl.textContent = 'AI';
 
-  // 气泡（带打字光标）
+  // 气泡容器
   const bubbleEl = document.createElement('div');
   bubbleEl.className = 'chat-bubble chat-bubble-typing';
   bubbleEl.innerHTML = '<span class="typewriter-cursor"></span>';
@@ -691,7 +690,7 @@ function typewriterEffect(fullText, speed = 20) {
   els.messages.insertBefore(msgEl, els.loading);
   scrollToBottom();
 
-  // 如果已有打字机在运行，先中断
+  // 中断已有打字机
   if (chatState.typewriterTimer) {
     clearInterval(chatState.typewriterTimer);
     chatState.typewriterTimer = null;
@@ -702,28 +701,164 @@ function typewriterEffect(fullText, speed = 20) {
   return new Promise((resolve) => {
     chatState.typewriterTimer = setInterval(() => {
       if (charIndex < fullText.length) {
-        // 每次追加一个字符到光标前
         const cursor = bubbleEl.querySelector('.typewriter-cursor');
         if (cursor) {
           const textNode = document.createTextNode(fullText[charIndex]);
           bubbleEl.insertBefore(textNode, cursor);
         }
         charIndex++;
-        scrollToBottom(); // 实时滚动到底部
+        scrollToBottom();
       } else {
-        // 打字完成：清除定时器、移除光标、保存消息
+        // ====== 打字完成：渲染最终内容 ======
         clearInterval(chatState.typewriterTimer);
         chatState.typewriterTimer = null;
         bubbleEl.classList.remove('chat-bubble-typing');
-        const cursor = bubbleEl.querySelector('.typewriter-cursor');
-        if (cursor) cursor.remove();
-        // 将完整内容保存到历史记录
+
+        // 使用 marked.js 将 Markdown 渲染为 HTML
+        let htmlContent = '';
+        if (typeof window.marked !== 'undefined') {
+          try {
+            htmlContent = window.marked.parse(fullText);
+          } catch (e) {
+            htmlContent = escapeHtml(fullText).replace(/\n/g, '<br>');
+          }
+        } else {
+          htmlContent = escapeHtml(fullText).replace(/\n/g, '<br>');
+        }
+        bubbleEl.innerHTML = htmlContent;
+
+        // 渲染代码高亮（如果有 highlight.js）
+        if (typeof hljs !== 'undefined') {
+          bubbleEl.querySelectorAll('pre code').forEach(block => {
+            hljs.highlightElement(block);
+          });
+        }
+
+        // 渲染 Mermaid 图表（如果有 mermaid）
+        if (typeof mermaid !== 'undefined') {
+          bubbleEl.querySelectorAll('.language-mermaid').forEach(el => {
+            const code = el.textContent;
+            el.outerHTML = `<div class="mermaid">${code}</div>`;
+          });
+          try { mermaid.init(undefined, bubbleEl); } catch(e) {}
+        }
+
+        // ====== 添加引用源区域（logo + 跳转链接）======
+        if (sources.length > 0 && pipeline === 'real-search') {
+          const sourceFooter = buildSourceFooter(sources, sourceCount, engineName);
+          bubbleEl.appendChild(sourceFooter);
+        }
+
+        // 降级模式提示
+        if (pipeline === 'ai-fallback') {
+          const warnEl = document.createElement('div');
+          warnEl.className = 'ai-fallback-hint';
+          warnEl.textContent = '无法连接到真实搜索引擎，以上答案由 AI 基于知识库生成';
+          bubbleEl.appendChild(warnEl);
+        }
+
+        // ====== 添加复制按钮 ======
+        const copyBtn = buildCopyButton(fullText);
+        bubbleEl.appendChild(copyBtn);
+
+        // 保存到历史记录
         chatState.messages.push({ role: 'assistant', content: fullText });
         saveChatHistory();
         resolve();
       }
     }, speed);
   });
+}
+
+/**
+ * HTML 转义（防止 XSS）
+ */
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/**
+ * 构建引用源区域：每个来源显示为一个小图标/Logo + 标题，点击跳转
+ */
+function buildSourceFooter(sources, count, engineName) {
+  const footer = document.createElement('div');
+  footer.className = 'source-footer';
+
+  const header = document.createElement('div');
+  header.className = 'source-header';
+  header.textContent = `参考来源 (${count} 条 · ${engineName})`;
+  footer.appendChild(header);
+
+  const list = document.createElement('div');
+  list.className = 'source-list';
+
+  sources.forEach((s, i) => {
+    const item = document.createElement('a');
+    item.className = 'source-item';
+    item.href = s.url || '#';
+    item.target = '_blank';
+    item.rel = 'noopener noreferrer';
+    item.title = s.snippet ? `${s.title}\n${s.snippet}` : s.title;
+
+    // 根据 URL 域名选择对应图标
+    const domainIcon = getDomainIcon(s.url || '');
+    item.innerHTML = `
+      <span class="source-icon">${domainIcon}</span>
+      <span class="source-title">${escapeHtml(s.title)}</span>
+    `;
+    list.appendChild(item);
+  });
+
+  footer.appendChild(list);
+  return footer;
+}
+
+/**
+ * 根据域名返回对应的 SVG 图标
+ */
+function getDomainIcon(url) {
+  if (!url) return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10A15 15 0 0 1 12 2z"/></svg>';
+  const domain = url.toLowerCase();
+  if (domain.includes('bing.com')) return '<svg viewBox="0 0 24 24" fill="#00809d"><path d="M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zm7 16a6 6 0 100-12 6 6 0 000 12zm0-2a4 4 0 110-8 4 4 0 010 8z"/></svg>';
+  if (domain.includes('baidu.com')) return '<svg viewBox="0 0 24 24" fill="#2932e1"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6zm4 4h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+  if (domain.includes('sogou.com')) return '<svg viewBox="0 0 24 24" fill="#ff8000"><path d="M12 2L2 22h20L12 2zm0 4l6 12H6l6-12z"/></svg>';
+  if (domain.includes('yandex')) return '<svg viewBox="0 0 24 24" fill="#fc3f1d"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15v-2h4v2h-4zm0-4V9h4v4h-4z"/></svg>';
+  if (domain.includes('google')) return '<svg viewBox="0 0 24 24" fill="#4285F4"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>';
+  if (domain.includes('wikipedia') || domain.includes('wiki')) return '<svg viewBox="0 0 24 24" fill="#333"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM9.5 17l-2-6h-2l3-7 3 7h-2zm5 0l2-6h2l-3-7-3 7h2z"/></svg>';
+  // 默认链接图标
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>';
+}
+
+/**
+ * 构建复制按钮
+ */
+function buildCopyButton(text) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'copy-wrapper';
+
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.title = '复制内容';
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="20 6 9 17 4 12"/></svg>';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+      }, 2000);
+    } catch (e) {
+      showToast('复制失败', 'error');
+    }
+  });
+
+  wrapper.appendChild(btn);
+  return wrapper;
 }
 
 /**
@@ -763,25 +898,56 @@ function renderAllMessages() {
 }
 
 /**
- * 渲染单条消息
+ * 渲染单条消息（历史消息加载时使用，支持 Markdown 渲染）
  */
 function renderMessage(role, content) {
   const msgEl = document.createElement('div');
   msgEl.className = `chat-message ${role}`;
 
-  // 头像
-  const avatarEl = document.createElement('div');
-  avatarEl.className = 'chat-avatar';
-  if (role === 'user') {
-    avatarEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-  } else {
+  // 仅 AI 消息显示头像，用户消息不显示
+  if (role === 'assistant') {
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'chat-avatar';
     avatarEl.textContent = 'AI';
+    msgEl.appendChild(avatarEl);
   }
 
-  // 气泡
+  // 气泡（AI 消息用 Markdown 渲染）
   const bubbleEl = document.createElement('div');
   bubbleEl.className = 'chat-bubble';
-  bubbleEl.textContent = content;
+
+  if (role === 'assistant') {
+    // AI 回复：Markdown 渲染
+    let htmlContent = '';
+    if (typeof window.marked !== 'undefined') {
+      try { htmlContent = window.marked.parse(content); } catch(e) {
+        htmlContent = escapeHtml(content).replace(/\n/g, '<br>');
+      }
+    } else {
+      htmlContent = escapeHtml(content).replace(/\n/g, '<br>');
+    }
+    bubbleEl.innerHTML = htmlContent;
+
+    // 代码高亮
+    if (typeof hljs !== 'undefined') {
+      bubbleEl.querySelectorAll('pre code').forEach(block => { hljs.highlightElement(block); });
+    }
+
+    // Mermaid 图表
+    if (typeof mermaid !== 'undefined') {
+      bubbleEl.querySelectorAll('.language-mermaid').forEach(el => {
+        el.outerHTML = `<div class="mermaid">${el.textContent}</div>`;
+      });
+      try { mermaid.init(undefined, bubbleEl); } catch(e) {}
+    }
+
+    // 历史消息也添加复制按钮
+    const copyBtn = buildCopyButton(content);
+    bubbleEl.appendChild(copyBtn);
+  } else {
+    // 用户消息：纯文本
+    bubbleEl.textContent = content;
+  }
 
   msgEl.appendChild(avatarEl);
   msgEl.appendChild(bubbleEl);

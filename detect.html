@@ -7,6 +7,32 @@
   <meta name="description" content="LeeQ AIGC检测 - 基于大语言模型的智能内容分析工具，支持合规检测、质量评估、AI生成检测、敏感信息检测">
   <meta name="keywords" content="AIGC检测，内容检测，AI检测，合规检测，质量评估，敏感信息检测">
   <meta name="robots" content="index, follow">
+  <!-- Open Graph -->
+  <meta property="og:title" content="AIGC检测 - LeeQ AI 智能内容分析">
+  <meta property="og:description" content="LeeQ AIGC检测 - 基于大语言模型的智能内容分析工具，支持合规检测、质量评估、AI生成检测、敏感信息检测">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LeeQ 翻译">
+  <meta property="og:url" content="https://lq-26k.pages.dev/detect">
+  <meta property="og:image" content="https://lq-26k.pages.dev/og-image.png">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AIGC检测 - LeeQ AI 智能内容分析">
+  <meta name="twitter:description" content="LeeQ AIGC检测 - 基于大语言模型的智能内容分析工具，支持合规检测、质量评估、AI生成检测、敏感信息检测">
+  <meta name="twitter:image" content="https://lq-26k.pages.dev/og-image.png">
+  <!-- JSON-LD 结构化数据 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "LeeQ AIGC 检测",
+    "url": "https://lq-26k.pages.dev/detect",
+    "description": "基于大语言模型的智能内容分析工具，支持合规检测、质量评估、AI生成检测、敏感信息检测",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web Browser",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" },
+    "author": { "@type": "Person", "name": "LeeQ" }
+  }
+  </script>
   <link rel="canonical" href="https://lq-26k.pages.dev/detect">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231387c0'><path d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z'/></svg>">
   <link rel="stylesheet" href="/css/style.css">
@@ -15,32 +41,49 @@
 <body>
   <div class="app-bg"></div>
 
+  <noscript>
+    <div style="padding:20px;text-align:center;font-size:16px;color:#333;">
+      <p>LeeQ AIGC 内容检测 - 基于大语言模型的智能内容分析工具，支持合规检测、质量评估、AI生成检测、敏感信息检测。</p>
+      <p>您的浏览器未启用 JavaScript，请启用后获得完整功能体验。</p>
+    </div>
+  </noscript>
+
   <a href="#detector" class="skip-link">跳到主内容</a>
 
+  <!-- 浮动导航栏：和 index.html 结构一致，nav-links 居中 -->
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="/" class="navbar-brand">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
         <span>LeeQ</span>
       </a>
-      <div class="navbar-actions">
-        <a href="/" class="nav-link" title="返回翻译">翻译</a>
-        <a href="/chat" class="nav-link" title="AI聊天">AI聊天</a>
-        
-        <button class="icon-btn" id="themeBtn" title="切换主题">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        </button>
+      <!-- 居中导航链接 -->
+      <div class="nav-links">
+        <a href="/" class="nav-link">翻译</a>
+        <a href="/detect" class="nav-link active">AIGC检测</a>
+        <a href="/chat" class="nav-link">AI聊天</a>
       </div>
+      <button class="icon-btn" id="themeBtn" title="切换主题">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
     </div>
   </nav>
 
-  <main class="detect-main" id="detector">
-    <!-- 页面头部 -->
-    <div class="detect-header">
-      <h1 class="page-title">AIGC 内容检测</h1>
-      <p class="page-subtitle">基于大语言模型的智能内容分析，支持合规检测、质量评估、AI生成检测、敏感信息检测</p>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-badge">AIGC 内容检测</div>
+    <h1 class="hero-title">智能内容分析</h1>
+    <p class="hero-subtitle">基于大语言模型的智能内容分析，支持合规检测、质量评估、AI生成检测、敏感信息检测</p>
+    <div class="hero-pills">
+      <span class="hero-pill">AI生成检测</span>
+      <span class="hero-pill">合规检测</span>
+      <span class="hero-pill">质量评估</span>
+      <span class="hero-pill">敏感信息检测</span>
     </div>
+  </section>
 
+  <!-- 主工作区：detect-main 保持该类名供 JS 引用 -->
+  <main class="detect-main" id="detector">
     <!-- 检测类型快速选择标签 -->
     <div class="detect-type-tabs" id="detectTypeTabs">
       <button class="detect-type-tab active" data-type="aiDetection">AI生成检测</button>
@@ -101,6 +144,11 @@
       </div>
     </div>
   </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    Powered by LeeQ 旗下产品 · 由 jie 开发 · Cloudflare 提供加速服务
+  </footer>
 
   <script src="/js/detect.js"></script>
 </body>

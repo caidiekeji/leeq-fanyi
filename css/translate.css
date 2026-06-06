@@ -1,41 +1,14 @@
-/* ====== 翻译页面专属样式 - Swiss Modernism 风格 ====== */
-
-/* 页面头部 */
-.translate-header {
-  text-align: center;
-  margin-bottom: 24px;
-  padding: 0 16px;
-}
-
-.translate-header .page-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--color-text);
-  letter-spacing: -0.02em;
-  margin-bottom: 6px;
-}
-
-.translate-header .page-subtitle {
-  font-size: 13px;
-  color: var(--color-text-muted);
-  font-weight: 400;
-}
+/* ====== 翻译页面专用样式 ====== */
 
 /* 主容器 - 翻译页面 */
 .translate-main {
-  max-width: 1200px;
-  width: 90%;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 24px;
-  height: calc(100vh - 73px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  padding: 0 24px 40px;
 }
 
-/* 翻译工作区 */
+/* 翻译工作区 - Tool Card 风格 */
 .translate-workspace {
-  flex: 1;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--color-border);
@@ -43,7 +16,7 @@
   background: var(--color-surface);
   overflow: hidden;
   box-shadow: var(--shadow-md);
-  min-height: 0;
+  min-height: 420px;
 }
 
 /* 控制栏 */
@@ -51,7 +24,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 18px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-surface);
   flex-shrink: 0;
@@ -71,11 +44,11 @@
 
 /* 语言选择器 */
 .lang-select {
-  padding: 8px 14px;
+  padding: 8px 12px;
   background: transparent;
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-text);
   font-family: var(--font-sans);
@@ -121,13 +94,13 @@
   height: 16px;
 }
 
-/* 翻译按钮 */
+/* 翻译按钮 - 渐变背景 */
 .translate-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 9px 22px;
+  padding: 10px 24px;
   border: none;
   border-radius: var(--radius-md);
   background: var(--gradient-primary);
@@ -197,10 +170,11 @@
   border-color: var(--color-primary);
 }
 
-/* 分栏面板 */
+/* 分栏面板 - 桌面端水平排列 */
 .split-panels {
   flex: 1;
   display: flex;
+  flex-direction: row;
   min-height: 0;
 }
 
@@ -222,16 +196,6 @@
   min-height: 0;
 }
 
-.panel-footer {
-  padding: 10px 18px;
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  background: var(--color-bg);
-  flex-shrink: 0;
-}
-
 /* 文本输入框 */
 .text-input {
   flex: 1;
@@ -240,7 +204,7 @@
   background: transparent;
   border: none;
   outline: none !important;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.7;
   color: var(--color-text);
   font-family: var(--font-sans);
@@ -261,7 +225,7 @@
 .result-display {
   flex: 1;
   padding: 20px 24px;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.7;
   color: var(--color-text);
   overflow-y: auto;
@@ -286,16 +250,15 @@
   color: var(--color-primary);
 }
 
-/* 字符计数 */
-.char-count {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.char-count.over {
-  color: var(--color-error);
+/* 面板尾部 */
+.panel-footer {
+  padding: 10px 20px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-bg);
+  flex-shrink: 0;
 }
 
 /* 快捷键提示 */
@@ -322,6 +285,18 @@
   border: 1px solid var(--color-border);
   border-radius: 3px;
   color: var(--color-text-secondary);
+}
+
+/* 字符计数 */
+.char-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.char-count.over {
+  color: var(--color-error);
 }
 
 /* 拖拽高亮 */
@@ -363,29 +338,23 @@
   color: var(--color-primary);
 }
 
-/* ====== 响应式 - 翻译页面 ====== */
+/* ====== 响应式 ====== */
+
+/* 768px 及以下：面板垂直排列，控制栏换行 */
 @media (max-width: 768px) {
   .translate-main {
-    padding: 12px;
-    height: auto;
+    padding: 0 16px 32px;
   }
 
   .translate-workspace {
-    min-height: calc(100vh - 140px);
-  }
-
-  .translate-header {
-    margin-bottom: 16px;
-  }
-
-  .translate-header .page-title {
-    font-size: 20px;
+    min-height: calc(100vh - 180px);
+    border-radius: var(--radius-md);
   }
 
   .translate-control-bar {
     flex-direction: column;
     gap: 12px;
-    padding: 14px;
+    padding: 14px 16px;
   }
 
   .translate-control-left,
@@ -397,16 +366,6 @@
   .translate-control-right {
     flex-wrap: wrap;
     gap: 6px;
-  }
-
-  .tool-btn {
-    width: 36px;
-    height: 36px;
-  }
-
-  .translate-btn {
-    flex: 1;
-    padding: 10px 20px;
   }
 
   .split-panels {
@@ -425,9 +384,32 @@
   .shortcut-hints {
     display: none;
   }
+
+  .tool-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .translate-btn {
+    flex: 1;
+    padding: 10px 20px;
+  }
+
+  .panel-footer {
+    padding: 10px 16px;
+  }
 }
 
+/* 480px 及以下：缩小字体和内边距 */
 @media (max-width: 480px) {
+  .translate-main {
+    padding: 0 12px 24px;
+  }
+
+  .translate-control-bar {
+    padding: 12px 12px;
+  }
+
   .translate-control-right {
     gap: 4px;
   }
@@ -442,6 +424,10 @@
     height: 16px;
   }
 
+  .translate-btn {
+    padding: 8px 16px;
+  }
+
   .translate-btn span {
     font-size: 13px;
   }
@@ -454,6 +440,16 @@
   .lang-select {
     font-size: 12px;
     padding: 6px 8px;
+  }
+
+  .text-input {
+    padding: 16px 18px;
+    font-size: 14px;
+  }
+
+  .result-display {
+    padding: 16px 18px;
+    font-size: 14px;
   }
 
   .panel-footer {

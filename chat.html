@@ -7,6 +7,32 @@
   <meta name="description" content="LeeQ AI 聊天 - 基于大语言模型的智能对话助手，支持多轮对话，智能问答">
   <meta name="keywords" content="AI聊天，智能对话，AI助手，LLM聊天，大语言模型对话">
   <meta name="robots" content="index, follow">
+  <!-- Open Graph -->
+  <meta property="og:title" content="AI 聊天 - LeeQ 智能对话">
+  <meta property="og:description" content="LeeQ AI 聊天 - 基于大语言模型的智能对话助手，支持多轮对话，智能问答">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="LeeQ 翻译">
+  <meta property="og:url" content="https://lq-26k.pages.dev/chat">
+  <meta property="og:image" content="https://lq-26k.pages.dev/og-image.png">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI 聊天 - LeeQ 智能对话">
+  <meta name="twitter:description" content="LeeQ AI 聊天 - 基于大语言模型的智能对话助手，支持多轮对话，智能问答">
+  <meta name="twitter:image" content="https://lq-26k.pages.dev/og-image.png">
+  <!-- JSON-LD 结构化数据 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "LeeQ AI 聊天",
+    "url": "https://lq-26k.pages.dev/chat",
+    "description": "基于大语言模型的智能对话助手，支持多轮对话，智能问答",
+    "applicationCategory": "CommunicationApplication",
+    "operatingSystem": "Web Browser",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" },
+    "author": { "@type": "Person", "name": "LeeQ" }
+  }
+  </script>
   <link rel="canonical" href="https://lq-26k.pages.dev/chat">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231387c0'><path d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z'/></svg>">
   <link rel="stylesheet" href="/css/style.css">
@@ -14,6 +40,13 @@
 </head>
 <body>
   <div class="app-bg"></div>
+
+  <noscript>
+    <div style="padding:20px;text-align:center;font-size:16px;color:#333;">
+      <p>LeeQ AI 聊天 - 基于大语言模型的智能对话助手，支持多轮对话、智能问答。</p>
+      <p>您的浏览器未启用 JavaScript，请启用后获得完整功能体验。</p>
+    </div>
+  </noscript>
 
   <!-- 整体布局：左侧边栏 + 右侧聊天区 -->
   <div class="chat-layout">
@@ -185,6 +218,25 @@
   </div>
 
   <div id="toast" class="toast"></div>
+
+  <!-- Markdown 渲染库 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- 代码高亮 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/core.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/languages/javascript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/languages/python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/languages/java.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/languages/json.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/languages/css.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/languages/xml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/languages/sql.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/languages/bash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/languages/go.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/languages/rust.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11/lib/languages/typescript.min.js"></script>
+  <!-- Mermaid 图表 -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
   <script src="/js/utils.js"></script>
   <script src="/js/chat.js"></script>

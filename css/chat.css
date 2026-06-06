@@ -638,47 +638,69 @@ body {
 }
 
 
-/* ====== 消息气泡样式 ====== */
+/* ====== 消息气泡样式（DeepSeek 极简风格）====== */
 
 /* 消息容器 */
 .chat-message {
   display: flex;
-  gap: 12px;
-  max-width: 75%;
-  margin: 0 auto 16px;
-  animation: msgFadeIn 0.3s ease;
+  gap: 0; /* DeepSeek 无头像间距 */
+  max-width: 80%; /* 稍宽一点 */
+  margin: 0 auto 20px;
+  animation: msgFadeIn 0.25s ease-out;
 }
 
 @keyframes msgFadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 用户消息（右对齐） */
+/* 用户消息（右对齐）- DeepSeek 风格：深蓝底 + 小圆角 */
 .chat-message.user {
   align-self: flex-end;
-  flex-direction: row-reverse;
-  margin-right: 40px;
+  justify-content: flex-end; /* 内容靠右 */
+  margin-right: 24px;
 }
 
+/* 用户气泡：DeepSeek 深色调 + 扁平设计 */
 .chat-message.user .chat-bubble {
-  background: var(--color-primary);
+  background: #2B4F8C; /* DeepSeek 用户消息深蓝 */
   color: #FFFFFF;
-  border-radius: 18px 18px 4px 18px;
+  border-radius: 14px 14px 4px 14px; /* 右下角尖角 */
+  padding: 13px 18px;
+  box-shadow: none; /* 无阴影，扁平 */
+  font-size: 15px;
+  line-height: 1.7;
 }
 
-/* AI 消息（左对齐） */
+/* AI 消息（左对齐）- DeepSeek 风格：浅色底 + 细边框 */
 .chat-message.assistant {
   align-self: flex-start;
-  margin-left: 40px;
+  margin-left: 24px;
 }
 
+/* AI 气泡：DeepSeek 浅色 + 细边框 + 微阴影 */
 .chat-message.assistant .chat-bubble {
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-  border-radius: 18px 18px 18px 4px;
-  box-shadow: var(--shadow-xs);
+  background: #F7F8FA; /* DeepSeek AI 消息浅灰白 */
+  color: #1A1A2E; /* 深色文字确保可读性 */
+  border: 1px solid #E8EAED; /* 极细边框 */
+  border-radius: 14px 14px 14px 4px; /* 左下角尖角 */
+  padding: 13px 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); /* 极微阴影 */
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* 暗色模式适配 - 用户消息保持深色 */
+[data-theme="dark"] .chat-message.user .chat-bubble {
+  background: #3B5998; /* 暗色模式稍亮一点的深蓝 */
+}
+
+/* 暗色模式适配 - AI 消息 */
+[data-theme="dark"] .chat-message.assistant .chat-bubble {
+  background: #2A2D35; /* 暗色模式深灰底 */
+  color: #E5E7EB; /* 浅色文字 */
+  border-color: #3A3F4B; /* 暗色边框 */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 /* 头像 */
@@ -710,11 +732,8 @@ body {
   height: 16px;
 }
 
-/* 气泡内容 */
+/* 气泡基础样式（公共部分，具体颜色/圆角由 user/assistant 覆盖） */
 .chat-bubble {
-  padding: 12px 18px;
-  font-size: 14.5px;
-  line-height: 1.7;
   word-break: break-word;
   white-space: pre-wrap;
 }
@@ -750,23 +769,26 @@ body {
   background: rgba(0, 0, 0, 0.25);
 }
 
+/* 用户消息内的代码块 - DeepSeek 深色底适配 */
 .chat-message.user .chat-bubble code {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18); /* 半透明白 */
+  color: #E8F0FE;
 }
 
 .chat-message.user .chat-bubble pre {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 
-/* ====== 加载指示器 ====== */
+/* ====== 加载指示器（DeepSeek 极简风格）====== */
 .chat-loading {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 16px 40px;
+  padding: 14px 24px;
   align-self: flex-start;
-  margin-left: 40px;
+  margin-left: 24px;
 }
 
 .chat-loading-dots {
@@ -835,6 +857,144 @@ body {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
+
+/* ====== Markdown 渲染样式（AI 回复内容）====== */
+
+/* 气泡内的 Markdown 内容 */
+.chat-bubble p { margin: 0 0 8px; line-height: 1.7; }
+.chat-bubble p:last-child { margin-bottom: 0; }
+.chat-bubble h1,.chat-bubble h2,.chat-bubble h3,
+.chat-bubble h4,.chat-bubble h5,.chat-bubble h6 {
+  margin: 14px 0 8px; font-weight: 600; line-height: 1.4;
+}
+.chat-bubble h1 { font-size: 1.25em; }
+.chat-bubble h2 { font-size: 1.15em; }
+.chat-bubble h3 { font-size: 1.08em; }
+.chat-bubble ul,.chat-bubble ol { margin: 8px 0; padding-left: 20px; }
+.chat-bubble li { margin-bottom: 3px; line-height: 1.65; }
+.chat-bubble strong { font-weight: 600; color: var(--color-text); }
+.chat-bubble em { font-style: italic; }
+
+/* 表格 */
+.chat-bubble table {
+  width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px;
+}
+.chat-bubble th,.chat-bubble td {
+  border: 1px solid var(--color-border); padding: 7px 10px; text-align: left;
+}
+.chat-bubble th { background: rgba(0,0,0,0.03); font-weight: 600; }
+[data-theme="dark"] .chat-bubble th { background: rgba(255,255,255,0.05); }
+
+/* 引用块 */
+.chat-bubble blockquote {
+  border-left: 3px solid #4F6EF7; padding: 8px 14px; margin: 10px 0;
+  background: rgba(79,110,247,0.05); border-radius: 0 6px 6px 0;
+  color: var(--color-text-secondary); font-size: 0.93em;
+}
+
+/* 行内代码 */
+.chat-bubble code:not([class]) {
+  background: rgba(79,110,247,0.08);
+  color: #4F6EF7; padding: 2px 6px; border-radius: 4px;
+  font-size: 0.88em; font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+/* 代码块 */
+.chat-bubble pre {
+  margin: 10px 0; border-radius: 8px; overflow-x: auto;
+  background: #f6f8fa; border: 1px solid #e1e4e8;
+}
+[data-theme="dark"] .chat-bubble pre { background: #161b22; border-color: #30363d; }
+.chat-bubble pre code {
+  display: block; padding: 12px 16px; font-size: 13px; line-height: 1.55;
+  font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+  background: transparent !important; color: inherit;
+}
+/* 覆盖 highlight.js 默认背景 */
+.chat-bubble pre code.hljs { background: transparent !important; }
+
+/* 分割线 */
+.chat-bubble hr { border: none; border-top: 1px solid var(--color-border); margin: 14px 0; }
+
+/* 链接 */
+.chat-bubble a { color: #4F6EF7; text-decoration: none; }
+.chat-bubble a:hover { text-decoration: underline; }
+
+/* Mermaid 图表容器 */
+.chat-bubble .mermaid {
+  margin: 12px 0; text-align: center; background: #fafbfc;
+  border-radius: 8px; padding: 16px; border: 1px solid #e1e4e8;
+}
+[data-theme="dark"] .chat-bubble .mermaid { background: #161b22; border-color: #30363d; }
+
+/* ====== 引用源区域（logo + 跳转链接）====== */
+.source-footer {
+  margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--color-border);
+}
+
+.source-header {
+  font-size: 11px; font-weight: 600; color: var(--color-text-muted);
+  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px;
+}
+
+.source-list {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+
+.source-item {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 20px;
+  background: rgba(0,0,0,0.03); border: 1px solid var(--color-border);
+  color: var(--color-text-secondary); font-size: 12px; text-decoration: none;
+  transition: all 0.15s ease; cursor: pointer; max-width: 220px;
+}
+[data-theme="dark"] .source-item { background: rgba(255,255,255,0.04); }
+
+.source-item:hover {
+  background: rgba(79,110,247,0.06); border-color: #4F6EF7; color: #4F6EF7;
+  transform: translateY(-1px); box-shadow: 0 2px 6px rgba(79,110,247,0.12);
+}
+
+.source-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; flex-shrink: 0;
+}
+.source-icon svg { width: 100%; height: 100%; }
+
+.source-title {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-weight: 500;
+}
+
+/* ====== 复制按钮 ====== */
+.copy-wrapper {
+  display: flex; justify-content: flex-end; margin-top: 10px;
+}
+
+.copy-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border: 1px solid var(--color-border);
+  border-radius: 6px; background: transparent;
+  color: var(--color-text-muted); cursor: pointer;
+  transition: all 0.15s ease; padding: 0;
+}
+
+.copy-btn:hover {
+  background: rgba(79,110,247,0.06); border-color: #4F6EF7; color: #4F6EF7;
+}
+
+.copy-btn svg { width: 15px; height: 15px; }
+
+.copy-btn.copied {
+  background: rgba(34,197,94,0.08); border-color: #22c55e; color: #22c55e;
+}
+
+/* ====== AI 降级提示 ====== */
+.ai-fallback-hint {
+  margin-top: 10px; padding: 8px 12px; border-radius: 6px;
+  background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2);
+  color: #b45309; font-size: 12px; line-height: 1.5;
+}
 @media (max-width: 768px) {
   .chat-sidebar {
     position: fixed;
@@ -863,13 +1023,13 @@ body {
     display: block;
   }
 
-  /* 消息气泡响应式 */
+  /* 消息气泡响应式 - DeepSeek 风格 */
   .chat-message {
-    max-width: 88%;
+    max-width: 90%;
   }
-  .chat-message.user { margin-right: 12px; }
-  .chat-message.assistant { margin-left: 12px; }
-  .chat-loading { margin-left: 12px; }
+  .chat-message.user { margin-right: 14px; }
+  .chat-message.assistant { margin-left: 14px; }
+  .chat-loading { margin-left: 14px; padding: 12px 18px; }
 
   /* 输入框响应式 */
   .ds-input-box { border-radius: 14px; }
