@@ -48,11 +48,6 @@
 </head>
 <body>
   <div class="app-bg"></div>
-  <div class="floating-shapes" aria-hidden="true">
-    <div class="floating-shape floating-shape-1"></div>
-    <div class="floating-shape floating-shape-2"></div>
-    <div class="floating-shape floating-shape-3"></div>
-  </div>
 
   <noscript>
     <div style="padding:20px;text-align:center;font-size:16px;color:#333;">
@@ -91,24 +86,24 @@
     <span id="announcementText"></span>
   </div>
 
-  <!-- 翻译主工作区 - 导航栏下方直接展示工具 -->
+  <!-- 翻译主工作区 — Bento Grid 布局 -->
   <main class="translate-main" id="translator">
-    <!-- 页面标题 - 极简一行 -->
+    <!-- 页面标题 -->
     <div class="page-header">
-      <h1><span class="highlight"></span>智能翻译</span></h1>
+      <h1><span class="highlight">智能翻译</span></h1>
       <span class="subtitle">基于大语言模型的多语言翻译，精准、快速、专业</span>
     </div>
-    <div class="translate-workspace">
-      <!-- 控制栏 -->
-      <div class="translate-control-bar">
-        <div class="translate-control-left">
+
+    <div class="translate-bento">
+      <!-- 行1：控制卡片 (2列) + 统计卡片 (1列) + 功能卡片 (1列) -->
+      <div class="translate-control-card stagger-item">
+        <div class="control-card-label">翻译控制</div>
+        <div class="control-row">
           <select id="sourceLang" class="lang-select"></select>
           <button class="swap-btn" id="swapBtn" title="互换语言">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
           </button>
           <select id="targetLang" class="lang-select"></select>
-        </div>
-        <div class="translate-control-right">
           <button class="tool-btn" id="realtimeBtn" title="实时翻译" aria-label="实时翻译">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </button>
@@ -128,33 +123,72 @@
         </div>
       </div>
 
-      <!-- 分栏面板 -->
-      <div class="split-panels">
-        <section class="panel panel-source">
-          <div class="panel-body">
-            <textarea id="sourceText" class="text-input" placeholder="输入要翻译的文本...&#10;支持 Ctrl+Enter 翻译 · Ctrl+D 清空 · Ctrl+K 聚焦&#10;支持拖拽 .txt / .md / .srt / .json 文件" maxlength="10000"></textarea>
-          </div>
-          <div class="panel-footer">
-            <div class="shortcut-hints">
-              <span><kbd>Ctrl+Enter</kbd> 翻译</span>
-              <span><kbd>Ctrl+D</kbd> 清空</span>
-              <span><kbd>Ctrl+K</kbd> 聚焦</span>
-            </div>
-            <span id="sourceCount" class="char-count">输入 0 / 5000</span>
-          </div>
-        </section>
+      <div class="translate-stat-card stagger-item">
+        <span class="stat-number" data-target="20" data-suffix="+">0</span>
+        <span class="stat-label">支持语言</span>
+      </div>
 
-        <section class="panel panel-result">
-          <div class="panel-body">
-            <div id="resultText" class="result-display empty">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
-              <p>翻译结果将显示在这里</p>
+      <div class="translate-feature-card stagger-item">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <span class="feature-text">LLM 智能翻译</span>
+      </div>
+
+      <!-- 行2-3：工作区卡片 (2×2) + 历史卡片 (1列) + 技巧卡片 (1列) -->
+      <div class="translate-workspace-card stagger-item">
+        <div class="split-panels">
+          <section class="panel panel-source">
+            <div class="panel-body">
+              <textarea id="sourceText" class="text-input" placeholder="输入要翻译的文本...&#10;支持 Ctrl+Enter 翻译 · Ctrl+D 清空 · Ctrl+K 聚焦&#10;支持拖拽 .txt / .md / .srt / .json 文件" maxlength="10000"></textarea>
             </div>
-          </div>
-          <div class="panel-footer">
-            <span id="resultCount" class="char-count">输出 0</span>
-          </div>
-        </section>
+            <div class="panel-footer">
+              <div class="shortcut-hints">
+                <span><kbd>Ctrl+Enter</kbd> 翻译</span>
+                <span><kbd>Ctrl+D</kbd> 清空</span>
+                <span><kbd>Ctrl+K</kbd> 聚焦</span>
+              </div>
+              <span id="sourceCount" class="char-count">输入 0 / 5000</span>
+            </div>
+          </section>
+
+          <section class="panel panel-result">
+            <div class="panel-body">
+              <div id="resultText" class="result-display empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
+                <p>翻译结果将显示在这里</p>
+              </div>
+            </div>
+            <div class="panel-footer">
+              <span id="resultCount" class="char-count">输出 0</span>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="translate-history-card stagger-item">
+        <div class="history-card-label">翻译历史</div>
+        <ul class="history-list" id="historyList">
+          <li class="history-empty">暂无翻译记录</li>
+        </ul>
+      </div>
+
+      <div class="translate-tips-card stagger-item">
+        <div class="tips-card-label">使用技巧</div>
+        <ul class="tips-list">
+          <li class="tips-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>支持 Ctrl+Enter 快捷翻译</span>
+          </li>
+          <li class="tips-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>拖拽文件自动识别源语言</span>
+          </li>
+          <li class="tips-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>开启实时翻译即时获取结果</span>
+          </li>
+        </ul>
       </div>
     </div>
   </main>
@@ -190,7 +224,7 @@
       }
     })();
 
-    /* ====== Scroll Reveal — Intersection Observer ====== */
+    /* ====== Scroll Reveal & Number Count-Up — Intersection Observer ====== */
     (function() {
       var observer = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
@@ -204,6 +238,42 @@
       document.querySelectorAll('.stagger-item').forEach(function(el, i) {
         el.style.transitionDelay = (i * 80) + 'ms';
         observer.observe(el);
+      });
+
+      /* Number count-up animation */
+      var countObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var el = entry.target;
+            var target = parseInt(el.getAttribute('data-target'), 10) || 0;
+            var suffix = el.getAttribute('data-suffix') || '';
+            var duration = 1800;
+            var startTime = null;
+
+            function easeOutCubic(t) {
+              return 1 - Math.pow(1 - t, 3);
+            }
+
+            function animate(timestamp) {
+              if (!startTime) startTime = timestamp;
+              var elapsed = timestamp - startTime;
+              var progress = Math.min(elapsed / duration, 1);
+              var easedProgress = easeOutCubic(progress);
+              var current = Math.round(easedProgress * target);
+              el.textContent = current + suffix;
+              if (progress < 1) {
+                requestAnimationFrame(animate);
+              }
+            }
+
+            requestAnimationFrame(animate);
+            countObserver.unobserve(el);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      document.querySelectorAll('.stat-number[data-target]').forEach(function(el) {
+        countObserver.observe(el);
       });
     })();
 
