@@ -67,13 +67,15 @@ function initChat() {
   bindEvents();
   updateSendButtons();
 
-  // 初始化 Mermaid 图表库配置
+  // 初始化 Mermaid 图表库配置（启用错误抑制，避免显示炸弹图标）
   if (typeof mermaid !== 'undefined') {
     mermaid.initialize({
       startOnLoad: false,
       theme: chatState.theme === 'dark' ? 'dark' : 'default',
       securityLevel: 'loose',
-      fontFamily: 'inherit'
+      fontFamily: 'inherit',
+      // 抑制默认的错误渲染（炸弹图标），改为抛出异常让我们自行处理
+      suppressErrorRendering: true
     });
   }
 }
@@ -738,13 +740,32 @@ function typewriterEffect(replyData, speed = 18) {
           });
         }
 
-        // 渲染 Mermaid 图表（如果有 mermaid）
+        // 渲染 Mermaid 图表（带容错：语法错误时回退为代码块）
         if (typeof mermaid !== 'undefined') {
-          bubbleEl.querySelectorAll('.language-mermaid').forEach(el => {
-            const code = el.textContent;
-            el.outerHTML = `<div class="mermaid">${code}</div>`;
-          });
-          try { mermaid.init(undefined, bubbleEl); } catch(e) {}
+          const mermaidBlocks = bubbleEl.querySelectorAll('.language-mermaid');
+          for (const el of mermaidBlocks) {
+            const code = el.textContent.trim();
+            try {
+              // 先验证语法
+              await mermaid.parse(code);
+              // 语法正确 → 替换为 mermaid 容器并渲染
+              el.outerHTML = `<div class="mermaid">${code}</div>`;
+            } catch (parseErr) {
+              // 语法验证失败 → 打印详细错误信息并回退为代码块
+              console.group('Mermaid 渲染失败');
+              console.warn('错误信息:', parseErr.message);
+              console.warn('原始代码:\n', code);
+              console.groupEnd();
+              el.outerHTML = `<pre><code class="language-mermaid">${escapeHtml(code)}</code></pre>`;
+              continue; // 跳过渲染
+            }
+          }
+          // 批量渲染所有有效的 mermaid 块
+          if (bubbleEl.querySelector('.mermaid')) {
+            try { await mermaid.init(undefined, bubbleEl); } catch(e) {
+              console.warn('Mermaid init 异常:', e.message);
+            }
+          }
         }
 
         // ====== 添加引用源区域（logo + 跳转链接）======
@@ -930,12 +951,32 @@ function renderMessage(role, content) {
       bubbleEl.querySelectorAll('pre code').forEach(block => { hljs.highlightElement(block); });
     }
 
-    // Mermaid 图表
+    // Mermaid 图表（带容错：语法错误时回退为代码块）
     if (typeof mermaid !== 'undefined') {
-      bubbleEl.querySelectorAll('.language-mermaid').forEach(el => {
-        el.outerHTML = `<div class="mermaid">${el.textContent}</div>`;
+      const mermaidBlocks = bubbleEl.querySelectorAll('.language-mermaid');
+      const renderPromises = [];
+      mermaidBlocks.forEach((el) => {
+        const code = el.textContent.trim();
+        // 使用 Promise 链处理异步验证
+        const p = mermaid.parse(code).then(() => {
+          el.outerHTML = `<div class="mermaid">${code}</div>`;
+        }).catch((parseErr) => {
+          console.group('Mermaid 渲染失败（历史消息）');
+          console.warn('错误信息:', parseErr.message);
+          console.warn('原始代码:\n', code);
+          console.groupEnd();
+          el.outerHTML = `<pre><code class="language-mermaid">${escapeHtml(code)}</code></pre>`;
+        });
+        renderPromises.push(p);
       });
-      try { mermaid.init(undefined, bubbleEl); } catch(e) {}
+      // 所有验证完成后统一渲染
+      Promise.all(renderPromises).then(() => {
+        if (bubbleEl.querySelector('.mermaid')) {
+          mermaid.init(undefined, bubbleEl).catch((e) => {
+            console.warn('Mermaid init 异常:', e.message);
+          });
+        }
+      });
     }
 
     // 历史消息也添加复制按钮
