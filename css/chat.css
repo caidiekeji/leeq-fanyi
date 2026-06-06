@@ -336,23 +336,24 @@ body {
 }
 
 
-/* ====== 右侧主内容区 ====== */
+/* ====== 右侧主内容区（白色背景）====== */
 .chat-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: var(--color-bg);
+  background: #FFFFFF; /* 聊天页面统一白色背景 */
   position: relative;
 }
 
-/* ----- 消息列表区域 ----- */
+/* ----- 消息列表区域（白色背景）----- */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
   scroll-behavior: smooth;
   display: flex;
   flex-direction: column;
+  background: #FFFFFF; /* 消息区白色背景 */
 }
 
 .chat-messages::-webkit-scrollbar { width: 6px; }
@@ -360,13 +361,14 @@ body {
 .chat-messages::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
 
 
-/* ====== 空状态：居中输入框（DeepSeek 极简风格）===== */
+/* ====== 空状态：居中输入框（DeepSeek 极简风格 - 白色背景）====== */
 .chat-welcome {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px 32px 48px;
+  background: #FFFFFF; /* 欢迎区白色背景 */
 }
 
 .welcome-content {
@@ -690,6 +692,23 @@ body {
   line-height: 1.7;
 }
 
+/* 暗色模式 - 聊天页面保持白色/浅色背景 */
+[data-theme="dark"] .chat-main {
+  background: #FFFFFF; /* 暗色模式下聊天区仍为白底 */
+}
+
+[data-theme="dark"] .chat-messages {
+  background: #FFFFFF;
+}
+
+[data-theme="dark"] .chat-welcome {
+  background: #FFFFFF;
+}
+
+[data-theme="dark"] .chat-input-bottom {
+  background: #FFFFFF;
+}
+
 /* 暗色模式适配 - 用户消息保持深色 */
 [data-theme="dark"] .chat-message.user .chat-bubble {
   background: #3B5998; /* 暗色模式稍亮一点的深蓝 */
@@ -703,33 +722,9 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-/* 头像 */
+/* 头像 - 当前版本统一不显示 */
 .chat-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.chat-message.user .chat-avatar {
-  background: var(--color-primary-dark, #1D4ED8);
-  color: #FFFFFF;
-}
-
-.chat-message.assistant .chat-avatar {
-  background: var(--color-bg);
-  color: var(--color-primary);
-  border: 1px solid var(--color-border);
-}
-
-.chat-avatar svg {
-  width: 16px;
-  height: 16px;
+  display: none;
 }
 
 /* 气泡基础样式（公共部分，具体颜色/圆角由 user/assistant 覆盖） */
@@ -819,10 +814,10 @@ body {
 }
 
 
-/* ====== 底部输入框（有消息时显示，DeepSeek 风格）===== */
+/* ====== 底部输入框（有消息时显示，DeepSeek 风格 - 白色背景）====== */
 .chat-input-bottom {
   border-top: 1px solid var(--color-border);
-  background: var(--color-surface);
+  background: #FFFFFF; /* 输入区白色背景 */
   padding: 14px 24px;
   flex-shrink: 0;
 }

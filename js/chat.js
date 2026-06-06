@@ -51,7 +51,9 @@ const els = {
   searchEngineSelect2: document.getElementById('searchEngineSelect2'),
   skillBtn2: document.getElementById('skillBtn2'),
   uploadBtn2: document.getElementById('uploadBtn2'),
-  uploadFilename2: document.getElementById('uploadFilename2')
+  uploadFilename2: document.getElementById('uploadFilename2'),
+  // 移动端汉堡菜单
+  mobileMenuBtn: document.getElementById('mobileMenuBtn')
 };
 
 /**
@@ -285,6 +287,14 @@ function bindEvents() {
 
   // --- 主题切换 ---
   els.themeBtn.addEventListener('click', toggleTheme);
+
+  // --- 移动端汉堡菜单 ---
+  if (els.mobileMenuBtn) {
+    els.mobileMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openMobileSidebar();
+    });
+  }
 
   // --- 移动端遮罩层 ---
   document.addEventListener('click', (e) => {
@@ -671,21 +681,15 @@ function typewriterEffect(replyData, speed = 18) {
   const engineName = typeof replyData === 'object' ? (replyData.engine || '') : '';
   const pipeline = typeof replyData === 'object' ? (replyData.pipeline || '') : '';
 
-  // 创建 AI 消息气泡
+  // 创建 AI 消息气泡（无头像）
   const msgEl = document.createElement('div');
   msgEl.className = 'chat-message assistant';
-
-  // 头像
-  const avatarEl = document.createElement('div');
-  avatarEl.className = 'chat-avatar';
-  avatarEl.textContent = 'AI';
 
   // 气泡容器
   const bubbleEl = document.createElement('div');
   bubbleEl.className = 'chat-bubble chat-bubble-typing';
   bubbleEl.innerHTML = '<span class="typewriter-cursor"></span>';
 
-  msgEl.appendChild(avatarEl);
   msgEl.appendChild(bubbleEl);
   els.messages.insertBefore(msgEl, els.loading);
   scrollToBottom();
@@ -904,14 +908,7 @@ function renderMessage(role, content) {
   const msgEl = document.createElement('div');
   msgEl.className = `chat-message ${role}`;
 
-  // 仅 AI 消息显示头像，用户消息不显示
-  if (role === 'assistant') {
-    const avatarEl = document.createElement('div');
-    avatarEl.className = 'chat-avatar';
-    avatarEl.textContent = 'AI';
-    msgEl.appendChild(avatarEl);
-  }
-
+  // 仅 AI 消息显示头像，用户消息不显示（当前版本统一不显示头像）
   // 气泡（AI 消息用 Markdown 渲染）
   const bubbleEl = document.createElement('div');
   bubbleEl.className = 'chat-bubble';
@@ -949,7 +946,7 @@ function renderMessage(role, content) {
     bubbleEl.textContent = content;
   }
 
-  msgEl.appendChild(avatarEl);
+  // 将气泡添加到消息容器（无头像模式）
   msgEl.appendChild(bubbleEl);
   els.messages.insertBefore(msgEl, els.loading);
 }
