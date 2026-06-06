@@ -41,6 +41,12 @@
 <body>
   <div class="app-bg"></div>
 
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="floating-shape floating-shape-1"></div>
+    <div class="floating-shape floating-shape-2"></div>
+    <div class="floating-shape floating-shape-3"></div>
+  </div>
+
   <noscript>
     <div style="padding:20px;text-align:center;font-size:16px;color:#333;">
       <p>LeeQ AIGC 内容检测 - 基于大语言模型的智能内容分析工具，支持合规检测、质量评估、AI生成检测、敏感信息检测。</p>
@@ -58,12 +64,15 @@
         <span>LeeQ</span>
       </a>
       <!-- 居中导航链接 -->
-      <div class="nav-links">
+      <div class="nav-links" id="navLinks">
         <a href="/" class="nav-link">翻译</a>
-        <a href="/detect" class="nav-link active">AIGC检测</a>
+        <a href="/detect" class="nav-link active" aria-current="page">AIGC检测</a>
         <a href="/chat" class="nav-link">AI聊天</a>
       </div>
-      <button class="icon-btn" id="themeBtn" title="切换主题">
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="打开菜单" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
     </div>
@@ -143,5 +152,37 @@
   </footer>
 
   <script src="/js/detect.js"></script>
+
+  <script>
+    /* Mobile Menu Toggle */
+    (function() {
+      var toggle = document.getElementById('mobileMenuToggle');
+      var nav = document.getElementById('navLinks');
+      if (toggle && nav) {
+        toggle.addEventListener('click', function() {
+          var isOpen = nav.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          toggle.setAttribute('aria-label', isOpen ? '关闭菜单' : '打开菜单');
+        });
+        document.addEventListener('click', function(e) {
+          if (!toggle.contains(e.target) && !nav.contains(e.target) && nav.classList.contains('is-open')) {
+            nav.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', '打开菜单');
+          }
+        });
+      }
+    })();
+    /* Navbar Scroll Shadow */
+    (function() {
+      var navbar = document.querySelector('.navbar');
+      var scrollHandler = function() {
+        if (window.scrollY > 10) { navbar.classList.add('scrolled'); }
+        else { navbar.classList.remove('scrolled'); }
+      };
+      window.addEventListener('scroll', scrollHandler, { passive: true });
+      scrollHandler();
+    })();
+  </script>
 </body>
 </html>

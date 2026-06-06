@@ -740,32 +740,31 @@ function typewriterEffect(replyData, speed = 18) {
           });
         }
 
-        // 渲染 Mermaid 图表（带容错：语法错误时回退为代码块）
+        // 渲染 Mermaid 图表（使用 Promise 链，避免 setInterval 回调中的 await）
         if (typeof mermaid !== 'undefined') {
           const mermaidBlocks = bubbleEl.querySelectorAll('.language-mermaid');
-          for (const el of mermaidBlocks) {
+          const renderPromises = [];
+          mermaidBlocks.forEach((el) => {
             const code = el.textContent.trim();
-            try {
-              // 先验证语法
-              await mermaid.parse(code);
-              // 语法正确 → 替换为 mermaid 容器并渲染
+            const p = mermaid.parse(code).then(() => {
               el.outerHTML = `<div class="mermaid">${code}</div>`;
-            } catch (parseErr) {
-              // 语法验证失败 → 打印详细错误信息并回退为代码块
+            }).catch((parseErr) => {
               console.group('Mermaid 渲染失败');
               console.warn('错误信息:', parseErr.message);
               console.warn('原始代码:\n', code);
               console.groupEnd();
               el.outerHTML = `<pre><code class="language-mermaid">${escapeHtml(code)}</code></pre>`;
-              continue; // 跳过渲染
+            });
+            renderPromises.push(p);
+          });
+          // 所有验证完成后统一渲染
+          Promise.all(renderPromises).then(() => {
+            if (bubbleEl.querySelector('.mermaid')) {
+              mermaid.init(undefined, bubbleEl).catch((e) => {
+                console.warn('Mermaid init 异常:', e.message);
+              });
             }
-          }
-          // 批量渲染所有有效的 mermaid 块
-          if (bubbleEl.querySelector('.mermaid')) {
-            try { await mermaid.init(undefined, bubbleEl); } catch(e) {
-              console.warn('Mermaid init 异常:', e.message);
-            }
-          }
+          });
         }
 
         // ====== 添加引用源区域（logo + 跳转链接）======

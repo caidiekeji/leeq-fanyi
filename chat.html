@@ -41,6 +41,12 @@
 <body>
   <div class="app-bg"></div>
 
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="floating-shape floating-shape-1"></div>
+    <div class="floating-shape floating-shape-2"></div>
+    <div class="floating-shape floating-shape-3"></div>
+  </div>
+
   <noscript>
     <div style="padding:20px;text-align:center;font-size:16px;color:#333;">
       <p>LeeQ AI 聊天 - 基于大语言模型的智能对话助手，支持多轮对话、智能问答。</p>
@@ -115,7 +121,7 @@
         <div class="footer-user-area">
           <div class="user-avatar-sm">U</div>
           <span class="user-name-sm">User</span>
-          <button class="theme-toggle-sm" id="themeBtn" title="切换主题">
+          <button class="theme-toggle-sm" id="themeBtn" title="切换主题" aria-label="切换主题">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           </button>
         </div>
@@ -248,5 +254,37 @@
 
   <script src="/js/utils.js"></script>
   <script src="/js/chat.js"></script>
+
+  <script>
+    /* Mobile Menu Toggle */
+    (function() {
+      var toggle = document.getElementById('mobileMenuToggle');
+      var nav = document.getElementById('navLinks');
+      if (toggle && nav) {
+        toggle.addEventListener('click', function() {
+          var isOpen = nav.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          toggle.setAttribute('aria-label', isOpen ? '关闭菜单' : '打开菜单');
+        });
+        document.addEventListener('click', function(e) {
+          if (!toggle.contains(e.target) && !nav.contains(e.target) && nav.classList.contains('is-open')) {
+            nav.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', '打开菜单');
+          }
+        });
+      }
+    })();
+    /* Navbar Scroll Shadow */
+    (function() {
+      var navbar = document.querySelector('.navbar');
+      var scrollHandler = function() {
+        if (window.scrollY > 10) { navbar.classList.add('scrolled'); }
+        else { navbar.classList.remove('scrolled'); }
+      };
+      window.addEventListener('scroll', scrollHandler, { passive: true });
+      scrollHandler();
+    })();
+  </script>
 </body>
 </html>

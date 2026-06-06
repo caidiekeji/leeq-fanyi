@@ -48,6 +48,11 @@
 </head>
 <body>
   <div class="app-bg"></div>
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="floating-shape floating-shape-1"></div>
+    <div class="floating-shape floating-shape-2"></div>
+    <div class="floating-shape floating-shape-3"></div>
+  </div>
 
   <noscript>
     <div style="padding:20px;text-align:center;font-size:16px;color:#333;">
@@ -65,13 +70,16 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
         <span id="siteName">LeeQ</span>
       </a>
-      <div class="nav-links">
-        <a href="/" class="nav-link active">翻译</a>
+      <div class="nav-links" id="navLinks">
+        <a href="/" class="nav-link active" aria-current="page">翻译</a>
         <a href="/detect" class="nav-link">AIGC检测</a>
         <a href="/chat" class="nav-link">AI聊天</a>
       </div>
       <div class="navbar-actions">
-        <button class="icon-btn" id="themeBtn" title="切换主题">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="打开菜单" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <button class="icon-btn" id="themeBtn" title="切换主题" aria-label="切换主题">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         </button>
       </div>
@@ -87,8 +95,8 @@
   <main class="translate-main" id="translator">
     <!-- 页面标题 - 极简一行 -->
     <div class="page-header">
-      <h1>智能翻译</h1>
-      <span>基于大语言模型的多语言翻译</span>
+      <h1><span class="highlight"></span>智能翻译</span></h1>
+      <span class="subtitle">基于大语言模型的多语言翻译，精准、快速、专业</span>
     </div>
     <div class="translate-workspace">
       <!-- 控制栏 -->
@@ -161,6 +169,93 @@
 
   <script src="/js/utils.js"></script>
   <script src="/js/app.js"></script>
+  <script>
+    /* ====== Mobile Menu Toggle ====== */
+    (function() {
+      var toggle = document.getElementById('mobileMenuToggle');
+      var nav = document.getElementById('navLinks');
+      if (toggle && nav) {
+        toggle.addEventListener('click', function() {
+          var isOpen = nav.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          toggle.setAttribute('aria-label', isOpen ? '关闭菜单' : '打开菜单');
+        });
+        document.addEventListener('click', function(e) {
+          if (!toggle.contains(e.target) && !nav.contains(e.target) && nav.classList.contains('is-open')) {
+            nav.classList.remove('is-open');
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', '打开菜单');
+          }
+        });
+      }
+    })();
+
+    /* ====== Scroll Reveal — Intersection Observer ====== */
+    (function() {
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+      document.querySelectorAll('.stagger-item').forEach(function(el, i) {
+        el.style.transitionDelay = (i * 80) + 'ms';
+        observer.observe(el);
+      });
+    })();
+
+    /* ====== Kinetic Text — Title Character Reveal ====== */
+    (function() {
+      var title = document.querySelector('.page-header h1');
+      if (!title) return;
+      var wrapper = document.createElement('span');
+      wrapper.className = 'kinetic-text';
+      function walk(node) {
+        var children = node.childNodes;
+        for (var i = 0; i < children.length; i++) {
+          var child = children[i];
+          if (child.nodeType === 3) {
+            var text = child.textContent;
+            for (var j = 0; j < text.length; j++) {
+              var span = document.createElement('span');
+              span.className = 'char';
+              span.textContent = text[j];
+              span.style.animationDelay = (j * 40) + 'ms';
+              wrapper.appendChild(span);
+            }
+          } else if (child.nodeType === 1) {
+            var clone = child.cloneNode(false);
+            walk(child);
+            clone.innerHTML = '';
+            while (child.firstChild) {
+              clone.appendChild(child.firstChild);
+            }
+            wrapper.appendChild(clone);
+          }
+        }
+      }
+      walk(title);
+      title.innerHTML = '';
+      title.appendChild(wrapper);
+    })();
+
+    /* ====== Navbar Scroll Shadow ====== */
+    (function() {
+      var navbar = document.querySelector('.navbar');
+      var scrollHandler = function() {
+        if (window.scrollY > 10) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      };
+      window.addEventListener('scroll', scrollHandler, { passive: true });
+      scrollHandler();
+    })();
+  </script>
   <script>
     (async function() {
       try {
