@@ -31,9 +31,14 @@
     }
   </script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300A86B'><path d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/translate.css">
   <style>
+    /* Essential inline overrides only (rest in translate.css) */
+    .is-hidden { display: none !important; }
     .hidden { display: none; }
     .noscript-warning { padding: 20px; text-align: center; font-size: 16px; color: var(--color-text-secondary); }
     .skip-link { position: absolute; left: -999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
@@ -46,37 +51,6 @@
     .nav-links { display: flex; gap: 1rem; }
     @media (max-width: 768px) {
       .nav-links { display: none; flex-direction: column; }
-      .ds-panels { flex-direction: column; width: 100%; }
-      .ds-panel { width: 100%; }
-    }
-    /* Tablet (376‑768px) – 保持列布局 */
-    @media (min-width: 376px) and (max-width: 768px) {
-      .panels { flex-direction:column; }
-    }
-    /* Desktop (769‑1024px) – 双列 */
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .panels { flex-direction:row; }
-    }
-    /* Large screen (≥1025px) – 限制宽度 */
-    @media (min-width: 1025px) {
-      .container { max-width:1200px; }
-    }
-    .stagger-item { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; transition-delay: var(--stagger-delay);
-    }
-    .stagger-item.is-visible { opacity: 1; transform: none; }
-    .card:hover { transform: translateY(-4px) rotateX(1deg) rotateY(-1deg); box-shadow: var(--shadow-lg); transition: transform 0.25s ease, box-shadow 0.25s ease; }
-    button:hover, a:hover { transform: translateY(-2px); }
-    button:active { transform: scale(0.95); }
-    :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-    .toolbar { display: flex; gap: 0.5rem; }
-.control-bar { display: flex; flex-wrap: wrap; gap: var(--gap); justify-content: center; margin-bottom: 1rem; }
-    .lang-select { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-    .lang-select select { padding: 0.4rem; border: 1px solid var(--color-border); border-radius: 4px; background: var(--color-surface); color: var(--color-text-primary); }
-    .ds-panels { display: flex; gap: 1rem; width: 80%; max-width: 1200px; margin: 0 auto; }
-    .ds-panel { flex: 1 1 0; }
-    .ds-panel { width:auto; }
-    @media (prefers-reduced-motion: reduce) {
-      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
     }
   </style>
 </head>
@@ -124,146 +98,192 @@
   </nav>
 
   <main class="translate-main" id="translator">
+    <!-- Left-aligned header (Anti-Center Bias compliance) -->
     <div class="page-header stagger-item">
-      <h1><span class="highlight">智能翻译</span></h1>
+      <h1 class="page-header-title"><span class="highlight">智能翻译</span></h1>
       <span class="subtitle">基于大语言模型的多语言翻译，精准、快速、专业</span>
     </div>
 
-    <div class="ds-translate-card stagger-item">
-      <div class="control-bar">
-        <div class="toolbar">
-          <button class="ds-tool-btn" id="realtimeBtn" title="实时翻译" aria-label="实时翻译">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          </button>
-          <button id="translateBtn" class="ds-translate-btn" disabled aria-disabled="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
-            <span>翻译</span>
-          </button>
-        </div>
-        <div class="lang-select">
-          <select id="sourceLang" aria-label="源语言">
+    <!-- Asymmetric translate workspace: 60/40 split -->
+    <div class="tw-workspace stagger-item">
+      <!-- Top bar: language + toolbar, integrated -->
+      <div class="tw-top-bar">
+        <div class="tw-lang-group">
+          <select id="sourceLang" class="tw-lang-select" aria-label="源语言">
             <option value="auto" selected>自动检测</option>
             <option value="zh">中文</option>
             <option value="en">English</option>
             <option value="ja">日本語</option>
             <option value="ko">한국어</option>
           </select>
-          <select id="targetLang" aria-label="目标语言">
+          <button class="tw-swap-btn" id="swapLangBtn" aria-label="交换语言" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          </button>
+          <select id="targetLang" class="tw-lang-select" aria-label="目标语言">
             <option value="en" selected>English</option>
             <option value="zh">中文</option>
             <option value="ja">日本語</option>
             <option value="ko">한국어</option>
           </select>
         </div>
+        <div class="tw-action-group">
+          <button class="tw-tool-btn" id="realtimeBtn" aria-label="实时翻译" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </button>
+          <button id="translateBtn" class="tw-primary-btn" disabled aria-disabled="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
+            <span>翻译</span>
+          </button>
+        </div>
       </div>
 
-        <div class="panels">
-        <section class="ds-panel ds-panel-source">
-          <div class="ds-panel-header">
-            <span class="ds-panel-label">源文本</span>
-            <span class="ds-panel-badge" id="sourceBadge">自动检测</span>
+      <!-- Panels: asymmetric 2fr / 1fr -->
+      <div class="tw-panels">
+        <section class="tw-panel tw-panel-source">
+          <div class="tw-panel-head">
+            <span class="tw-panel-label">源文本</span>
+            <span class="tw-panel-badge" id="sourceBadge">自动检测</span>
           </div>
-          <div class="ds-panel-body">
-            <textarea id="sourceText" class="ds-text-input" placeholder="输入要翻译的文本..." maxlength="10000"></textarea>
+          <div class="tw-panel-body">
+            <textarea id="sourceText" class="tw-textarea" placeholder="输入要翻译的文本..." maxlength="10000" aria-label="源文本输入"></textarea>
           </div>
-          <div class="ds-panel-footer">
-            <div class="ds-shortcuts">
+          <div class="tw-panel-foot">
+            <div class="tw-shortcuts">
               <span><kbd>Ctrl+Enter</kbd> 翻译</span>
               <span><kbd>Ctrl+D</kbd> 清空</span>
-              <span><kbd>Ctrl+K</kbd> 聚焦</span>
             </div>
-            <span id="sourceCount" class="ds-char-count">输入 0 / 5000</span>
+            <span id="sourceCount" class="tw-count">输入 0 / 5000</span>
           </div>
         </section>
 
-        <section class="ds-panel ds-panel-result">
-          <div class="ds-panel-header">
-            <span class="ds-panel-label">翻译结果</span>
-            <div class="ds-result-actions">
-              <button class="ds-tool-btn" id="copyBtn" title="复制" aria-label="复制">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <section class="tw-panel tw-panel-result">
+          <div class="tw-panel-head">
+            <span class="tw-panel-label">翻译结果</span>
+            <div class="tw-result-acts">
+              <button class="tw-icon-btn" id="copyBtn" title="复制" aria-label="复制" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               </button>
-              <button class="ds-tool-btn" id="exportBtn" title="导出" aria-label="导出">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <button class="tw-icon-btn" id="exportBtn" title="导出" aria-label="导出" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               </button>
-              <button class="ds-tool-btn" id="clearBtn" title="清空" aria-label="清空">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <button class="tw-icon-btn" id="clearBtn" title="清空" aria-label="清空" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
           </div>
-          <div class="ds-panel-body">
-            <div id="resultText" class="ds-result-display empty">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="42" height="42"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
-              <p>翻译结果将显示在这里</p>
+          <div class="tw-panel-body">
+            <div id="resultText" class="tw-result empty">
+              <div class="tw-empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
+              </div>
+              <p class="tw-empty-text">输入文本并点击「翻译」</p>
+              <p class="tw-empty-hint">支持 20+ 语言互译，自动检测源语言</p>
+            </div>
+            <!-- Skeleton loader (shown during translation) -->
+            <div id="resultSkeleton" class="tw-skeleton is-hidden">
+              <div class="tw-skel-line" style="width:92%"></div>
+              <div class="tw-skel-line" style="width:78%"></div>
+              <div class="tw-skel-line" style="width:85%"></div>
+              <div class="tw-skel-line" style="width:45%"></div>
             </div>
           </div>
-          <div class="ds-panel-footer">
-            <span id="resultCount" class="ds-char-count">输出 0</span>
+          <div class="tw-panel-foot">
+            <span id="resultCount" class="tw-count">输出 0</span>
           </div>
         </section>
+      </div>
+
+      <!-- Stats + Language Shortcuts — compact row -->
+      <div class="tw-stats-row">
+        <div class="tw-stat" data-stat="langs">
+          <span class="tw-stat-num" data-target="20" data-suffix="+">0</span>
+          <span class="tw-stat-label">支持语言</span>
+        </div>
+        <div class="tw-stat" data-stat="accuracy">
+          <span class="tw-stat-num" data-target="99" data-suffix="%">0</span>
+          <span class="tw-stat-label">翻译准确率</span>
+        </div>
+        <div class="tw-stat" data-stat="speed">
+          <span class="tw-stat-num" data-target="500" data-suffix="ms+">0</span>
+          <span class="tw-stat-label">平均响应</span>
+        </div>
+      </div>
+
+      <div class="tw-lang-chips">
+        <span class="tw-chips-label">常用翻译</span>
+        <div class="tw-chips-group">
+          <button class="tw-chip" data-from="auto" data-to="en"><span>中 → EN</span></button>
+          <button class="tw-chip" data-from="en" data-to="zh"><span>EN → 中</span></button>
+          <button class="tw-chip" data-from="zh" data-to="ja"><span>中文 → 日本語</span></button>
+          <button class="tw-chip" data-from="zh" data-to="ko"><span>中文 → 한국어</span></button>
+          <button class="tw-chip" data-from="zh" data-to="fr"><span>中文 → Français</span></button>
+          <button class="tw-chip" data-from="zh" data-to="de"><span>中文 → Deutsch</span></button>
+        </div>
       </div>
     </div>
 
-    <section class="ds-info-section stagger-item">
-      <div class="ds-stats-row">
-        <div class="ds-stat-block">
-          <div class="ds-stat-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg></div>
-          <span class="ds-stat-number" data-target="20" data-suffix="+">0</span>
-          <span class="ds-stat-label">支持语言</span>
-        </div>
-        <div class="ds-stat-block">
-          <div class="ds-stat-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-          <span class="ds-stat-number" data-target="99" data-suffix="%">0</span>
-          <span class="ds-stat-label">翻译准确率</span>
-        </div>
-        <div class="ds-stat-block">
-          <div class="ds-stat-icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-          <span class="ds-stat-number" data-target="500" data-suffix="ms+">0</span>
-          <span class="ds-stat-label">平均响应</span>
-        </div>
+    <!-- Bento Grid Capabilities (Section 9: Bento 2.0 Paradigm) -->
+    <section class="tw-bento stagger-item">
+      <div class="tw-bento-head">
+        <h2 class="tw-bento-title">核心能力</h2>
+        <p class="tw-bento-desc">前沿 AI 翻译技术，让跨语言沟通零障碍</p>
       </div>
+      <div class="tw-bento-grid">
+        <!-- Card 1: The Intelligent List (perpetual auto-sort simulation) -->
+        <div class="tw-bento-card tw-bento-wide" data-archetype="list">
+          <div class="tw-bento-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+          <h3 class="tw-bento-card-title">LLM 智能翻译</h3>
+          <p class="tw-bento-card-desc">基于大语言模型，理解上下文语境，翻译更自然流畅</p>
+          <div class="tw-bento-marquee">
+            <span>Hello World</span>
+            <span>你好世界</span>
+            <span>こんにちは世界</span>
+            <span>안녕하세요 세계</span>
+          </div>
+        </div>
 
-      <div class="ds-lang-shortcuts">
-        <span class="ds-section-title">常用翻译</span>
-        <div class="ds-lang-chips">
-          <button class="ds-lang-chip" data-from="auto" data-to="en"><span class="chip-zh">中</span><span class="chip-arrow"></span><span class="chip-en">English</span></button>
-          <button class="ds-lang-chip" data-from="en" data-to="zh"><span class="chip-en">English</span><span class="chip-arrow"></span><span class="chip-zh">中文</span></button>
-          <button class="ds-lang-chip" data-from="zh" data-to="ja"><span class="chip-zh">中文</span><span class="chip-arrow"></span><span class="chip-en">日本語</span></button>
-          <button class="ds-lang-chip" data-from="zh" data-to="ko"><span class="chip-zh">中文</span><span class="chip-arrow"></span><span class="chip-en">한국어</span></button>
-          <button class="ds-lang-chip" data-from="zh" data-to="fr"><span class="chip-zh">中文</span><span class="chip-arrow"></span><span class="chip-en">Français</span></button>
-          <button class="ds-lang-chip" data-from="zh" data-to="de"><span class="chip-zh">中文</span><span class="chip-arrow"></span><span class="chip-en">Deutsch</span></button>
-          <button class="ds-lang-chip" data-from="zh" data-to="es"><span class="chip-zh">中文</span><span class="chip-arrow"></span><span class="chip-en">Español</span></button>
-          <button class="ds-lang-chip" data-from="zh" data-to="ru"><span class="chip-zh">中文</span><span class="chip-arrow"></span><span class="chip-en">Русский</span></button>
+        <!-- Card 2: The Live Status (breathing indicator) -->
+        <div class="tw-bento-card" data-archetype="live">
+          <div class="tw-bento-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+          <h3 class="tw-bento-card-title">智能语言检测</h3>
+          <p class="tw-bento-card-desc">自动识别源文本语言，无需手动选择</p>
+          <div class="tw-bento-status">
+            <span class="tw-status-dot"></span>
+            <span class="tw-status-text">实时检测中</span>
+          </div>
         </div>
-      </div>
 
-      <div class="ds-capabilities">
-        <div class="ds-cap-card">
-          <div class="ds-cap-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-          <h3 class="ds-cap-title">LLM 智能翻译</h3>
-          <p class="ds-cap-desc">基于大语言模型，理解上下文语境，翻译更自然流畅</p>
+        <!-- Card 3: The Command Input (typewriter) -->
+        <div class="tw-bento-card" data-archetype="cmd">
+          <div class="tw-bento-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="16" y1="8" x2="16" y2="16"/><line x1="8" y1="8" x2="8" y2="16"/></svg></div>
+          <h3 class="tw-bento-card-title">格式完美保留</h3>
+          <p class="tw-bento-card-desc">换行、标点、代码块等格式结构完整保留</p>
+          <div class="tw-bento-typewriter" aria-label="打字动画示例">
+            <span class="tw-type-text"></span>
+            <span class="tw-type-cursor"></span>
+          </div>
         </div>
-        <div class="ds-cap-card">
-          <div class="ds-cap-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-          <h3 class="ds-cap-title">智能语言检测</h3>
-          <p class="ds-cap-desc">自动识别源文本语言，无需手动选择，开箱即用</p>
-        </div>
-        <div class="ds-cap-card">
-          <div class="ds-cap-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="16" y1="8" x2="16" y2="16"/><line x1="8" y1="8" x2="8" y2="16"/></svg></div>
-          <h3 class="ds-cap-title">格式完美保留</h3>
-          <p class="ds-cap-desc">保留原文的换行、标点、代码块等格式结构</p>
-        </div>
-        <div class="ds-cap-card">
-          <div class="ds-cap-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-          <h3 class="ds-cap-title">隐私安全</h3>
-          <p class="ds-cap-desc">端到端加密传输，文本不留存，保护您的隐私数据</p>
+
+        <!-- Card 4: The Wide Data Stream (infinite carousel) -->
+        <div class="tw-bento-card" data-archetype="stream">
+          <div class="tw-bento-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <h3 class="tw-bento-card-title">隐私安全</h3>
+          <p class="tw-bento-card-desc">端到端加密传输，文本不留存</p>
+          <div class="tw-bento-stream">
+            <div class="tw-stream-track">
+              <span class="tw-stream-item">加密传输</span>
+              <span class="tw-stream-item">零留存</span>
+              <span class="tw-stream-item">隐私优先</span>
+              <span class="tw-stream-item">实时保护</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <div class="hidden" id="historyContainer">
-      <ul class="history-list" id="historyList">
-        <li class="history-empty">暂无翻译记录</li>
+    <div class="is-hidden" id="historyContainer">
+      <ul class="tw-history" id="historyList">
+        <li class="tw-history-empty">暂无翻译记录</li>
       </ul>
     </div>
   </main>
@@ -299,7 +319,7 @@
 
     // Language quick chips
     (function(){
-      var chips=document.querySelectorAll('.ds-lang-chip');
+      var chips=document.querySelectorAll('.tw-chip');
       if(!chips.length) return;
       chips.forEach(function(chip){
         chip.addEventListener('click',function(){
@@ -312,6 +332,32 @@
           var textarea=document.getElementById('sourceText'); if(textarea) textarea.focus();
         });
       });
+    })();
+
+    // Swap language button
+    (function(){
+      var swapBtn=document.getElementById('swapLangBtn');
+      if(!swapBtn) return;
+      swapBtn.addEventListener('click',function(){
+        var src=document.getElementById('sourceLang');
+        var tgt=document.getElementById('targetLang');
+        if(!src||!tgt) return;
+        var tmp=src.value; src.value=tgt.value; tgt.value=tmp;
+        src.dispatchEvent(new Event('change'));
+        tgt.dispatchEvent(new Event('change'));
+      });
+    })();
+
+    // Typewriter text for bento card
+    (function(){
+      var typeEl=document.querySelector('.tw-type-text');
+      if(!typeEl) return;
+      var phrases=['代码.json','<p>段落</p>','列表项 ···','函数(){}'];
+      var idx=0;
+      setInterval(function(){
+        idx=(idx+1)%phrases.length;
+        typeEl.textContent=phrases[idx];
+      },3000);
     })();
 
     // Scroll reveal & count-up
@@ -350,7 +396,7 @@
           }
         });
       },{threshold:0.3});
-      document.querySelectorAll('.ds-stat-number[data-target]').forEach(function(el){countObserver.observe(el);});
+      document.querySelectorAll('.tw-stat-num[data-target]').forEach(function(el){countObserver.observe(el);});
     })();
 
     // Kinetic title text
