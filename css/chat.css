@@ -373,7 +373,7 @@ body {
 
 .welcome-content {
   width: 100%;
-  max-width: 760px;
+  max-width: 720px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -646,8 +646,8 @@ body {
 .chat-message {
   display: flex;
   gap: 0; /* DeepSeek 无头像间距 */
-  max-width: 80%; /* 稍宽一点 */
-  margin: 0 auto 20px;
+  max-width: 72%; /* 收窄，与输入框宽度更协调 */
+  margin: 0 auto 16px;
   animation: msgFadeIn 0.25s ease-out;
 }
 
@@ -660,7 +660,7 @@ body {
 .chat-message.user {
   align-self: flex-end;
   justify-content: flex-end; /* 内容靠右 */
-  margin-right: 24px;
+  margin-right: 20px;
 }
 
 /* 用户气泡：DeepSeek 深色调 + 扁平设计 */
@@ -677,7 +677,7 @@ body {
 /* AI 消息（左对齐）- DeepSeek 风格：浅色底 + 细边框 */
 .chat-message.assistant {
   align-self: flex-start;
-  margin-left: 24px;
+  margin-left: 20px;
 }
 
 /* AI 气泡：DeepSeek 浅色 + 细边框 + 微阴影 */
@@ -783,7 +783,7 @@ body {
   gap: 10px;
   padding: 14px 24px;
   align-self: flex-start;
-  margin-left: 24px;
+  margin-left: 20px;
 }
 
 .chat-loading-dots {
@@ -816,14 +816,13 @@ body {
 
 /* ====== 底部输入框（有消息时显示，DeepSeek 风格 - 白色背景）====== */
 .chat-input-bottom {
-  border-top: 1px solid var(--color-border);
   background: #FFFFFF; /* 输入区白色背景 */
-  padding: 14px 24px;
+  padding: 16px 24px;
   flex-shrink: 0;
 }
 
 .ds-bottom-wrapper {
-  max-width: 760px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
@@ -924,7 +923,7 @@ body {
 
 /* ====== 引用源区域（logo + 跳转链接）====== */
 .source-footer {
-  margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--color-border);
+  margin-top: 14px; padding-top: 10px;
 }
 
 .source-header {
@@ -1058,8 +1057,9 @@ body {
 
   /* 消息气泡响应式 - DeepSeek 风格 */
   .chat-message {
-    max-width: 90%;
+    max-width: 88%;
   }
+
   .chat-message.user { margin-right: 14px; }
   .chat-message.assistant { margin-left: 14px; }
   .chat-loading { margin-left: 14px; padding: 12px 18px; }
@@ -1135,7 +1135,7 @@ body {
     padding: 8px 12px;
   }
   .chat-message {
-    max-width: 95%;
+    max-width: 94%;
   }
   .chat-message.user { margin-right: 8px; }
   .chat-message.assistant { margin-left: 8px; }
@@ -1170,7 +1170,7 @@ body {
   .ds-send-btn { width: 30px; height: 30px; }
   .ds-send-btn svg { width: 14px; height: 14px; }
   .mobile-menu-btn { top: 8px; left: 8px; width: 30px; height: 30px; }
-  .chat-message { max-width: 98%; }
+  .chat-message { max-width: 96%; }
   .chat-message.user .chat-bubble { font-size: 13px !important; padding: 10px 12px !important; }
   .chat-message.assistant .chat-bubble { font-size: 13px !important; padding: 10px 12px !important; }
   .ds-select { max-width: 90px; font-size: 11px; }

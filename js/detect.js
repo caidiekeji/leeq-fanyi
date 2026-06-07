@@ -90,10 +90,10 @@
 
     isDetecting = true;
     detectBtn.disabled = true;
-    placeholder.style.display = 'none';
-    reportEl.style.display = 'none';
-    resultCount.style.display = 'none';
-    loadingEl.style.display = 'flex';
+    placeholder.classList.add('is-hidden');
+    reportEl.classList.add('is-hidden');
+    resultCount.classList.add('is-hidden');
+    loadingEl.classList.remove('is-hidden');
 
     const type = detectType.value;
 
@@ -108,26 +108,26 @@
 
       if (data.code === 200) {
         renderReport(data.data);
-        resultCount.style.display = 'block';
+        resultCount.classList.remove('is-hidden');
         sourceCount.textContent = '输入 ' + text.length + ' / 10000';
       } else {
         showError(data.message || '检测失败');
-        resultCount.style.display = 'block';
+        resultCount.classList.remove('is-hidden');
       }
     } catch (e) {
       showError('网络请求失败：' + e.message);
-      resultCount.style.display = 'block';
+      resultCount.classList.remove('is-hidden');
     } finally {
       isDetecting = false;
       detectBtn.disabled = textEl.value.trim().length === 0;
-      loadingEl.style.display = 'none';
+      loadingEl.classList.add('is-hidden');
     }
   }
 
   function showError(msg) {
-    reportEl.style.display = 'block';
-    placeholder.style.display = 'none';
-    reportBody.innerHTML = '<div class="report-section"><p style="color:var(--color-error);text-align:center;padding:24px">' + escapeHtml(msg) + '</p></div>';
+    reportEl.classList.remove('is-hidden');
+    placeholder.classList.add('is-hidden');
+    reportBody.innerHTML = '<div class="report-section"><p class="detect-error-msg">' + escapeHtml(msg) + '</p></div>';
   }
 
   function escapeHtml(str) {
@@ -139,8 +139,8 @@
   // 渲染报告
   function renderReport(data) {
     const report = data.report;
-    reportEl.style.display = 'block';
-    placeholder.style.display = 'none';
+    reportEl.classList.remove('is-hidden');
+    placeholder.classList.add('is-hidden');
 
     let html = '';
 
@@ -151,7 +151,7 @@
     html += '</div>';
 
     if (report.raw) {
-      html += '<div class="report-section"><div style="padding:16px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:13px;line-height:1.8;color:var(--color-text-secondary);white-space:pre-wrap;word-break:break-word">' + formatMarkdown(report.raw) + '</div></div>';
+      html += '<div class="report-section"><div class="report-raw-content">' + formatMarkdown(report.raw) + '</div></div>';
     } else if (data.type === 'compliance') {
       html += renderComplianceReport(report);
     } else if (data.type === 'quality') {
@@ -270,7 +270,7 @@
 
     html += '<div class="report-summary ' + (isAI ? 'status-fail' : 'status-pass') + '">';
     html += '<div class="ai-result-badge">';
-    html += '<div class="ai-badge-icon">' + (isAI ? '&#x1F916;' : '&#x270D;') + '</div>';
+    html += '<div class="ai-badge-icon">' + (isAI ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><path d="M12 2a4 4 0 0 1 4 4v2h1a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-1v1a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1H6a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3h1V6a4 4 0 0 1 4-4z"/><circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/><path d="M9 15s1 2 3 2 3-2 3-2"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>') + '</div>';
     html += '<div class="ai-badge-text">' + (isAI ? '疑似 AI 生成' : '可能为人类创作') + '</div>';
     html += '<div class="ai-confidence">置信度 ' + confidence + '%</div>';
     html += '</div>';
@@ -309,7 +309,7 @@
 
     html += '<div class="report-summary ' + (hasSensitive ? 'status-fail' : 'status-pass') + '">';
     html += '<div class="sensitive-summary-row">';
-    html += '<div class="sensitive-icon">' + (hasSensitive ? '&#x26A0;' : '&#x2705;') + '</div>';
+    html += '<div class="sensitive-icon">' + (hasSensitive ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>') + '</div>';
     html += '<div class="sensitive-info">';
     html += '<div class="summary-overall">' + (hasSensitive ? '发现 <strong>' + totalCount + '</strong> 处敏感信息' : '未发现敏感信息') + '</div>';
     html += '<p>' + escapeHtml(report.summary || '') + '</p>';

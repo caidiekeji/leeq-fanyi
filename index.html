@@ -89,8 +89,8 @@
   </div>
 
   <!-- ============================================================
-       主工作区 — DeepSeek 风格居中卡片布局
-       结构：标题 → 翻译卡片(语言工具栏 → 双面板 → 操作栏)
+       主工作区 — v6 左右分屏布局
+       结构：标题 → 翻译卡片(语言栏 + [左输入 | 操作条 | 右结果] + 底部信息)
        ============================================================ -->
   <main class="translate-main" id="translator">
 
@@ -100,7 +100,7 @@
       <span class="subtitle">基于大语言模型的多语言翻译，精准、快速、专业</span>
     </div>
 
-    <!-- 主翻译卡片 — DeepSeek 风格统一卡片容器 -->
+    <!-- 主翻译卡片 — v6 左右分屏容器 -->
     <div class="ds-translate-card stagger-item">
 
       <!-- 语言选择工具栏 -->
@@ -126,7 +126,7 @@
         </button>
       </div>
 
-      <!-- 翻译面板容器 — DeepSeek 双栏设计 -->
+      <!-- 翻译面板容器 — v6 左右分屏：源文本(左) | 操作条(中) | 结果(右) -->
       <div class="ds-panels">
 
         <!-- 源文本面板 -->
@@ -148,12 +148,12 @@
           </div>
         </section>
 
-        <!-- 分隔操作区 -->
+        <!-- 垂直分隔操作条（分屏模式下为中间竖条） -->
         <div class="ds-divider-actions">
           <button id="actionTranslateBtn" class="ds-action-btn" disabled>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
           </button>
-          <span class="ds-divider-line"></span>
+          <span class="ds-divider-line-h"></span>
           <button class="ds-tool-btn" id="actionCopyBtn" title="复制结果" aria-label="复制结果">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           </button>

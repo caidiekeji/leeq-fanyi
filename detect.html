@@ -144,7 +144,7 @@
       </div>
     </section>
 
-    <!-- ===== 检测工具区 ===== -->
+    <!-- ===== 检测工具区 — v6 左右分屏布局 ===== -->
     <section class="tool-section reveal-item">
       <div class="tool-section-header">
         <h2 class="tool-section-title">开始内容检测</h2>
@@ -179,64 +179,75 @@
         <option value="sensitiveInfo">敏感信息检测</option>
       </select>
 
-      <!-- 输入卡片 -->
-      <div class="detect-input-card" id="detectInputCard">
-        <div class="detect-card-header">
-          <div class="detect-card-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            输入待检测内容
-          </div>
-          <span class="detect-card-hint">支持文章、评论、文案、代码片段等</span>
-        </div>
-        <textarea id="detectText" class="detect-textarea"
-          placeholder="在此粘贴需要检测的内容...&#10;支持 Ctrl+Enter 快速检测，最多 10000 字符"
-          maxlength="10000" aria-label="待检测内容"></textarea>
-        <div class="detect-input-footer">
-          <div class="detect-shortcut">
-            <kbd>Ctrl</kbd> + <kbd>Enter</kbd> 快速检测
-          </div>
-          <span id="sourceCount" class="detect-char-count">0 / 10000</span>
-          <button id="detectBtn" class="detect-submit-btn" disabled>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span>开始检测</span>
-          </button>
-        </div>
-      </div>
+      <!-- ===== 分屏工作区：左输入 | 右结果 ===== -->
+      <div class="detect-workspace">
 
-      <!-- 加载状态 -->
-      <div id="detectLoading" class="detect-loading-card" style="display:none" role="status" aria-label="检测中">
-        <div class="detect-loading-spinner"></div>
-        <p class="detect-loading-text">AI 正在分析您的内容...</p>
-        <div class="detect-loading-progress">
-          <div class="detect-loading-bar"></div>
-        </div>
-      </div>
-
-      <!-- 空状态 -->
-      <div id="detectPlaceholder" class="detect-empty-card">
-        <svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="36" cy="36" r="28"/><path d="M36 24v16"/><path d="M36 44h.02" stroke-width="3"/></svg>
-        <h3 class="detect-empty-title">等待检测</h3>
-        <p class="detect-empty-desc">选择检测类型，粘贴内容后点击"开始检测"，详细分析报告将显示在这里</p>
-      </div>
-
-      <!-- 结果卡片 -->
-      <div id="detectReport" class="detect-result-card" style="display:none">
-        <div class="detect-result-header">
-          <div class="detect-result-title-group">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            <span class="detect-result-title">检测报告</span>
-          </div>
-          <div class="detect-result-actions">
-            <span id="resultCount" class="detect-result-meta" style="display:none"></span>
-            <button class="detect-result-close" id="resultCloseBtn" aria-label="关闭报告">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
+        <!-- 左侧：输入面板 -->
+        <div class="detect-workspace-left">
+          <div class="detect-input-card" id="detectInputCard">
+            <div class="detect-card-header">
+              <div class="detect-card-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                输入待检测内容
+              </div>
+              <span class="detect-card-hint">支持文章、评论、文案、代码片段等</span>
+            </div>
+            <textarea id="detectText" class="detect-textarea"
+              placeholder="在此粘贴需要检测的内容...&#10;支持 Ctrl+Enter 快速检测，最多 10000 字符"
+              maxlength="10000" aria-label="待检测内容"></textarea>
+            <div class="detect-input-footer">
+              <div class="detect-shortcut">
+                <kbd>Ctrl</kbd> + <kbd>Enter</kbd> 快速检测
+              </div>
+              <span id="sourceCount" class="detect-char-count">0 / 10000</span>
+              <button id="detectBtn" class="detect-submit-btn" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>开始检测</span>
+              </button>
+            </div>
           </div>
         </div>
-        <div class="detect-result-body" id="reportBody">
-          <!-- 报告内容由 JS 动态填充 -->
+
+        <!-- 右侧：结果区域（加载/空状态/报告） -->
+        <div class="detect-workspace-right">
+          <!-- 加载状态 -->
+          <div id="detectLoading" class="detect-loading-card is-hidden" role="status" aria-label="检测中">
+            <div class="detect-loading-spinner"></div>
+            <p class="detect-loading-text">AI 正在分析您的内容...</p>
+            <div class="detect-loading-progress">
+              <div class="detect-loading-bar"></div>
+            </div>
+          </div>
+
+          <!-- 空状态 -->
+          <div id="detectPlaceholder" class="detect-empty-card">
+            <svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="36" cy="36" r="28"/><path d="M36 24v16"/><path d="M36 44h.02" stroke-width="3"/></svg>
+            <h3 class="detect-empty-title">等待检测</h3>
+            <p class="detect-empty-desc">选择检测类型，粘贴内容后点击"开始检测"，详细分析报告将显示在这里</p>
+          </div>
+
+          <!-- 结果卡片 -->
+          <div id="detectReport" class="detect-result-card is-hidden">
+            <div class="detect-result-header">
+              <div class="detect-result-title-group">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <span class="detect-result-title">检测报告</span>
+              </div>
+              <div class="detect-result-actions">
+                <span id="resultCount" class="detect-result-meta is-hidden"></span>
+                <button class="detect-result-close" id="resultCloseBtn" aria-label="关闭报告">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="detect-result-body" id="reportBody">
+              <!-- 报告内容由 JS 动态填充 -->
+            </div>
+          </div>
         </div>
-      </div>
+
+      </div><!-- /detect-workspace -->
+
     </section>
 
   </main>
@@ -350,7 +361,7 @@
               var span = document.createElement('span');
               span.className = 'char';
               span.textContent = text[j];
-              span.style.animationDelay = (j * 35) + 'ms';
+              span.style.setProperty('animation-delay', (j * 35) + 'ms');
               wrapper.appendChild(span);
             }
           } else if (child.nodeType === 1) {
@@ -373,9 +384,9 @@
       var report = document.getElementById('detectReport');
       if (closeBtn && report) {
         closeBtn.addEventListener('click', function() {
-          report.style.display = 'none';
+          report.classList.add('is-hidden');
           var ph = document.getElementById('detectPlaceholder');
-          if (ph) ph.style.display = 'flex';
+          if (ph) ph.classList.remove('is-hidden');
         });
       }
     })();
