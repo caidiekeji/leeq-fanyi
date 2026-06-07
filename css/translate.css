@@ -866,3 +866,10 @@
 
   .ds-info-section { gap: 14px; }
 }
+/* ====================
+   Custom layout tweaks for copy button & divider
+   ==================== */
+#actionCopyBtn { display: none; }
+/* 调整中间操作条间距 */
+.ds-divider-actions { gap: 12px; }
+
