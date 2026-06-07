@@ -19,30 +19,30 @@
   <meta name="twitter:image" content="https://lq-26k.pages.dev/og-image.png">
   <meta name="robots" content="index, follow">
   <meta name="author" content="LeeQ">
-  <!-- 规范链接，防止重复内容问题 -->
+  <!-- 规范链接 -->
   <link rel="canonical" href="https://lq-26k.pages.dev/">
-  <!-- JSON-LD 结构化数据，帮助搜索引擎理解站点类型 -->
+  <!-- JSON-LD 结构化数据 -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "LeeQ 翻译",
-    "url": "https://lq-26k.pages.dev/",
-    "description": "基于大语言模型（LLM）的智能多语言翻译工具，支持 20+ 种语言互译，智能语言检测，格式完美保留。",
-    "applicationCategory": "UtilityApplication",
-    "operatingSystem": "Web Browser",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "CNY"
-    },
-    "author": {
-      "@type": "Person",
-      "name": "LeeQ"
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "LeeQ 翻译",
+      "url": "https://lq-26k.pages.dev/",
+      "description": "基于大语言模型（LLM）的智能多语言翻译工具，支持 20+ 种语言互译，智能语言检测，格式完美保留。",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "CNY"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "LeeQ"
+      }
     }
-  }
   </script>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231387c0'><path d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z'/></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230D9488'><path d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z'/></svg>">
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/translate.css">
 </head>
@@ -58,7 +58,7 @@
 
   <a href="#translator" class="skip-link">跳到主内容</a>
 
-  <!-- 浮动导航栏，玻璃拟态固定定位 -->
+  <!-- 导航栏 -->
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="/" class="navbar-brand">
@@ -86,111 +86,124 @@
     <span id="announcementText"></span>
   </div>
 
-  <!-- 翻译主工作区 — Bento Grid 布局 -->
+  <!-- ============================================================
+       翻译主工作区 — Split Screen 分屏布局 (DeepL / Google style)
+       ============================================================ -->
   <main class="translate-main" id="translator">
+
     <!-- 页面标题 -->
-    <div class="page-header">
+    <div class="page-header stagger-item">
       <h1><span class="highlight">智能翻译</span></h1>
       <span class="subtitle">基于大语言模型的多语言翻译，精准、快速、专业</span>
     </div>
 
-    <div class="translate-bento">
-      <!-- 行1：控制卡片 (2列) + 统计卡片 (1列) + 功能卡片 (1列) -->
-      <div class="translate-control-card stagger-item">
-        <div class="control-card-label">翻译控制</div>
-        <div class="control-row">
-          <select id="sourceLang" class="lang-select"></select>
-          <button class="swap-btn" id="swapBtn" title="互换语言">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-          </button>
-          <select id="targetLang" class="lang-select"></select>
-          <button class="tool-btn" id="realtimeBtn" title="实时翻译" aria-label="实时翻译">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          </button>
-          <button id="translateBtn" class="translate-btn" disabled>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
-            <span>翻译</span>
-          </button>
-          <button class="tool-btn" id="exportBtn" title="导出" aria-label="导出">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </button>
-          <button class="tool-btn" id="copyBtn" title="复制" aria-label="复制">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          </button>
-          <button class="tool-btn" id="clearBtn" title="清空" aria-label="清空">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
+    <!-- 工具栏：语言选择 + 操作按钮 -->
+    <div class="translate-toolbar stagger-item">
+      <select id="sourceLang" class="lang-select"></select>
+
+      <button class="swap-btn" id="swapBtn" title="互换语言" aria-label="互换语言">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      </button>
+
+      <select id="targetLang" class="lang-select"></select>
+
+      <div class="toolbar-spacer"></div>
+
+      <button class="tool-btn" id="realtimeBtn" title="实时翻译" aria-label="实时翻译">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </button>
+
+      <button id="translateBtn" class="translate-btn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
+        <span>翻译</span>
+      </button>
+
+      <button class="tool-btn" id="exportBtn" title="导出" aria-label="导出">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+
+      <button class="tool-btn" id="copyBtn" title="复制" aria-label="复制">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+
+      <button class="tool-btn" id="clearBtn" title="清空" aria-label="清空">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- 分屏工作区：左源文 | 右译文 -->
+    <div class="split-workspace stagger-item">
+      <!-- 左侧：源文本输入 -->
+      <section class="panel panel-source">
+        <div class="panel-header">
+          <span class="panel-label">源文本</span>
+          <span class="panel-badge" id="sourceBadge">自动检测</span>
+        </div>
+        <div class="panel-body">
+          <textarea id="sourceText" class="text-input" placeholder="输入要翻译的文本...&#10;&#10;支持 Ctrl+Enter 翻译 · Ctrl+D 清空 · Ctrl+K 聚焦&#10;支持拖拽 .txt / .md / .srt / .json 文件" maxlength="10000"></textarea>
+        </div>
+        <div class="panel-footer">
+          <div class="shortcut-hints">
+            <span><kbd>Ctrl+Enter</kbd> 翻译</span>
+            <span><kbd>Ctrl+D</kbd> 清空</span>
+            <span><kbd>Ctrl+K</kbd> 聚焦</span>
+          </div>
+          <span id="sourceCount" class="char-count">输入 0 / 5000</span>
+        </div>
+      </section>
+
+      <!-- 右侧：翻译结果 -->
+      <section class="panel panel-result">
+        <div class="panel-header">
+          <span class="panel-label">翻译结果</span>
+        </div>
+        <div class="panel-body">
+          <div id="resultText" class="result-display empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="44" height="44"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
+            <p>翻译结果将显示在这里</p>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <span id="resultCount" class="char-count">输出 0</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- 底部信息栏：统计 + 技巧 -->
+    <div class="translate-info-bar stagger-item">
+      <div class="info-stats">
+        <div class="stat-item">
+          <span class="stat-number" data-target="20" data-suffix="+">0</span>
+          <span class="stat-label">支持语言</span>
+        </div>
+        <div class="info-feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <span>LLM 智能翻译</span>
         </div>
       </div>
-
-      <div class="translate-stat-card stagger-item">
-        <span class="stat-number" data-target="20" data-suffix="+">0</span>
-        <span class="stat-label">支持语言</span>
-      </div>
-
-      <div class="translate-feature-card stagger-item">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        </div>
-        <span class="feature-text">LLM 智能翻译</span>
-      </div>
-
-      <!-- 行2-3：工作区卡片 (2×2) + 历史卡片 (1列) + 技巧卡片 (1列) -->
-      <div class="translate-workspace-card stagger-item">
-        <div class="split-panels">
-          <section class="panel panel-source">
-            <div class="panel-body">
-              <textarea id="sourceText" class="text-input" placeholder="输入要翻译的文本...&#10;支持 Ctrl+Enter 翻译 · Ctrl+D 清空 · Ctrl+K 聚焦&#10;支持拖拽 .txt / .md / .srt / .json 文件" maxlength="10000"></textarea>
-            </div>
-            <div class="panel-footer">
-              <div class="shortcut-hints">
-                <span><kbd>Ctrl+Enter</kbd> 翻译</span>
-                <span><kbd>Ctrl+D</kbd> 清空</span>
-                <span><kbd>Ctrl+K</kbd> 聚焦</span>
-              </div>
-              <span id="sourceCount" class="char-count">输入 0 / 5000</span>
-            </div>
-          </section>
-
-          <section class="panel panel-result">
-            <div class="panel-body">
-              <div id="resultText" class="result-display empty">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
-                <p>翻译结果将显示在这里</p>
-              </div>
-            </div>
-            <div class="panel-footer">
-              <span id="resultCount" class="char-count">输出 0</span>
-            </div>
-          </section>
-        </div>
-      </div>
-
-      <div class="translate-history-card stagger-item">
-        <div class="history-card-label">翻译历史</div>
-        <ul class="history-list" id="historyList">
-          <li class="history-empty">暂无翻译记录</li>
-        </ul>
-      </div>
-
-      <div class="translate-tips-card stagger-item">
-        <div class="tips-card-label">使用技巧</div>
-        <ul class="tips-list">
-          <li class="tips-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            <span>支持 Ctrl+Enter 快捷翻译</span>
-          </li>
-          <li class="tips-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            <span>拖拽文件自动识别源语言</span>
-          </li>
-          <li class="tips-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            <span>开启实时翻译即时获取结果</span>
-          </li>
-        </ul>
+      <div class="info-tips">
+        <span class="tips-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>支持快捷键操作</span>
+        </span>
+        <span class="tips-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>拖拽文件自动识别</span>
+        </span>
+        <span class="tips-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>实时翻译即时获取</span>
+        </span>
       </div>
     </div>
+
+    <!-- 隐藏的历史记录容器（供JS使用） -->
+    <div class="translate-history-card" style="display:none;">
+      <ul class="history-list" id="historyList">
+        <li class="history-empty">暂无翻译记录</li>
+      </ul>
+    </div>
+
   </main>
 
   <!-- Toast 提示 -->
@@ -233,7 +246,7 @@
             observer.unobserve(entry.target);
           }
         });
-      }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+      }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
 
       document.querySelectorAll('.stagger-item').forEach(function(el, i) {
         el.style.transitionDelay = (i * 80) + 'ms';
@@ -250,9 +263,7 @@
             var duration = 1800;
             var startTime = null;
 
-            function easeOutCubic(t) {
-              return 1 - Math.pow(1 - t, 3);
-            }
+            function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
             function animate(timestamp) {
               if (!startTime) startTime = timestamp;
@@ -261,9 +272,7 @@
               var easedProgress = easeOutCubic(progress);
               var current = Math.round(easedProgress * target);
               el.textContent = current + suffix;
-              if (progress < 1) {
-                requestAnimationFrame(animate);
-              }
+              if (progress < 1) { requestAnimationFrame(animate); }
             }
 
             requestAnimationFrame(animate);
@@ -300,9 +309,7 @@
             var clone = child.cloneNode(false);
             walk(child);
             clone.innerHTML = '';
-            while (child.firstChild) {
-              clone.appendChild(child.firstChild);
-            }
+            while (child.firstChild) { clone.appendChild(child.firstChild); }
             wrapper.appendChild(clone);
           }
         }
@@ -316,11 +323,8 @@
     (function() {
       var navbar = document.querySelector('.navbar');
       var scrollHandler = function() {
-        if (window.scrollY > 10) {
-          navbar.classList.add('scrolled');
-        } else {
-          navbar.classList.remove('scrolled');
-        }
+        if (window.scrollY > 10) { navbar.classList.add('scrolled'); }
+        else { navbar.classList.remove('scrolled'); }
       };
       window.addEventListener('scroll', scrollHandler, { passive: true });
       scrollHandler();
@@ -334,28 +338,14 @@
           const data = await res.json();
           if (data.code === 200 && data.data) {
             const { title, description, keywords, ogImage } = data.data;
-            if (title) {
-              document.title = title;
-              const sn = document.getElementById('siteName');
-              if (sn) sn.textContent = title;
-            }
+            if (title) { document.title = title; const sn = document.getElementById('siteName'); if (sn) sn.textContent = title; }
             if (description) document.querySelector('meta[name="description"]').content = description;
             if (keywords) document.querySelector('meta[name="keywords"]').content = keywords;
-            // 动态更新规范链接
             if (title) {
               const canonical = document.querySelector('link[rel="canonical"]');
               if (canonical) canonical.href = 'https://lq-26k.pages.dev/';
-              // 动态更新 JSON-LD 结构化数据
               const ld = document.querySelector('script[type="application/ld+json"]');
-              if (ld) {
-                try {
-                  const json = JSON.parse(ld.textContent);
-                  json.name = title;
-                  json.description = description || json.description;
-                  if (ogImage) json.image = ogImage;
-                  ld.textContent = JSON.stringify(json);
-                } catch {}
-              }
+              if (ld) { try { const json = JSON.parse(ld.textContent); json.name = title; json.description = description || json.description; if (ogImage) json.image = ogImage; ld.textContent = JSON.stringify(json); } catch {} }
             }
           }
         }
