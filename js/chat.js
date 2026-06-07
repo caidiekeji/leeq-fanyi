@@ -1147,16 +1147,21 @@ function renderMessage(role, content) {
       });
     }
 
-    // 历史消息也添加复制按钮（气泡外）
-    const copyBtn = buildCopyButton(content);
-    msgEl.appendChild(copyBtn);
+    // 历史消息复制按钮（在气泡之后添加，见下方）
   } else {
     // 用户消息：纯文本
     bubbleEl.textContent = content;
   }
 
-  // 将气泡添加到消息容器（无头像模式）
+  // 将气泡添加到消息容器（无头像模式）— 气泡始终在最前
   msgEl.appendChild(bubbleEl);
+
+  // AI 消息：复制按钮放在气泡下面（气泡外）
+  if (role === 'assistant') {
+    const copyBtn = buildCopyButton(content);
+    msgEl.appendChild(copyBtn);
+  }
+
   els.messages.insertBefore(msgEl, els.loading);
 }
 

@@ -645,11 +645,10 @@ body {
 
 /* ====== 用户消息 — 右侧对齐 + 较窄 ====== */
 .chat-message.user {
-  display: flex;
-  justify-content: flex-end;
+  align-self: flex-end; /* 在flex列容器中靠右 */
   max-width: 680px;
   margin-left: auto;
-  margin-right: 0;
+  margin-right: 24px;
   margin-bottom: 20px;
   animation: msgFadeIn 0.25s ease-out;
 }
@@ -662,8 +661,7 @@ body {
   box-shadow: none;
   font-size: 15px;
   line-height: 1.7;
-  text-align: right; /* 右对齐文字 */
-  max-width: max-content; /* 自适应宽度 */
+  text-align: right; /* 文字右对齐 */
 }
 
 /* ====== AI 消息 — 居中 + 宽幅 ====== */
@@ -1263,9 +1261,10 @@ body {
 
   /* 消息气泡响应式 */
   .chat-message.user {
+    align-self: flex-end;
     max-width: 88%;
     margin-left: auto;
-    margin-right: 0;
+    margin-right: 12px;
   }
   .chat-message.assistant {
     max-width: 92%;
@@ -1343,7 +1342,9 @@ body {
     padding: 8px 12px;
   }
   .chat-message.user {
+    align-self: flex-end;
     max-width: 92%;
+    margin-left: auto;
     margin-right: 8px;
   }
   .chat-message.assistant {
