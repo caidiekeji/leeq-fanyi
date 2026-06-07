@@ -965,7 +965,7 @@ body {
 .chat-bubble pre code.hljs { background: transparent !important; }
 
 /* 分割线 */
-.chat-bubble hr { border: none; border-top: 1px solid var(--color-border); margin: 14px 0; }
+.chat-bubble hr { border: none; border-top: 1px solid var(--color-border); margin: 10px 0; }
 
 /* 链接 */
 .chat-bubble a { color: #4F6EF7; text-decoration: none; }
@@ -980,8 +980,8 @@ body {
 
 /* ====== 搜索引用源（已阅读 N 个网页 风格）====== */
 .source-footer {
-  margin-top: 16px;
-  padding-top: 12px;
+  margin-top: 10px;
+  padding-top: 8px;
 }
 
 .source-header {
@@ -991,7 +991,7 @@ body {
   font-size: 13px;
   font-weight: 500;
   color: var(--color-text-secondary);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .source-header-icon {
@@ -1071,24 +1071,25 @@ body {
   font-weight: 500;
 }
 
-/* ====== AI 富内容样式（居中宽幅容器内）====== */
+/* ====== AI 富内容样式（紧凑间距）====== */
 .chat-message.assistant .chat-bubble h2,
 .chat-message.assistant .chat-bubble h3 {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--color-text);
-  margin: 24px 0 12px;
+  margin: 16px 0 6px;
   line-height: 1.4;
 }
 
 .chat-message.assistant .chat-bubble h3 {
-  font-size: 17px;
-  margin-top: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 14px;
 }
 
 .chat-message.assistant .chat-bubble p {
-  margin: 0 0 12px;
-  line-height: 1.75;
+  margin: 0 0 8px;
+  line-height: 1.7;
   color: var(--color-text);
 }
 
@@ -1099,13 +1100,13 @@ body {
 .chat-message.assistant .chat-bubble table {
   width: 100%;
   border-collapse: collapse;
-  margin: 16px 0;
-  font-size: 14px;
+  margin: 10px 0;
+  font-size: 13px;
 }
 
 .chat-message.assistant .chat-bubble th,
 .chat-message.assistant .chat-bubble td {
-  padding: 10px 14px;
+  padding: 7px 10px;
   text-align: left;
   border-bottom: 1px solid var(--color-border);
 }
@@ -1126,12 +1127,13 @@ body {
 
 .chat-message.assistant .chat-bubble ul,
 .chat-message.assistant .chat-bubble ol {
-  margin: 8px 0 16px 20px;
+  margin: 4px 0 10px 18px;
+  padding: 0;
   color: var(--color-text);
 }
 
 .chat-message.assistant .chat-bubble li {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   line-height: 1.65;
 }
 

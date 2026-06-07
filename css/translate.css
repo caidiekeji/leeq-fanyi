@@ -9,7 +9,7 @@
 .translate-main {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 32px 48px;
+  padding: 0 32px 24px;
   min-height: calc(100vh - var(--nav-height));
   display: flex;
   flex-direction: column;
@@ -25,6 +25,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
   box-shadow: var(--shadow-sm);
 }
@@ -160,7 +162,7 @@
   display: flex;
   flex-direction: row;
   flex: 1;
-  min-height: 420px;
+  min-height: 0;
 }
 
 /* ================================================================
@@ -399,8 +401,9 @@
 .ds-info-section {
   display: flex;
   flex-direction: column;
-  gap: 36px;
-  padding-top: 12px;
+  gap: 24px;
+  padding-top: 8px;
+  flex-shrink: 0;
 }
 
 /* ---- Stats Row ---- */
@@ -672,7 +675,7 @@
    Responsive — Tablet ≤ 768px (stack vertically)
    ================================================================ */
 @media (max-width: 768px) {
-  .translate-main { padding: 0 20px 32px; }
+  .translate-main { padding: 0 20px 20px; }
 
   .ds-translate-card { border-radius: var(--radius-md); }
 
@@ -748,7 +751,7 @@
   .ds-panel-footer { padding: 8px 16px; }
   .ds-shortcuts { display: none; }
 
-  .ds-stats-row { gap: 32px; padding: 24px 0 4px; }
+  .ds-stats-row { gap: 32px; padding: 16px 0 2px; }
   .ds-stat-icon-wrap { width: 40px; height: 40px; }
   .ds-stat-icon-wrap svg { width: 20px; height: 20px; }
   .ds-stat-number { font-size: 30px; }
@@ -764,14 +767,14 @@
   .ds-cap-title { font-size: 14px; }
   .ds-cap-desc { font-size: 11.5px; }
 
-  .ds-info-section { gap: 28px; }
+  .ds-info-section { gap: 18px; }
 }
 
 /* ================================================================
    Responsive — Mobile ≤ 480px
    ================================================================ */
 @media (max-width: 480px) {
-  .translate-main { padding: 0 14px 24px; }
+  .translate-main { padding: 0 14px 16px; }
 
   .ds-lang-bar {
     gap: 5px;
@@ -817,7 +820,7 @@
   .ds-action-btn svg { width: 14px; height: 14px; }
   .ds-divider-actions .ds-tool-btn { width: 30px; height: 30px; }
 
-  .ds-stats-row { gap: 24px; padding: 20px 0 2px; }
+  .ds-stats-row { gap: 24px; padding: 14px 0 2px; }
   .ds-stat-icon-wrap { width: 36px; height: 36px; }
   .ds-stat-icon-wrap svg { width: 18px; height: 18px; }
   .ds-stat-number { font-size: 26px; }
@@ -834,14 +837,14 @@
   .ds-cap-title { font-size: 13px; }
   .ds-cap-desc { font-size: 11px; }
 
-  .ds-info-section { gap: 24px; }
+  .ds-info-section { gap: 16px; }
 }
 
 /* ================================================================
    Responsive — Extra Small ≤ 360px
    ================================================================ */
 @media (max-width: 360px) {
-  .translate-main { padding: 0 10px 20px; }
+  .translate-main { padding: 0 10px 12px; }
 
   .ds-lang-bar { gap: 4px; padding: 8px 10px; }
 

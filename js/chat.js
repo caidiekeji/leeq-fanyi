@@ -701,7 +701,8 @@ async function sendSearchRequest(payload) {
 }
 
 /**
- * 打字机效果：逐字显示 AI 回复，完成后渲染 Markdown + 添加复制按钮和引用源
+ * 打字机效果（实时 Markdown 渲染）
+ * 边打字边渲染：每累积一定字符或遇到换行/空格时，用 marked.parse 重新渲染
  * @param {string|Object} replyData - 纯文本或结构化数据 {text, sources, sourceCount, engine, pipeline}
  * @param {number} speed - 每字间隔毫秒（默认 18ms）
  */
@@ -733,24 +734,60 @@ function typewriterEffect(replyData, speed = 18) {
   }
 
   let charIndex = 0;
+  let lastRenderIndex = 0; // 上次渲染到的位置
+
+  /**
+   * 增量渲染：将已累积的文本通过 marked 解析为 HTML 写入气泡
+   * 保留光标位置，避免闪烁
+   */
+  function flushRender() {
+    if (charIndex <= lastRenderIndex) return;
+
+    const accumulated = fullText.substring(0, charIndex);
+
+    if (typeof window.marked !== 'undefined') {
+      try {
+        const htmlContent = window.marked.parse(accumulated);
+        // 追加光标
+        bubbleEl.innerHTML = htmlContent + '<span class="typewriter-cursor"></span>';
+      } catch (e) {
+        bubbleEl.innerHTML = escapeHtml(accumulated).replace(/\n/g, '<br>') + '<span class="typewriter-cursor"></span>';
+      }
+    } else {
+      bubbleEl.innerHTML = escapeHtml(accumulated).replace(/\n/g, '<br>') + '<span class="typewriter-cursor"></span>';
+    }
+
+    lastRenderIndex = charIndex;
+    scrollToBottom();
+  }
 
   return new Promise((resolve) => {
     chatState.typewriterTimer = setInterval(() => {
       if (charIndex < fullText.length) {
-        const cursor = bubbleEl.querySelector('.typewriter-cursor');
-        if (cursor) {
-          const textNode = document.createTextNode(fullText[charIndex]);
-          bubbleEl.insertBefore(textNode, cursor);
-        }
         charIndex++;
-        scrollToBottom();
+
+        // 触发条件：遇到换行、空格、或每隔 N 个字符刷新一次
+        const currentChar = fullText[charIndex - 1];
+        const shouldFlush = currentChar === '\n'
+          || currentChar === ' '
+          || currentChar === '>'
+          || currentChar === '`'
+          || currentChar === '*'
+          || currentChar === '#'
+          || currentChar === '|'
+          || currentChar === '-'
+          || (charIndex - lastRenderIndex >= 8); // 至多每8字符刷一次
+
+        if (shouldFlush) {
+          flushRender();
+        }
       } else {
-        // ====== 打字完成：渲染最终内容 ======
+        // ====== 打字完成：最终渲染 ======
         clearInterval(chatState.typewriterTimer);
         chatState.typewriterTimer = null;
         bubbleEl.classList.remove('chat-bubble-typing');
 
-        // 使用 marked.js 将 Markdown 渲染为 HTML
+        // 最终完整 Markdown 渲染
         let htmlContent = '';
         if (typeof window.marked !== 'undefined') {
           try {
