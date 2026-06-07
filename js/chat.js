@@ -582,7 +582,22 @@ async function handleSend() {
   const displayContent = chatState.searchMode
     ? `[${chatState.searchEngine}搜索] ${text}`
     : userContent;
-  addMessage('user', displayContent);
+
+  // 构建消息元数据（含文件信息，用于历史恢复时渲染文件卡片）
+  const msgMeta = { role: 'user', content: displayContent };
+  if (chatState.uploadedFileContent) {
+    msgMeta.fileName = chatState.uploadedFileName;
+    msgMeta.fileSize = chatState.uploadedFileSize;
+  }
+  chatState.messages.push(msgMeta);
+  saveChatHistory();
+
+  // 渲染用户消息（有文件时先渲染卡片）
+  if (chatState.uploadedFileContent) {
+    const fileCard = buildFileCard(chatState.uploadedFileName, chatState.uploadedFileSize || '');
+    els.messages.appendChild(fileCard);
+  }
+  renderMessage('user', displayContent);
 
   // 清空输入框
   els.inputLarge.value = '';
@@ -1062,7 +1077,16 @@ function addMessage(role, content) {
  */
 function renderAllMessages() {
   els.messages.querySelectorAll('.chat-message').forEach(el => el.remove());
-  chatState.messages.forEach(msg => renderMessage(msg.role, msg.content));
+  // 移除文件卡片（非 .chat-message 元素）
+  els.messages.querySelectorAll('.chat-file-card').forEach(el => el.remove());
+  chatState.messages.forEach(msg => {
+    // 历史消息中有文件信息时，先渲染文件卡片
+    if (msg.role === 'user' && msg.fileName) {
+      const fileCard = buildFileCard(msg.fileName, msg.fileSize || '');
+      els.messages.appendChild(fileCard);
+    }
+    renderMessage(msg.role, msg.content);
+  });
   scrollToBottom();
 }
 

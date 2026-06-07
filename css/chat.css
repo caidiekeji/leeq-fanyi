@@ -125,6 +125,7 @@ body {
   cursor: pointer;
   transition: all var(--transition-fast);
   text-align: left;
+  text-decoration: none;
 }
 
 .sidebar-action:hover {
