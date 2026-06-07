@@ -1,45 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
-
 /* ================================================================
-   Design Tokens — Teal Business 青绿专业
-   60%: #F0FDFA (清新浅底) | 30%: #99F6E4 (青绿面板) | 10%: #0D9488 (深青强调)
+   Design Tokens — DeepSeek Dark Aesthetic
+   配色：深色背景 + 墨绿强调 + 柔和面板
+   灵感：DeepSeek Chat 极简深色界面
    ================================================================ */
 :root {
-  /* ---- Primary: Deep Teal ---- */
+  /* ---- Primary: Deep Teal (brand accent) ---- */
   --color-primary: #0D9488;
   --color-primary-light: #14B8A6;
   --color-primary-dark: #0F766E;
-  --color-primary-bg: rgba(13, 148, 136, 0.06);
-  --color-primary-glow: rgba(13, 148, 136, 0.18);
+  --color-primary-bg: rgba(13, 148, 136, 0.08);
+  --color-primary-glow: rgba(13, 148, 136, 0.15);
 
-  /* ---- Secondary: Soft Teal ---- */
-  --color-secondary: #5EEAD4;
-  --color-secondary-light: #99F6E4;
-  --color-secondary-bg: rgba(94, 234, 212, 0.08);
+  /* ---- Secondary ---- */
+  --color-secondary: #2DD4BF;
+  --color-secondary-light: #5EEAD4;
+  --color-secondary-bg: rgba(45, 212, 191, 0.06);
 
-  /* ---- Accent: Warm Coral (for CTAs) ---- */
-  --color-accent: #F97316;
-  --color-accent-hover: #EA580C;
-  --color-accent-bg: rgba(249, 115, 22, 0.06);
+  /* ---- Accent: Warm amber ---- */
+  --color-accent: #F59E0B;
+  --color-accent-hover: #D97706;
+  --color-accent-bg: rgba(245, 158, 11, 0.08);
 
-  /* ---- Neutrals — Clean Light ---- */
-  --color-bg: #F8FAFA;
-  --color-bg-alt: #EFF5F5;
-  --color-surface: #FFFFFF;
-  --color-surface-hover: #FCFDFD;
-  --color-surface-raised: #FFFFFF;
-  --color-surface-dim: #F0F5F5;
+  /* ---- Neutrals — Deep Dark (DeepSeek style) ---- */
+  --color-bg: #08080C;
+  --color-bg-alt: #0E0E14;
+  --color-surface: #14141E;
+  --color-surface-hover: #1A1A28;
+  --color-surface-raised: #1C1C2A;
+  --color-surface-dim: #0A0A10;
 
   /* ---- Text ---- */
-  --color-text: #1A2E2C;
-  --color-text-secondary: #4A6564;
-  --color-text-muted: #8BA8A6;
-  --color-text-inverse: #FFFFFF;
+  --color-text: #E8E8F0;
+  --color-text-secondary: #9898A8;
+  --color-text-muted: #5C5C6E;
+  --color-text-inverse: #08080C;
 
-  /* ---- Border ---- */
-  --color-border: #D1E7E4;
-  --color-border-light: #E8F4F2;
-  --color-border-focus: #0D9488;
+  /* ---- Border — very subtle (DeepSeek style) ---- */
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+  --color-border-focus: rgba(13, 148, 136, 0.5);
 
   /* ---- Semantic ---- */
   --color-success: #10B981;
@@ -51,11 +50,10 @@
   --color-info: #64748B;
   --color-info-bg: rgba(100, 116, 139, 0.06);
 
-  /* ---- Gradients (no blue-purple) ---- */
+  /* ---- Gradients (no blue-purple!) ---- */
   --gradient-primary: linear-gradient(135deg, #0D9488 0%, #14B8A6 50%, #2DD4BF 100%);
-  --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, #FB923C 100%);
+  --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, #FBBF24 100%);
   --gradient-surface: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 100%);
-  --gradient-hero: linear-gradient(180deg, var(--color-bg) 0%, #F0FDFA 40%, var(--color-bg-alt) 100%);
 
   /* ---- Radius ---- */
   --radius-xs: 4px;
@@ -65,15 +63,15 @@
   --radius-xl: 24px;
   --radius-2xl: 32px;
 
-  /* ---- Shadows ---- */
-  --shadow-xs: 0 1px 2px rgba(13, 148, 136, 0.03);
-  --shadow-sm: 0 1px 3px rgba(13, 148, 136, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 4px 12px rgba(13, 148, 136, 0.06), 0 2px 4px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 8px 24px rgba(13, 148, 136, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
-  --shadow-xl: 0 16px 40px rgba(13, 148, 136, 0.1), 0 8px 16px rgba(0, 0, 0, 0.05);
-  --shadow-card-hover: 0 12px 32px rgba(13, 148, 136, 0.12), 0 4px 12px rgba(0, 0, 0, 0.04);
-  --shadow-teal: 0 4px 20px rgba(13, 148, 136, 0.15);
-  --shadow-inset: inset 0 1px 2px rgba(13, 148, 136, 0.04);
+  /* ---- Shadows — dark, subtle ---- */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.7);
+  --shadow-card-hover: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --shadow-teal: 0 4px 20px rgba(13, 148, 136, 0.12);
+  --shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.4);
 
   /* ---- Typography ---- */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -86,66 +84,58 @@
   --transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* ---- Layout ---- */
-  --nav-height: 60px;
-  --max-width: 1200px;
+  --nav-height: 64px;
+  --max-width: 960px;
 }
 
 /* ================================================================
-   Dark Theme — Teal Business Dark
+   Light Theme — Subtle light mode
    ================================================================ */
-[data-theme="dark"] {
-  --color-primary: #2DD4BF;
-  --color-primary-light: #5EEAD4;
-  --color-primary-dark: #14B8A6;
-  --color-primary-bg: rgba(45, 212, 191, 0.08);
-  --color-primary-glow: rgba(45, 212, 191, 0.15);
+[data-theme="light"] {
+  --color-primary: #0D9488;
+  --color-primary-light: #14B8A6;
+  --color-primary-dark: #0F766E;
+  --color-primary-bg: rgba(13, 148, 136, 0.06);
+  --color-primary-glow: rgba(13, 148, 136, 0.12);
 
-  --color-secondary: #5EEAD4;
-  --color-secondary-light: #99F6E4;
-  --color-secondary-bg: rgba(94, 234, 212, 0.05);
+  --color-secondary: #2DD4BF;
+  --color-secondary-light: #5EEAD4;
+  --color-secondary-bg: rgba(45, 212, 191, 0.05);
 
-  --color-accent: #FB923C;
-  --color-accent-hover: #F97316;
-  --color-accent-bg: rgba(251, 146, 60, 0.08);
+  --color-accent: #F59E0B;
+  --color-accent-hover: #D97706;
+  --color-accent-bg: rgba(245, 158, 11, 0.06);
 
-  --color-bg: #0C1413;
-  --color-bg-alt: #111E1C;
-  --color-surface: #162825;
-  --color-surface-hover: #1A302D;
-  --color-surface-raised: #1C3530;
-  --color-surface-dim: #121F1C;
+  --color-bg: #F5F5F0;
+  --color-bg-alt: #EBEBE5;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #FAFAF7;
+  --color-surface-raised: #FFFFFF;
+  --color-surface-dim: #F0F0EB;
 
-  --color-text: #E8F5F3;
-  --color-text-secondary: #9CBEBB;
-  --color-text-muted: #5C7E7A;
-  --color-text-inverse: #0C1413;
+  --color-text: #1A1A18;
+  --color-text-secondary: #5C5C54;
+  --color-text-muted: #9C9C94;
+  --color-text-inverse: #FFFFFF;
 
-  --color-border: #243D38;
-  --color-border-light: #1A302D;
-  --color-border-focus: #2DD4BF;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-light: rgba(0, 0, 0, 0.04);
+  --color-border-focus: rgba(13, 148, 136, 0.4);
 
-  --color-success: #34D399;
-  --color-success-bg: rgba(52, 211, 153, 0.08);
-  --color-warning: #FBBF24;
-  --color-warning-bg: rgba(251, 191, 36, 0.08);
-  --color-error: #F87171;
-  --color-error-bg: rgba(248, 113, 113, 0.08);
-  --color-info: #9CA3AF;
-  --color-info-bg: rgba(156, 163, 175, 0.06);
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.06);
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.06);
+  --color-error: #EF4444;
+  --color-error-bg: rgba(239, 68, 68, 0.04);
 
-  --gradient-primary: linear-gradient(135deg, #2DD4BF 0%, #5EEAD4 50%, #99F6E4 100%);
-  --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, #FCD34D 100%);
-  --gradient-surface: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 100%);
-  --gradient-hero: linear-gradient(180deg, var(--color-bg) 0%, #111E1C 40%, var(--color-bg-alt) 100%);
-
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.7), 0 8px 16px rgba(0, 0, 0, 0.5);
-  --shadow-card-hover: 0 12px 32px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-teal: 0 4px 20px rgba(45, 212, 191, 0.12);
-  --shadow-inset: inset 0 1px 2px rgba(45, 212, 191, 0.04);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.1);
+  --shadow-card-hover: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --shadow-teal: 0 4px 20px rgba(13, 148, 136, 0.08);
 }
 
 /* ================================================================
@@ -156,7 +146,7 @@
 *:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 html {
@@ -175,7 +165,7 @@ body {
   line-height: 1.6;
 }
 
-/* ---- Background — subtle teal gradient atmosphere ---- */
+/* ---- Background — DeepSeek subtle ambient glow ---- */
 .app-bg {
   position: fixed;
   inset: 0;
@@ -186,27 +176,65 @@ body {
 .app-bg::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 480px;
-  background: radial-gradient(ellipse 90% 70% at 50% -10%, var(--color-primary-bg) 0%, transparent 70%);
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse 50% 60% at center, rgba(13, 148, 136, 0.06) 0%, transparent 70%);
   pointer-events: none;
+}
+
+.app-bg::after {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  right: -80px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle at center, rgba(13, 148, 136, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ---- Floating decorative blobs (DeepSeek style ambient) ---- */
+.app-bg .floating-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.floating-blob.blob-1 {
+  width: 300px;
+  height: 300px;
+  background: rgba(13, 148, 136, 0.08);
+  top: 20%;
+  left: -80px;
+  animation: blobFloat 20s ease-in-out infinite;
+}
+
+.floating-blob.blob-2 {
+  width: 200px;
+  height: 200px;
+  background: rgba(245, 158, 11, 0.05);
+  bottom: 15%;
+  right: -40px;
+  animation: blobFloat 25s ease-in-out infinite reverse;
+}
+
+@keyframes blobFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
 }
 
 /* ================================================================
    Skip Link
    ================================================================ */
 .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
 
 .skip-link {
@@ -216,7 +244,7 @@ body {
   transform: translateX(-50%);
   padding: 10px 20px;
   background: var(--color-primary);
-  color: var(--color-text-inverse);
+  color: #fff;
   border-radius: var(--radius-sm);
   z-index: 10000;
   font-weight: 600;
@@ -227,7 +255,7 @@ body {
 .skip-link:focus { top: 10px; }
 
 /* ================================================================
-   Navbar — Clean Minimal
+   Navbar — DeepSeek minimal glass style
    ================================================================ */
 .navbar {
   position: sticky;
@@ -235,17 +263,15 @@ body {
   z-index: 100;
   width: 100%;
   height: var(--nav-height);
-  background: rgba(248, 250, 250, 0.82);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border-bottom: 1px solid var(--color-border-light);
+  background: rgba(8, 8, 12, 0.75);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--color-border);
   transition: all var(--transition-base);
 }
 
-[data-theme="dark"] .navbar {
-  background: rgba(12, 20, 19, 0.88);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+[data-theme="light"] .navbar {
+  background: rgba(245, 245, 240, 0.8);
 }
 
 .navbar.scrolled {
@@ -266,24 +292,24 @@ body {
 .navbar-brand {
   display: flex;
   align-items: center;
-  gap: 9px;
-  font-size: 19px;
+  gap: 10px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--color-text);
   text-decoration: none;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   flex-shrink: 0;
   transition: color var(--transition-fast);
 }
 .navbar-brand:hover { color: var(--color-primary); }
 
 .navbar-brand svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   color: var(--color-primary);
   transition: transform var(--transition-base);
 }
-.navbar-brand:hover svg { transform: rotate(-8deg) scale(1.08); }
+.navbar-brand:hover svg { transform: rotate(-6deg) scale(1.06); }
 
 /* ---- Nav Links ---- */
 .nav-links {
@@ -295,10 +321,10 @@ body {
 .nav-link {
   position: relative;
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   text-decoration: none;
-  padding: 8px 16px;
+  padding: 8px 14px;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
   letter-spacing: 0.01em;
@@ -310,17 +336,17 @@ body {
 }
 
 .nav-link.active {
-  color: var(--color-primary-dark);
+  color: var(--color-primary-light);
   font-weight: 600;
 }
 
 .nav-link.active::after {
   content: '';
   position: absolute;
-  bottom: 2px;
+  bottom: 1px;
   left: 50%;
   transform: translateX(-50%);
-  width: 16px;
+  width: 14px;
   height: 2px;
   background: var(--color-primary);
   border-radius: 1px;
@@ -337,16 +363,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: none;
+  width: 38px;
+  height: 38px;
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--color-text-muted);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
-.icon-btn:hover { background: var(--color-bg-alt); color: var(--color-primary); }
+.icon-btn:hover { background: var(--color-bg-alt); color: var(--color-primary); border-color: var(--color-border); }
 .icon-btn:active { transform: scale(0.92); }
 .icon-btn svg { width: 18px; height: 18px; }
 
@@ -355,8 +381,8 @@ body {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -367,29 +393,19 @@ body {
 .mobile-menu-toggle svg { width: 22px; height: 22px; }
 
 /* ================================================================
-   Split Screen Layout — Main Container
-   ================================================================ */
-.split-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 0 28px 40px;
-  min-height: calc(100vh - var(--nav-height));
-}
-
-/* ================================================================
-   Page Header — Compact for translation tool
+   Page Header — DeepSeek minimal
    ================================================================ */
 .page-header {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 28px 0 16px;
+  padding: 40px 0 20px;
   text-align: center;
 }
 
 .page-header h1 {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 800;
   color: var(--color-text);
   letter-spacing: -0.03em;
@@ -404,7 +420,7 @@ body {
 }
 
 .page-header .subtitle {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--color-text-secondary);
   font-weight: 400;
 }
@@ -415,12 +431,12 @@ body {
 .kinetic-text .char {
   display: inline-block;
   opacity: 0;
-  transform: translateY(8px);
-  animation: charReveal 0.4s ease forwards;
+  transform: translateY(10px) rotateX(20deg);
+  animation: charReveal 0.45s ease forwards;
 }
 
 @keyframes charReveal {
-  to { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: translateY(0) rotateX(0); }
 }
 
 /* ================================================================
@@ -428,21 +444,21 @@ body {
    ================================================================ */
 .footer {
   text-align: center;
-  padding: 24px 24px;
+  padding: 20px 24px 28px;
   font-size: 12px;
   color: var(--color-text-muted);
-  border-top: 1px solid var(--color-border-light);
+  border-top: 1px solid var(--color-border);
   margin-top: auto;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
 }
 
 /* ================================================================
    Spinner
    ================================================================ */
 .spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.25);
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
   border-top-color: #FFFFFF;
   border-radius: 50%;
   animation: spin 0.7s cubic-bezier(0.6, 0.3, 0.3, 1) infinite;
@@ -476,13 +492,13 @@ body {
 }
 
 /* ================================================================
-   Toast
+   Toast — DeepSeek minimal style
    ================================================================ */
 .toast {
   position: fixed;
   top: 20px;
   right: 20px;
-  padding: 12px 22px;
+  padding: 10px 20px;
   border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
@@ -496,7 +512,7 @@ body {
 .toast.show { transform: translateX(0) scale(1); opacity: 1; }
 .toast.success { background: var(--color-success-bg); color: var(--color-success); border: 1px solid rgba(16, 185, 129, 0.15); }
 .toast.error { background: var(--color-error-bg); color: var(--color-error); border: 1px solid rgba(239, 68, 68, 0.15); }
-.toast.info { background: var(--color-primary-bg); color: var(--color-primary-dark); border: 1px solid rgba(13, 148, 136, 0.15); }
+.toast.info { background: var(--color-primary-bg); color: var(--color-primary-light); border: 1px solid rgba(13, 148, 136, 0.15); }
 
 /* ================================================================
    Modal
@@ -504,7 +520,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(12, 20, 19, 0.4);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -512,8 +528,8 @@ body {
   opacity: 0;
   visibility: hidden;
   transition: all var(--transition-slow);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 .modal-overlay.active { opacity: 1; visibility: visible; }
 
@@ -539,7 +555,7 @@ body {
   margin-bottom: 20px;
 }
 .modal-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--color-text);
   letter-spacing: -0.02em;
@@ -585,7 +601,7 @@ body {
 }
 
 /* ================================================================
-   Buttons
+   Buttons — DeepSeek minimal style
    ================================================================ */
 .btn {
   display: inline-flex;
@@ -607,7 +623,7 @@ body {
 
 .btn-primary {
   background: var(--gradient-primary);
-  color: var(--color-text-inverse);
+  color: #FFFFFF;
   box-shadow: 0 2px 12px var(--color-primary-glow);
 }
 .btn-primary:hover {
@@ -623,7 +639,7 @@ body {
 .btn-secondary:hover {
   background: var(--color-surface-hover);
   border-color: var(--color-primary);
-  color: var(--color-primary-dark);
+  color: var(--color-primary-light);
 }
 
 .btn-danger {
@@ -757,6 +773,18 @@ body {
 [dir="rtl"] .toast { right: auto; left: 20px; }
 
 /* ================================================================
+   Announcement Bar
+   ================================================================ */
+.announcement-bar {
+  background: var(--color-primary-bg);
+  border-bottom: 1px solid var(--color-border);
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--color-primary-light);
+}
+
+/* ================================================================
    Reduced Motion
    ================================================================ */
 @media (prefers-reduced-motion: reduce) {
@@ -767,13 +795,14 @@ body {
     scroll-behavior: auto !important;
   }
   .kinetic-text .char { opacity: 1; transform: none; animation: none; }
+  .floating-blob { display: none; }
 }
 
 /* ================================================================
    Responsive — Tablet ≤ 768px
    ================================================================ */
 @media (max-width: 768px) {
-  :root { --nav-height: 56px; }
+  :root { --nav-height: 58px; }
 
   .navbar-inner { padding: 0 18px; }
 
@@ -784,8 +813,9 @@ body {
     right: 0;
     flex-direction: column;
     background: var(--color-surface);
+    border: 1px solid var(--color-border);
     border-radius: 0 0 var(--radius-md) var(--radius-md);
-    padding: 8px;
+    padding: 6px;
     box-shadow: var(--shadow-lg);
     transform: translateY(-120%);
     opacity: 0;
@@ -799,49 +829,45 @@ body {
 
   .mobile-menu-toggle { display: flex; }
 
-  .split-container { padding: 0 18px 32px; }
+  .page-header { padding: 28px 0 16px; }
+  .page-header h1 { font-size: 24px; }
 
-  .page-header { padding: 22px 0 12px; }
-  .page-header h1 { font-size: 22px; }
+  .footer { padding: 16px 18px 20px; }
 }
 
 /* ================================================================
    Responsive — Mobile ≤ 480px
    ================================================================ */
 @media (max-width: 480px) {
-  :root { --nav-height: 52px; }
+  :root { --nav-height: 54px; }
 
   .navbar-inner { padding: 0 12px; }
-  .navbar-brand { font-size: 17px; gap: 8px; }
-  .navbar-brand svg { width: 22px; height: 22px; }
-  .icon-btn { width: 34px; height: 34px; }
+  .navbar-brand { font-size: 16px; gap: 8px; }
+  .navbar-brand svg { width: 20px; height: 20px; }
+  .icon-btn { width: 36px; height: 36px; }
   .icon-btn svg { width: 17px; height: 17px; }
 
-  .split-container { padding: 0 12px 24px; }
+  .page-header { padding: 22px 0 12px; }
+  .page-header h1 { font-size: 22px; }
+  .page-header .subtitle { font-size: 12px; }
 
-  .page-header { padding: 18px 0 8px; }
-  .page-header h1 { font-size: 20px; }
-  .page-header .subtitle { font-size: 13px; }
-
-  .footer { padding: 20px 16px; font-size: 11px; }
+  .footer { padding: 14px 12px 18px; font-size: 11px; }
 }
 
 /* ================================================================
    Responsive — Extra Small ≤ 360px
    ================================================================ */
 @media (max-width: 360px) {
-  :root { --nav-height: 48px; }
+  :root { --nav-height: 50px; }
 
   .navbar-inner { padding: 0 8px; }
-  .navbar-brand { font-size: 15px; }
-  .navbar-brand svg { width: 20px; height: 20px; }
-  .icon-btn { width: 32px; height: 32px; }
+  .navbar-brand { font-size: 14px; gap: 6px; }
+  .navbar-brand svg { width: 18px; height: 18px; }
+  .icon-btn { width: 34px; height: 34px; }
 
-  .split-container { padding: 0 8px 20px; }
+  .page-header { padding: 18px 0 10px; }
+  .page-header h1 { font-size: 20px; }
+  .page-header .subtitle { font-size: 11px; }
 
-  .page-header { padding: 14px 0 6px; }
-  .page-header h1 { font-size: 18px; }
-  .page-header .subtitle { font-size: 12px; }
-
-  .footer { padding: 16px 10px; font-size: 10px; }
+  .footer { padding: 12px 8px 16px; font-size: 10px; }
 }

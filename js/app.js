@@ -157,7 +157,7 @@ function bindShortcuts() {
 }
 
 function bindDragDrop() {
-  const sourcePanel = document.querySelector('.panel-source .panel-body');
+  const sourcePanel = document.querySelector('.ds-panel-source .ds-panel-body');
   if (!sourcePanel) return;
   sourcePanel.addEventListener('dragover', e => {
     e.preventDefault();

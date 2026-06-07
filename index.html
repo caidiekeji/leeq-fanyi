@@ -36,10 +36,7 @@
         "price": "0",
         "priceCurrency": "CNY"
       },
-      "author": {
-        "@type": "Person",
-        "name": "LeeQ"
-      }
+      "author": { "@type": "Person", "name": "LeeQ" }
     }
   </script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230D9488'><path d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z'/></svg>">
@@ -47,7 +44,10 @@
   <link rel="stylesheet" href="/css/translate.css">
 </head>
 <body>
-  <div class="app-bg"></div>
+  <div class="app-bg">
+    <div class="floating-blob blob-1"></div>
+    <div class="floating-blob blob-2"></div>
+  </div>
 
   <noscript>
     <div style="padding:20px;text-align:center;font-size:16px;color:#333;">
@@ -58,7 +58,9 @@
 
   <a href="#translator" class="skip-link">跳到主内容</a>
 
-  <!-- 导航栏 -->
+  <!-- ============================================================
+       导航栏 — DeepSeek 极简玻璃风格
+       ============================================================ -->
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="/" class="navbar-brand">
@@ -87,7 +89,8 @@
   </div>
 
   <!-- ============================================================
-       翻译主工作区 — Split Screen 分屏布局 (DeepL / Google style)
+       主工作区 — DeepSeek 风格居中卡片布局
+       结构：标题 → 翻译卡片(语言工具栏 → 双面板 → 操作栏)
        ============================================================ -->
   <main class="translate-main" id="translator">
 
@@ -97,108 +100,123 @@
       <span class="subtitle">基于大语言模型的多语言翻译，精准、快速、专业</span>
     </div>
 
-    <!-- 工具栏：语言选择 + 操作按钮 -->
-    <div class="translate-toolbar stagger-item">
-      <select id="sourceLang" class="lang-select"></select>
+    <!-- 主翻译卡片 — DeepSeek 风格统一卡片容器 -->
+    <div class="ds-translate-card stagger-item">
 
-      <button class="swap-btn" id="swapBtn" title="互换语言" aria-label="互换语言">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-      </button>
+      <!-- 语言选择工具栏 -->
+      <div class="ds-lang-bar">
+        <select id="sourceLang" class="ds-lang-select"></select>
 
-      <select id="targetLang" class="lang-select"></select>
+        <button class="ds-swap-btn" id="swapBtn" title="互换语言" aria-label="互换语言">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        </button>
 
-      <div class="toolbar-spacer"></div>
+        <select id="targetLang" class="ds-lang-select"></select>
 
-      <button class="tool-btn" id="realtimeBtn" title="实时翻译" aria-label="实时翻译">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      </button>
+        <div class="ds-lang-spacer"></div>
 
-      <button id="translateBtn" class="translate-btn" disabled>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
-        <span>翻译</span>
-      </button>
+        <!-- 紧凑工具栏按钮 -->
+        <button class="ds-tool-btn" id="realtimeBtn" title="实时翻译" aria-label="实时翻译">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </button>
 
-      <button class="tool-btn" id="exportBtn" title="导出" aria-label="导出">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      </button>
+        <button id="translateBtn" class="ds-translate-btn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
+          <span>翻译</span>
+        </button>
+      </div>
 
-      <button class="tool-btn" id="copyBtn" title="复制" aria-label="复制">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      </button>
+      <!-- 翻译面板容器 — DeepSeek 双栏设计 -->
+      <div class="ds-panels">
 
-      <button class="tool-btn" id="clearBtn" title="清空" aria-label="清空">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-
-    <!-- 分屏工作区：左源文 | 右译文 -->
-    <div class="split-workspace stagger-item">
-      <!-- 左侧：源文本输入 -->
-      <section class="panel panel-source">
-        <div class="panel-header">
-          <span class="panel-label">源文本</span>
-          <span class="panel-badge" id="sourceBadge">自动检测</span>
-        </div>
-        <div class="panel-body">
-          <textarea id="sourceText" class="text-input" placeholder="输入要翻译的文本...&#10;&#10;支持 Ctrl+Enter 翻译 · Ctrl+D 清空 · Ctrl+K 聚焦&#10;支持拖拽 .txt / .md / .srt / .json 文件" maxlength="10000"></textarea>
-        </div>
-        <div class="panel-footer">
-          <div class="shortcut-hints">
-            <span><kbd>Ctrl+Enter</kbd> 翻译</span>
-            <span><kbd>Ctrl+D</kbd> 清空</span>
-            <span><kbd>Ctrl+K</kbd> 聚焦</span>
+        <!-- 源文本面板 -->
+        <section class="ds-panel ds-panel-source">
+          <div class="ds-panel-header">
+            <span class="ds-panel-label">源文本</span>
+            <span class="ds-panel-badge" id="sourceBadge">自动检测</span>
           </div>
-          <span id="sourceCount" class="char-count">输入 0 / 5000</span>
-        </div>
-      </section>
-
-      <!-- 右侧：翻译结果 -->
-      <section class="panel panel-result">
-        <div class="panel-header">
-          <span class="panel-label">翻译结果</span>
-        </div>
-        <div class="panel-body">
-          <div id="resultText" class="result-display empty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="44" height="44"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
-            <p>翻译结果将显示在这里</p>
+          <div class="ds-panel-body">
+            <textarea id="sourceText" class="ds-text-input" placeholder="输入要翻译的文本..." maxlength="10000"></textarea>
           </div>
-        </div>
-        <div class="panel-footer">
-          <span id="resultCount" class="char-count">输出 0</span>
-        </div>
-      </section>
-    </div>
+          <div class="ds-panel-footer">
+            <div class="ds-shortcuts">
+              <span><kbd>Ctrl+Enter</kbd> 翻译</span>
+              <span><kbd>Ctrl+D</kbd> 清空</span>
+              <span><kbd>Ctrl+K</kbd> 聚焦</span>
+            </div>
+            <span id="sourceCount" class="ds-char-count">输入 0 / 5000</span>
+          </div>
+        </section>
 
-    <!-- 底部信息栏：统计 + 技巧 -->
-    <div class="translate-info-bar stagger-item">
-      <div class="info-stats">
-        <div class="stat-item">
-          <span class="stat-number" data-target="20" data-suffix="+">0</span>
-          <span class="stat-label">支持语言</span>
+        <!-- 分隔操作区 -->
+        <div class="ds-divider-actions">
+          <button id="actionTranslateBtn" class="ds-action-btn" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
+          </button>
+          <span class="ds-divider-line"></span>
+          <button class="ds-tool-btn" id="actionCopyBtn" title="复制结果" aria-label="复制结果">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+          <button class="ds-tool-btn" id="actionClearBtn" title="清空全部" aria-label="清空全部">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
-        <div class="info-feature">
+
+        <!-- 翻译结果面板 -->
+        <section class="ds-panel ds-panel-result">
+          <div class="ds-panel-header">
+            <span class="ds-panel-label">翻译结果</span>
+            <div class="ds-result-actions">
+              <button class="ds-tool-btn" id="copyBtn" title="复制" aria-label="复制">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+              <button class="ds-tool-btn" id="exportBtn" title="导出" aria-label="导出">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </button>
+              <button class="ds-tool-btn" id="clearBtn" title="清空" aria-label="清空">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="ds-panel-body">
+            <div id="resultText" class="ds-result-display empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="42" height="42"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
+              <p>翻译结果将显示在这里</p>
+            </div>
+          </div>
+          <div class="ds-panel-footer">
+            <span id="resultCount" class="ds-char-count">输出 0</span>
+          </div>
+        </section>
+
+      </div><!-- /ds-panels -->
+
+    </div><!-- /ds-translate-card -->
+
+    <!-- 底部信息栏：统计 + 功能标签 -->
+    <div class="ds-info-bar stagger-item">
+      <div class="ds-stat">
+        <span class="ds-stat-number" data-target="20" data-suffix="+">0</span>
+        <span class="ds-stat-label">支持语言</span>
+      </div>
+      <div class="ds-features">
+        <span class="ds-feature-tag">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          <span>LLM 智能翻译</span>
-        </div>
-      </div>
-      <div class="info-tips">
-        <span class="tips-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <span>支持快捷键操作</span>
+          LLM 智能翻译
         </span>
-        <span class="tips-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <span>拖拽文件自动识别</span>
+        <span class="ds-feature-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          智能语言检测
         </span>
-        <span class="tips-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <span>实时翻译即时获取</span>
+        <span class="ds-feature-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="16" y1="8" x2="16" y2="16"/><line x1="8" y1="8" x2="8" y2="16"/></svg>
+          格式完美保留
         </span>
       </div>
     </div>
 
-    <!-- 隐藏的历史记录容器（供JS使用） -->
-    <div class="translate-history-card" style="display:none;">
+    <!-- 隐藏的历史记录容器 -->
+    <div style="display:none;">
       <ul class="history-list" id="historyList">
         <li class="history-empty">暂无翻译记录</li>
       </ul>
@@ -237,7 +255,7 @@
       }
     })();
 
-    /* ====== Scroll Reveal & Number Count-Up — Intersection Observer ====== */
+    /* ====== Scroll Reveal & Number Count-Up ====== */
     (function() {
       var observer = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
@@ -249,11 +267,11 @@
       }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
 
       document.querySelectorAll('.stagger-item').forEach(function(el, i) {
-        el.style.transitionDelay = (i * 80) + 'ms';
+        el.style.setProperty('--stagger-delay', (i * 100) + 'ms');
         observer.observe(el);
       });
 
-      /* Number count-up animation */
+      /* Number count-up */
       var countObserver = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
           if (entry.isIntersecting) {
@@ -270,9 +288,8 @@
               var elapsed = timestamp - startTime;
               var progress = Math.min(elapsed / duration, 1);
               var easedProgress = easeOutCubic(progress);
-              var current = Math.round(easedProgress * target);
-              el.textContent = current + suffix;
-              if (progress < 1) { requestAnimationFrame(animate); }
+              el.textContent = Math.round(easedProgress * target) + suffix;
+              if (progress < 1) requestAnimationFrame(animate);
             }
 
             requestAnimationFrame(animate);
@@ -281,7 +298,7 @@
         });
       }, { threshold: 0.3 });
 
-      document.querySelectorAll('.stat-number[data-target]').forEach(function(el) {
+      document.querySelectorAll('.ds-stat-number[data-target]').forEach(function(el) {
         countObserver.observe(el);
       });
     })();
@@ -302,7 +319,7 @@
               var span = document.createElement('span');
               span.className = 'char';
               span.textContent = text[j];
-              span.style.animationDelay = (j * 40) + 'ms';
+              span.style.setProperty('animation-delay', (j * 40) + 'ms');
               wrapper.appendChild(span);
             }
           } else if (child.nodeType === 1) {
@@ -323,8 +340,8 @@
     (function() {
       var navbar = document.querySelector('.navbar');
       var scrollHandler = function() {
-        if (window.scrollY > 10) { navbar.classList.add('scrolled'); }
-        else { navbar.classList.remove('scrolled'); }
+        if (window.scrollY > 10) navbar.classList.add('scrolled');
+        else navbar.classList.remove('scrolled');
       };
       window.addEventListener('scroll', scrollHandler, { passive: true });
       scrollHandler();
@@ -337,16 +354,10 @@
         if (res.ok) {
           const data = await res.json();
           if (data.code === 200 && data.data) {
-            const { title, description, keywords, ogImage } = data.data;
+            const { title, description, keywords } = data.data;
             if (title) { document.title = title; const sn = document.getElementById('siteName'); if (sn) sn.textContent = title; }
             if (description) document.querySelector('meta[name="description"]').content = description;
             if (keywords) document.querySelector('meta[name="keywords"]').content = keywords;
-            if (title) {
-              const canonical = document.querySelector('link[rel="canonical"]');
-              if (canonical) canonical.href = 'https://lq-26k.pages.dev/';
-              const ld = document.querySelector('script[type="application/ld+json"]');
-              if (ld) { try { const json = JSON.parse(ld.textContent); json.name = title; json.description = description || json.description; if (ogImage) json.image = ogImage; ld.textContent = JSON.stringify(json); } catch {} }
-            }
           }
         }
       } catch {}
