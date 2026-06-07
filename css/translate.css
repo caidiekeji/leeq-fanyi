@@ -5,11 +5,11 @@
    结构：标题(极简) → 翻译工作区(语言栏+左右分屏) → 功能卡片网格
    ================================================================ */
 
-/* ---- Main Container — 100% Full Width ---- */
+/* ---- Main Container — 100% Full Width, Exact One Screen ---- */
 .translate-main {
   width: 100%;
   margin: 0 auto;
-  padding: 0 0 32px;
+  padding: 0;
   min-height: calc(100vh - var(--nav-height));
   display: flex;
   flex-direction: column;
@@ -33,13 +33,13 @@
 }
 
 /* ================================================================
-   Translate Card — 全宽无边框容器（百度风格：融入背景）
+   Translate Card — 全宽无边框容器，填满一屏
    ================================================================ */
 .ds-translate-card {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0;
+  min-height: calc(100vh - var(--nav-height) - 60px);
   background: transparent;
   border: none;
   border-radius: 0;
@@ -178,7 +178,7 @@
   display: flex;
   flex-direction: row;
   flex: 1;
-  min-height: 0;
+  min-height: 420px;
 }
 
 /* ================================================================
@@ -262,7 +262,7 @@
   color: var(--color-text);
   font-family: var(--font-sans);
   resize: none;
-  min-height: 180px;
+  min-height: calc(100vh - var(--nav-height) - 200px);
 }
 .ds-text-input:focus { outline: none !important; }
 .ds-text-input::placeholder { color: var(--color-text-muted); }
@@ -287,7 +287,7 @@
   color: var(--color-text-muted);
   font-size: 14px;
   gap: 14px;
-  min-height: 180px;
+  min-height: calc(100vh - var(--nav-height) - 220px);
 }
 .ds-result-display.empty svg {
   width: 48px;
@@ -682,13 +682,8 @@
     min-height: auto;
   }
 
-  .ds-panel-source {
-    border-right: none;
-    border-bottom: 1px solid var(--color-border);
-    min-height: 220px;
-  }
-
-  .ds-panel-result { min-height: 200px; }
+  .ds-panel-source { border-right: none; border-bottom: 1px solid var(--color-border); min-height: calc(50vh - 40px); }
+  .ds-panel-result { min-height: calc(45vh - 30px); }
 
   /* Horizontal divider strip */
   .ds-divider-actions {
@@ -726,8 +721,8 @@
     line-height: 1.8;
     padding: 4px 0;
   }
-  .ds-text-input { min-height: 140px; }
-  .ds-result-display.empty { min-height: 140px; }
+  .ds-text-input { min-height: calc(50vh - 80px); }
+  .ds-result-display.empty { min-height: calc(45vh - 70px); }
   .ds-result-display.empty svg { width: 38px; height: 38px; }
 
   .ds-panel-footer { padding: 8px 16px; }
@@ -771,8 +766,8 @@
   .ds-tool-btn { width: 30px; height: 30px; }
   .ds-tool-btn svg { width: 14px; height: 14px; }
 
-  .ds-panel-source { min-height: 190px; }
-  .ds-panel-result { min-height: 170px; }
+  .ds-panel-source { min-height: calc(45vh - 30px); }
+  .ds-panel-result { min-height: calc(40vh - 20px); }
 
   .ds-panel-header { padding: 8px 12px; }
   .ds-panel-body { padding: 10px 12px; }
@@ -782,8 +777,8 @@
     line-height: 1.75;
     padding: 4px 0;
   }
-  .ds-text-input { min-height: 120px; }
-  .ds-result-display.empty { min-height: 120px; }
+  .ds-text-input { min-height: calc(45vh - 60px); }
+  .ds-result-display.empty { min-height: calc(40vh - 50px); }
   .ds-result-display.empty svg { width: 34px; height: 34px; }
 
   .ds-panel-footer { padding: 8px 12px; }
@@ -831,8 +826,8 @@
   .ds-translate-btn svg { width: 12px; height: 12px; }
   .ds-tool-btn { width: 28px; height: 28px; }
 
-  .ds-panel-source { min-height: 170px; }
-  .ds-panel-result { min-height: 150px; }
+  .ds-panel-source { min-height: calc(40vh - 20px); }
+  .ds-panel-result { min-height: calc(35vh - 10px); }
 
   .ds-panel-header { padding: 6px 10px; }
   .ds-panel-body { padding: 8px 10px; }
@@ -842,8 +837,8 @@
     line-height: 1.65;
     padding: 2px 0;
   }
-  .ds-text-input { min-height: 100px; }
-  .ds-result-display.empty { min-height: 100px; }
+  .ds-text-input { min-height: calc(40vh - 50px); }
+  .ds-result-display.empty { min-height: calc(35vh - 40px); }
   .ds-result-display.empty svg { width: 30px; height: 30px; }
 
   .ds-panel-footer { padding: 6px 10px; }
