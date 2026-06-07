@@ -663,7 +663,7 @@ body {
   font-size: 15px;
   line-height: 1.7;
   text-align: right; /* 右对齐文字 */
-  max-width: 100%; /* 自适应宽度 */
+  max-width: max-content; /* 自适应宽度 */
 }
 
 /* ====== AI 消息 — 居中 + 宽幅 ====== */
