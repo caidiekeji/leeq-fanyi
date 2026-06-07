@@ -73,8 +73,8 @@
   --shadow-teal: 0 4px 20px rgba(13, 148, 136, 0.12);
   --shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 
-  /* ---- Typography ---- */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  /* ---- Typography — Outfit (premium Geist alternative), Satoshi fallback ---- */
+  --font-sans: 'Outfit', 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Consolas', monospace;
 
   /* ---- Transitions ---- */
@@ -162,6 +162,8 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -396,24 +398,26 @@ body {
 .mobile-menu-toggle svg { width: 22px; height: 22px; }
 
 /* ================================================================
-   Page Header — Clean minimal
+   Page Header — Clean minimal (base, overridden per-page)
    ================================================================ */
 .page-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 6px;
   padding: 28px 0 16px;
   text-align: center;
   flex-shrink: 0;
 }
 
+/* Translate page overrides via translate.css: .translate-main > .page-header → left-align */
+
 .page-header h1 {
   font-size: 30px;
   font-weight: 800;
   color: var(--color-text);
   letter-spacing: -0.03em;
-  line-height: 1.2;
+  line-height: 1.1;
+  text-wrap: balance;
 }
 
 .page-header h1 .highlight {
