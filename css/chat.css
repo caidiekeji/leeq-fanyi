@@ -53,7 +53,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  text-decoration: none;
+
   color: var(--color-primary);
   font-size: 17px;
   font-weight: 700;
@@ -662,7 +662,7 @@ body {
   box-shadow: none;
   font-size: 15px;
   line-height: 1.7;
-  text-align: left;
+  text-align: right; /* 右对齐文字 */
   max-width: 100%; /* 自适应宽度 */
 }
 
@@ -953,7 +953,7 @@ body {
 
 /* 代码块 */
 .chat-bubble pre {
-  margin: 10px 0; border-radius: 8px; overflow-x: auto;
+  margin: 6px 0; border-radius: 8px; overflow-x: auto;
   background: #f6f8fa; border: 1px solid #e1e4e8;
 }
 [data-theme="dark"] .chat-bubble pre { background: #161b22; border-color: #30363d; }
@@ -1078,18 +1078,18 @@ body {
   font-size: 17px;
   font-weight: 700;
   color: var(--color-text);
-  margin: 16px 0 6px;
+  margin: 12px 0 4px;
   line-height: 1.4;
 }
 
 .chat-message.assistant .chat-bubble h3 {
   font-size: 15px;
   font-weight: 600;
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .chat-message.assistant .chat-bubble p {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   line-height: 1.7;
   color: var(--color-text);
 }
@@ -1101,7 +1101,7 @@ body {
 .chat-message.assistant .chat-bubble table {
   width: 100%;
   border-collapse: collapse;
-  margin: 10px 0;
+  margin: 6px 0;
   font-size: 13px;
 }
 
@@ -1128,13 +1128,13 @@ body {
 
 .chat-message.assistant .chat-bubble ul,
 .chat-message.assistant .chat-bubble ol {
-  margin: 4px 0 10px 18px;
+  margin: 2px 0 6px 16px;
   padding: 0;
   color: var(--color-text);
 }
 
 .chat-message.assistant .chat-bubble li {
-  margin-bottom: 2px;
+  margin-bottom: 1px;
   line-height: 1.65;
 }
 
