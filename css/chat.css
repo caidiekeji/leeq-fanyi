@@ -649,7 +649,7 @@ body {
   justify-content: flex-end;
   max-width: 680px;
   margin-left: auto;
-  margin-right: auto;
+  margin-right: 0;
   margin-bottom: 20px;
   animation: msgFadeIn 0.25s ease-out;
 }
@@ -1264,7 +1264,8 @@ body {
   /* 消息气泡响应式 */
   .chat-message.user {
     max-width: 88%;
-    margin-right: 12px;
+    margin-left: auto;
+    margin-right: 0;
   }
   .chat-message.assistant {
     max-width: 92%;
