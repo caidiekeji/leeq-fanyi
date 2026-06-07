@@ -393,63 +393,181 @@
 .ds-divider-actions .ds-tool-btn svg { width: 15px; height: 15px; }
 
 /* ================================================================
-   Info Bar — Stats + Feature Tags
+   Info Section — Grand Atmospheric Style (大气风格)
+   结构：统计数据行 → 语言快捷选择 → 特色能力卡片
    ================================================================ */
-.ds-info-bar {
+.ds-info-section {
   display: flex;
-  align-items: center;
-  gap: 28px;
-  padding: 24px 4px 0;
-  margin-top: 8px;
+  flex-direction: column;
+  gap: 36px;
+  padding-top: 12px;
 }
 
-.ds-stat {
+/* ---- Stats Row ---- */
+.ds-stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 56px;
+  padding: 32px 0 4px;
+}
+
+.ds-stat-block {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  flex-shrink: 0;
+  gap: 8px;
+  position: relative;
 }
 
+.ds-stat-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--color-primary-bg);
+  color: var(--color-primary-light);
+  margin-bottom: 6px;
+}
+.ds-stat-icon-wrap svg { width: 24px; height: 24px; }
+
 .ds-stat-number {
-  font-size: 28px;
+  font-size: 40px;
   font-weight: 800;
-  color: var(--color-primary);
+  color: var(--color-text);
   letter-spacing: -0.03em;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
 .ds-stat-label {
-  font-size: 10px;
-  color: var(--color-text-muted);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.ds-features {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.ds-feature-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--color-text-secondary);
   font-weight: 500;
-  padding: 5px 12px;
-  background: var(--color-bg-alt);
+  letter-spacing: 0.04em;
+}
+
+/* ---- Language Shortcuts ---- */
+.ds-lang-shortcuts {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ds-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.ds-lang-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.ds-lang-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 18px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  transition: all var(--transition-fast);
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-family: var(--font-sans);
 }
-.ds-feature-tag:hover { color: var(--color-primary); border-color: var(--color-primary); background: var(--color-primary-bg); }
-.ds-feature-tag svg { width: 14px; height: 14px; color: var(--color-primary); }
+.ds-lang-chip:hover {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-teal);
+}
+.ds-lang-chip:active { transform: scale(0.96); }
+.ds-lang-chip.active {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+}
+.ds-lang-chip.active .chip-zh,
+.ds-lang-chip.active .chip-en { color: var(--color-primary-light); }
+.ds-lang-chip.active .chip-arrow { border-left-color: var(--color-primary-light); }
+
+.chip-zh, .chip-en {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+.ds-lang-chip:hover .chip-zh,
+.ds-lang-chip:hover .chip-en { color: var(--color-primary-light); }
+
+.chip-arrow {
+  width: 0;
+  height: 0;
+  border-left: 5px solid var(--color-text-muted);
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  transition: border-color var(--transition-fast);
+}
+.ds-lang-chip:hover .chip-arrow { border-left-color: var(--color-primary-light); }
+
+/* ---- Capabilities Grid ---- */
+.ds-capabilities {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.ds-cap-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 26px 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-alt);
+  transition: all var(--transition-base);
+}
+.ds-cap-card:hover {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.ds-cap-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-md);
+  background: var(--gradient-primary);
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+.ds-cap-icon svg { width: 24px; height: 24px; }
+
+.ds-cap-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.ds-cap-desc {
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
 
 /* ================================================================
    History List
@@ -630,12 +748,23 @@
   .ds-panel-footer { padding: 8px 16px; }
   .ds-shortcuts { display: none; }
 
-  .ds-stat-number { font-size: 24px; }
-  .ds-stat-label { font-size: 9px; }
+  .ds-stats-row { gap: 32px; padding: 24px 0 4px; }
+  .ds-stat-icon-wrap { width: 40px; height: 40px; }
+  .ds-stat-icon-wrap svg { width: 20px; height: 20px; }
+  .ds-stat-number { font-size: 30px; }
+  .ds-stat-label { font-size: 12px; }
 
-  .ds-info-bar { gap: 18px; padding: 18px 4px 0; flex-wrap: wrap; }
-  .ds-features { gap: 8px; }
-  .ds-feature-tag { font-size: 10px; padding: 4px 10px; }
+  .ds-lang-chip { padding: 8px 14px; }
+  .chip-zh, .chip-en { font-size: 12px; }
+
+  .ds-capabilities { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .ds-cap-card { padding: 20px 14px; }
+  .ds-cap-icon { width: 44px; height: 44px; }
+  .ds-cap-icon svg { width: 22px; height: 22px; }
+  .ds-cap-title { font-size: 14px; }
+  .ds-cap-desc { font-size: 11.5px; }
+
+  .ds-info-section { gap: 28px; }
 }
 
 /* ================================================================
@@ -688,11 +817,24 @@
   .ds-action-btn svg { width: 14px; height: 14px; }
   .ds-divider-actions .ds-tool-btn { width: 30px; height: 30px; }
 
-  .ds-stat-number { font-size: 22px; }
-  .ds-stat-label { font-size: 9px; }
+  .ds-stats-row { gap: 24px; padding: 20px 0 2px; }
+  .ds-stat-icon-wrap { width: 36px; height: 36px; }
+  .ds-stat-icon-wrap svg { width: 18px; height: 18px; }
+  .ds-stat-number { font-size: 26px; }
+  .ds-stat-label { font-size: 11px; }
 
-  .ds-info-bar { flex-wrap: wrap; gap: 12px; padding: 14px 4px 0; }
-  .ds-feature-tag { font-size: 9px; padding: 3px 8px; }
+  .ds-lang-chips { gap: 8px; justify-content: center; }
+  .ds-lang-chip { padding: 7px 12px; }
+  .chip-zh, .chip-en { font-size: 11.5px; }
+
+  .ds-capabilities { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .ds-cap-card { padding: 18px 12px; gap: 10px; }
+  .ds-cap-icon { width: 40px; height: 40px; }
+  .ds-cap-icon svg { width: 20px; height: 20px; }
+  .ds-cap-title { font-size: 13px; }
+  .ds-cap-desc { font-size: 11px; }
+
+  .ds-info-section { gap: 24px; }
 }
 
 /* ================================================================
@@ -738,9 +880,22 @@
   .ds-divider-actions { padding: 4px 10px; }
   .ds-action-btn { padding: 5px 10px; font-size: 10px; }
 
-  .ds-stat-number { font-size: 20px; }
-  .ds-stat-label { font-size: 8px; }
+  .ds-stats-row { gap: 20px; padding: 16px 0 2px; }
+  .ds-stat-icon-wrap { width: 32px; height: 32px; }
+  .ds-stat-icon-wrap svg { width: 16px; height: 16px; }
+  .ds-stat-number { font-size: 22px; }
+  .ds-stat-label { font-size: 10px; }
 
-  .ds-info-bar { padding: 10px 4px 0; }
-  .ds-feature-tag { font-size: 8px; padding: 2px 7px; }
+  .ds-lang-chips { gap: 6px; }
+  .ds-lang-chip { padding: 6px 10px; }
+  .chip-zh, .chip-en { font-size: 11px; }
+
+  .ds-capabilities { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .ds-cap-card { padding: 14px 10px; gap: 8px; }
+  .ds-cap-icon { width: 36px; height: 36px; }
+  .ds-cap-icon svg { width: 18px; height: 18px; }
+  .ds-cap-title { font-size: 12px; }
+  .ds-cap-desc { font-size: 10px; line-height: 1.5; }
+
+  .ds-info-section { gap: 20px; }
 }

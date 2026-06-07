@@ -640,14 +640,15 @@ body {
 }
 
 
-/* ====== 消息气泡样式（DeepSeek 极简风格）====== */
+/* ====== 消息气泡样式（极简无背景风格）====== */
 
-/* 消息容器 */
+/* 消息容器 — 居中 */
 .chat-message {
   display: flex;
-  gap: 0; /* DeepSeek 无头像间距 */
-  max-width: 72%; /* 收窄，与输入框宽度更协调 */
-  margin: 0 auto 16px;
+  flex-direction: column;
+  align-items: center; /* 所有消息居中 */
+  max-width: 780px; /* 与输入框同宽，大气 */
+  margin: 0 auto 20px;
   animation: msgFadeIn 0.25s ease-out;
 }
 
@@ -656,40 +657,41 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 用户消息（右对齐）- DeepSeek 风格：深蓝底 + 小圆角 */
+/* 用户消息（居中）- 无背景纯文字 */
 .chat-message.user {
-  align-self: flex-end;
-  justify-content: flex-end; /* 内容靠右 */
-  margin-right: 20px;
+  align-self: center;
 }
 
-/* 用户气泡：DeepSeek 深色调 + 扁平设计 */
+/* 用户气泡：透明底 + 无边框 + 纯文字 */
 .chat-message.user .chat-bubble {
-  background: #2B4F8C; /* DeepSeek 用户消息深蓝 */
-  color: #FFFFFF;
-  border-radius: 14px 14px 4px 14px; /* 右下角尖角 */
+  background: transparent;
+  color: var(--color-text);
+  border-radius: 0;
   padding: 13px 18px;
-  box-shadow: none; /* 无阴影，扁平 */
+  box-shadow: none;
   font-size: 15px;
   line-height: 1.7;
+  text-align: left;
+  width: 100%;
 }
 
-/* AI 消息（左对齐）- DeepSeek 风格：浅色底 + 细边框 */
+/* AI 消息（居中）- 无背景纯文字 */
 .chat-message.assistant {
-  align-self: flex-start;
-  margin-left: 20px;
+  align-self: center;
 }
 
-/* AI 气泡：DeepSeek 浅色 + 细边框 + 微阴影 */
+/* AI 气泡：透明底 + 无边框 + 纯文字 */
 .chat-message.assistant .chat-bubble {
-  background: #F7F8FA; /* DeepSeek AI 消息浅灰白 */
-  color: #1A1A2E; /* 深色文字确保可读性 */
-  border: 1px solid #E8EAED; /* 极细边框 */
-  border-radius: 14px 14px 14px 4px; /* 左下角尖角 */
+  background: transparent;
+  color: var(--color-text);
+  border: none;
+  border-radius: 0;
   padding: 13px 18px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); /* 极微阴影 */
+  box-shadow: none;
   font-size: 15px;
   line-height: 1.7;
+  text-align: left;
+  width: 100%;
 }
 
 /* 暗色模式 - 聊天页面保持白色/浅色背景 */
@@ -709,17 +711,18 @@ body {
   background: #FFFFFF;
 }
 
-/* 暗色模式适配 - 用户消息保持深色 */
+/* 暗色模式适配 - 用户消息保持无背景 */
 [data-theme="dark"] .chat-message.user .chat-bubble {
-  background: #3B5998; /* 暗色模式稍亮一点的深蓝 */
+  background: transparent;
+  color: var(--color-text);
 }
 
-/* 暗色模式适配 - AI 消息 */
+/* 暗色模式适配 - AI 消息保持无背景 */
 [data-theme="dark"] .chat-message.assistant .chat-bubble {
-  background: #2A2D35; /* 暗色模式深灰底 */
-  color: #E5E7EB; /* 浅色文字 */
-  border-color: #3A3F4B; /* 暗色边框 */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  background: transparent;
+  color: var(--color-text);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 /* 头像 - 当前版本统一不显示 */
@@ -764,26 +767,26 @@ body {
   background: rgba(0, 0, 0, 0.25);
 }
 
-/* 用户消息内的代码块 - DeepSeek 深色底适配 */
+/* 用户消息内的代码块 - 透明底统一风格 */
 .chat-message.user .chat-bubble code {
-  background: rgba(255, 255, 255, 0.18); /* 半透明白 */
-  color: #E8F0FE;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--color-text);
 }
 
 .chat-message.user .chat-bubble pre {
-  background: rgba(0, 0, 0, 0.25);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--color-border);
 }
 
 
-/* ====== 加载指示器（DeepSeek 极简风格）====== */
+/* ====== 加载指示器（极简风格，居中）====== */
 .chat-loading {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 14px 24px;
-  align-self: flex-start;
-  margin-left: 20px;
+  margin: 0 auto;
 }
 
 .chat-loading-dots {
@@ -960,27 +963,41 @@ body {
   font-weight: 500;
 }
 
-/* ====== 复制按钮 ====== */
+/* ====== 复制按钮（气泡外右侧）====== */
 .copy-wrapper {
-  display: flex; justify-content: flex-end; margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  width: 100%;
 }
 
 .copy-btn {
-  display: flex; align-items: center; justify-content: center;
-  width: 30px; height: 30px; border: 1px solid var(--color-border);
-  border-radius: 6px; background: transparent;
-  color: var(--color-text-muted); cursor: pointer;
-  transition: all 0.15s ease; padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
 }
 
 .copy-btn:hover {
-  background: rgba(79,110,247,0.06); border-color: #4F6EF7; color: #4F6EF7;
+  background: rgba(79, 110, 247, 0.06);
+  border-color: #4F6EF7;
+  color: #4F6EF7;
 }
 
 .copy-btn svg { width: 15px; height: 15px; }
 
 .copy-btn.copied {
-  background: rgba(34,197,94,0.08); border-color: #22c55e; color: #22c55e;
+  background: rgba(34, 197, 94, 0.08);
+  border-color: #22c55e;
+  color: #22c55e;
 }
 
 /* ====== AI 降级提示 ====== */
@@ -1055,14 +1072,11 @@ body {
     height: 18px;
   }
 
-  /* 消息气泡响应式 - DeepSeek 风格 */
+  /* 消息气泡响应式 - 居中风格 */
   .chat-message {
-    max-width: 88%;
+    max-width: 92%;
   }
-
-  .chat-message.user { margin-right: 14px; }
-  .chat-message.assistant { margin-left: 14px; }
-  .chat-loading { margin-left: 14px; padding: 12px 18px; }
+  .chat-loading { padding: 12px 18px; }
 
   /* 输入框响应式 */
   .ds-input-box { border-radius: 14px; }
@@ -1135,16 +1149,13 @@ body {
     padding: 8px 12px;
   }
   .chat-message {
-    max-width: 94%;
+    max-width: 96%;
   }
-  .chat-message.user { margin-right: 8px; }
-  .chat-message.assistant { margin-left: 8px; }
   .chat-bubble {
     font-size: 14px !important;
     padding: 11px 14px !important;
   }
   .chat-loading {
-    margin-left: 8px;
     padding: 10px 14px;
   }
   .mobile-menu-btn {
@@ -1170,7 +1181,7 @@ body {
   .ds-send-btn { width: 30px; height: 30px; }
   .ds-send-btn svg { width: 14px; height: 14px; }
   .mobile-menu-btn { top: 8px; left: 8px; width: 30px; height: 30px; }
-  .chat-message { max-width: 96%; }
+  .chat-message { max-width: 98%; }
   .chat-message.user .chat-bubble { font-size: 13px !important; padding: 10px 12px !important; }
   .chat-message.assistant .chat-bubble { font-size: 13px !important; padding: 10px 12px !important; }
   .ds-select { max-width: 90px; font-size: 11px; }

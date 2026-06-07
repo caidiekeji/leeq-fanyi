@@ -260,17 +260,30 @@ function bindEvents() {
   // --- 技能面板（欢迎区和底部区同步） ---
   els.skillBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    els.skillPanel.style.display = els.skillPanel.style.display === 'none' ? 'block' : 'none';
+    if (els.skillPanel.style.getPropertyValue('display') === 'none' || els.skillPanel.style.display === 'none') {
+      els.skillPanel.style.setProperty('display', 'block');
+      els.skillPanel.classList.remove('is-hidden');
+    } else {
+      els.skillPanel.style.setProperty('display', 'none');
+      els.skillPanel.classList.add('is-hidden');
+    }
   });
   if (els.skillBtn2) {
     els.skillBtn2.addEventListener('click', (e) => {
       e.stopPropagation();
-      els.skillPanel.style.display = els.skillPanel.style.display === 'none' ? 'block' : 'none';
+      if (els.skillPanel.style.getPropertyValue('display') === 'none' || els.skillPanel.style.display === 'none') {
+        els.skillPanel.style.setProperty('display', 'block');
+        els.skillPanel.classList.remove('is-hidden');
+      } else {
+        els.skillPanel.style.setProperty('display', 'none');
+        els.skillPanel.classList.add('is-hidden');
+      }
     });
   }
   document.addEventListener('click', (e) => {
     if (!els.skillPanel.contains(e.target) && e.target !== els.skillBtn && e.target !== els.skillBtn2) {
-      els.skillPanel.style.display = 'none';
+      els.skillPanel.style.setProperty('display', 'none');
+      els.skillPanel.classList.add('is-hidden');
     }
   });
 
@@ -454,8 +467,10 @@ function handleClear() {
  */
 function switchToWelcomeMode() {
   chatState.hasMessages = false;
-  els.welcome.style.display = '';
-  els.inputBottomArea.style.display = 'none';
+  els.welcome.classList.remove('is-hidden');
+  els.welcome.style.setProperty('display', '');
+  els.inputBottomArea.classList.add('is-hidden');
+  els.inputBottomArea.style.setProperty('display', 'none');
   els.messages.querySelectorAll('.chat-message').forEach(el => el.remove());
   els.inputLarge.value = '';
   els.inputBottom.value = '';
@@ -469,8 +484,10 @@ function switchToWelcomeMode() {
  */
 function switchToMessageMode() {
   chatState.hasMessages = true;
-  els.welcome.style.display = 'none';
-  els.inputBottomArea.style.display = '';
+  els.welcome.classList.add('is-hidden');
+  els.welcome.style.setProperty('display', 'none');
+  els.inputBottomArea.classList.remove('is-hidden');
+  els.inputBottomArea.style.setProperty('display', '');
   updateSendButtons();
 }
 
@@ -781,9 +798,9 @@ function typewriterEffect(replyData, speed = 18) {
           bubbleEl.appendChild(warnEl);
         }
 
-        // ====== 添加复制按钮 ======
+        // ====== 添加复制按钮（气泡外）======
         const copyBtn = buildCopyButton(fullText);
-        bubbleEl.appendChild(copyBtn);
+        msgEl.appendChild(copyBtn);
 
         // 保存到历史记录
         chatState.messages.push({ role: 'assistant', content: fullText });
@@ -978,9 +995,9 @@ function renderMessage(role, content) {
       });
     }
 
-    // 历史消息也添加复制按钮
+    // 历史消息也添加复制按钮（气泡外）
     const copyBtn = buildCopyButton(content);
-    bubbleEl.appendChild(copyBtn);
+    msgEl.appendChild(copyBtn);
   } else {
     // 用户消息：纯文本
     bubbleEl.textContent = content;
@@ -995,7 +1012,13 @@ function renderMessage(role, content) {
  * 显示/隐藏加载指示器
  */
 function showLoading(show) {
-  els.loading.style.display = show ? 'flex' : 'none';
+  if (show) {
+    els.loading.classList.remove('is-hidden');
+    els.loading.style.setProperty('display', 'flex');
+  } else {
+    els.loading.classList.add('is-hidden');
+    els.loading.style.setProperty('display', 'none');
+  }
 }
 
 /**

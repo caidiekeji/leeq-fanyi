@@ -174,7 +174,7 @@
                 </div>
               </div>
               <!-- 技能选择面板 -->
-              <div class="ds-skill-panel" id="skillPanel" style="display:none">
+              <div class="ds-skill-panel is-hidden" id="skillPanel">
                 <div class="ds-skill-list" id="skillPanelList">
                   <div class="ds-skill-empty">暂无可用技能，请在管理后台添加</div>
                 </div>
@@ -184,7 +184,7 @@
         </div>
 
         <!-- 加载指示器 -->
-        <div class="chat-loading" id="chatLoading" style="display:none">
+      <div class="chat-loading is-hidden" id="chatLoading">
           <div class="chat-loading-dots">
             <span></span><span></span><span></span>
           </div>
@@ -192,8 +192,8 @@
         </div>
       </div>
 
-      <!-- 有消息时的底部输入框（DeepSeek 风格） -->
-      <div class="chat-input-bottom" id="chatInputBottom" style="display:none">
+      <!-- 有消息时的底部输入框 -->
+      <div class="chat-input-bottom is-hidden" id="chatInputBottom">
         <div class="ds-bottom-wrapper">
           <div class="ds-input-box">
             <textarea id="chatInputBottomEl" class="ds-textarea" placeholder="输入你的问题... (Enter 发送)" rows="1" maxlength="5000"></textarea>
