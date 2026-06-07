@@ -15,6 +15,7 @@ const chatState = {
   skills: [],             // 可用技能列表
   uploadedFileContent: null, // 上传的文件内容
   uploadedFileName: null, // 上传的文件名
+  uploadedFileSize: null, // 上传的文件大小（格式化后）
   typewriterTimer: null   // 打字机定时器引用（用于中断）
 };
 
@@ -427,11 +428,13 @@ function handleNewChat() {
   chatState.activeSkill = null;
   chatState.uploadedFileContent = null;
   chatState.uploadedFileName = null;
+  chatState.uploadedFileSize = null;
   els.searchModeBtn.classList.remove('search-active');
   if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
-  els.uploadFilename.style.display = 'none';
+  els.uploadFilename.classList.add('is-hidden');
+  els.uploadFilename.style.setProperty('display', 'none');
   els.uploadFilename.textContent = '';
-  if (els.uploadFilename2) { els.uploadFilename2.style.display = 'none'; els.uploadFilename2.textContent = ''; }
+  if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
   saveChatHistory();
   switchToWelcomeMode();
   updatePlaceholder();
@@ -451,11 +454,13 @@ function handleClear() {
   chatState.activeSkill = null;
   chatState.uploadedFileContent = null;
   chatState.uploadedFileName = null;
+  chatState.uploadedFileSize = null;
   els.searchModeBtn.classList.remove('search-active');
   if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
-  els.uploadFilename.style.display = 'none';
+  els.uploadFilename.classList.add('is-hidden');
+  els.uploadFilename.style.setProperty('display', 'none');
   els.uploadFilename.textContent = '';
-  if (els.uploadFilename2) { els.uploadFilename2.style.display = 'none'; els.uploadFilename2.textContent = ''; }
+  if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
   saveChatHistory();
   switchToWelcomeMode();
   updatePlaceholder();
@@ -525,9 +530,11 @@ async function handleFileUpload(e) {
     }
     chatState.uploadedFileContent = text;
     chatState.uploadedFileName = file.name;
+    chatState.uploadedFileSize = formatFileSize(file.size);
     els.uploadFilename.textContent = file.name;
-    els.uploadFilename.style.display = '';
-    if (els.uploadFilename2) { els.uploadFilename2.textContent = file.name; els.uploadFilename2.style.display = ''; }
+    els.uploadFilename.classList.remove('is-hidden');
+    els.uploadFilename.style.setProperty('display', '');
+    if (els.uploadFilename2) { els.uploadFilename2.textContent = file.name; els.uploadFilename2.classList.remove('is-hidden'); els.uploadFilename2.style.setProperty('display', ''); }
     showToast(`已加载文件: ${file.name} (${text.length} 字符)`, 'success');
   } catch (err) {
     showToast('文件读取失败: ' + err.message, 'error');
@@ -555,15 +562,19 @@ async function handleSend() {
   // 构建用户消息内容
   let userContent = text;
 
-  // 如果有上传文件，附加上传内容
+  // 如果有上传文件，先渲染文件卡片到消息区（独立于气泡）
   if (chatState.uploadedFileContent) {
-    userContent = `【上传文件: ${chatState.uploadedFileName}】\n\n${chatState.uploadedFileContent}\n\n---\n【用户问题】\n${text}`;
-    // 清空上传状态
-    chatState.uploadedFileContent = null;
-    chatState.uploadedFileName = null;
-    els.uploadFilename.style.display = 'none';
+    const fileCard = buildFileCard(chatState.uploadedFileName, chatState.uploadedFileSize || '');
+    els.messages.appendChild(fileCard);
+
+    // 用户消息只显示问题文本，不含文件内容（文件已通过卡片展示）
+    userContent = text;
+
+    // 清除文件名显示（保留内容供API调用）
+    els.uploadFilename.classList.add('is-hidden');
+    els.uploadFilename.style.setProperty('display', 'none');
     els.uploadFilename.textContent = '';
-    if (els.uploadFilename2) { els.uploadFilename2.style.display = 'none'; els.uploadFilename2.textContent = ''; }
+    if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
   }
 
   // 添加用户消息（先中断可能正在运行的打字机）
@@ -598,10 +609,12 @@ async function handleSend() {
         searchPayload.fileContext = `【参考文件: ${chatState.uploadedFileName}】\n${chatState.uploadedFileContent}`;
         // 清空上传状态（与普通聊天一致）
         chatState.uploadedFileContent = null;
-        chatState.uploadedFileName = null;
-        els.uploadFilename.style.display = 'none';
-        els.uploadFilename.textContent = '';
-        if (els.uploadFilename2) { els.uploadFilename2.style.display = 'none'; els.uploadFilename2.textContent = ''; }
+  chatState.uploadedFileName = null;
+  chatState.uploadedFileSize = null;
+  els.uploadFilename.classList.add('is-hidden');
+  els.uploadFilename.style.setProperty('display', 'none');
+  els.uploadFilename.textContent = '';
+  if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
       }
       // 如果有激活的技能，传递技能提示词（搜索模式下也生效）
       if (chatState.activeSkill?.prompt) {
@@ -821,17 +834,36 @@ function escapeHtml(text) {
 }
 
 /**
- * 构建引用源区域：每个来源显示为一个小图标/Logo + 标题，点击跳转
+ * 格式化文件大小
+ */
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  const size = (bytes / Math.pow(1024, i)).toFixed(i > 0 ? 2 : 0);
+  return `${size} ${units[i]}`;
+}
+
+/**
+ * 构建引用源区域：已阅读 N 个网页 + 搜索引擎图标 + 来源列表
  */
 function buildSourceFooter(sources, count, engineName) {
   const footer = document.createElement('div');
   footer.className = 'source-footer';
 
+  // 头部：搜索图标 + "已阅读 N 个网页" + 搜索引擎图标
   const header = document.createElement('div');
   header.className = 'source-header';
-  header.textContent = `参考来源 (${count} 条 · ${engineName})`;
+
+  const searchIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+  header.innerHTML = `
+    <span class="source-header-icon">${searchIcon}</span>
+    <span>已阅读 ${count} 个网页</span>
+    <span class="source-header-engines">${getEngineIcons(engineName)}</span>
+  `;
   footer.appendChild(header);
 
+  // 来源列表
   const list = document.createElement('div');
   list.className = 'source-list';
 
@@ -843,7 +875,6 @@ function buildSourceFooter(sources, count, engineName) {
     item.rel = 'noopener noreferrer';
     item.title = s.snippet ? `${s.title}\n${s.snippet}` : s.title;
 
-    // 根据 URL 域名选择对应图标
     const domainIcon = getDomainIcon(s.url || '');
     item.innerHTML = `
       <span class="source-icon">${domainIcon}</span>
@@ -852,9 +883,40 @@ function buildSourceFooter(sources, count, engineName) {
     list.appendChild(item);
   });
 
-  footer.appendChild(list);
+  if (sources.length > 0) {
+    footer.appendChild(list);
+  }
+
   return footer;
 }
+
+/**
+ * 根据搜索引擎名称返回对应图标HTML
+ */
+function getEngineIcons(engineName) {
+  const name = (engineName || '').toLowerCase();
+  let icons = '';
+
+  if (name.includes('bing')) {
+    icons += '<svg viewBox="0 0 24 24" width="18" height="18"><rect width="24" height="24" rx="4" fill="#008373"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="11" font-weight="bold">B</text></svg>';
+  }
+  if (name.includes('baidu') || name.includes('百度')) {
+    icons += '<svg viewBox="0 0 24 24" width="18" height="18"><rect width="24" height="24" rx="4" fill="#2932E1"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="10" font-weight="bold">du</text></svg>';
+  }
+  if (name.includes('google') || name.includes('谷歌')) {
+    icons += '<svg viewBox="0 0 24 24" width="18" height="18"><rect width="24" height="24" rx="4" fill="#4285F4"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="10" font-weight="bold">G</text></svg>';
+  }
+  if (!icons) {
+    // 默认图标
+    icons = '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="10" fill="#E8EAED"/><text x="12" y="16" text-anchor="middle" fill="#5C6470" font-size="10">?</text></svg>';
+  }
+
+  return icons;
+}
+
+/**
+ * 获取域名图标（根据 URL 返回对应搜索引擎/网站 SVG 图标）
+ */
 
 /**
  * 根据域名返回对应的 SVG 图标
@@ -900,6 +962,35 @@ function buildCopyButton(text) {
 
   wrapper.appendChild(btn);
   return wrapper;
+}
+
+/**
+ * 构建文件附件卡片（独立于气泡外，右对齐）
+ */
+function buildFileCard(fileName, fileSize) {
+  const card = document.createElement('div');
+  card.className = 'chat-file-card';
+
+  // 文件图标（根据扩展名选图标）
+  let iconSvg = '';
+  const ext = fileName.split('.').pop().toLowerCase();
+  if (['md', 'txt', 'csv', 'json', 'xml', 'html', 'css', 'js'].includes(ext)) {
+    iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>';
+  } else if (['pdf'].includes(ext)) {
+    iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/></svg>';
+  } else {
+    iconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+  }
+
+  card.innerHTML = `
+    <div class="chat-file-card-icon">${iconSvg}</div>
+    <div class="chat-file-card-info">
+      <div class="chat-file-card-name">${escapeHtml(fileName)}</div>
+      <div class="chat-file-card-size">${fileSize || ''}</div>
+    </div>
+  `;
+
+  return card;
 }
 
 /**
