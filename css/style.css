@@ -316,7 +316,7 @@ body {
 }
 .navbar-brand:hover svg { transform: rotate(-6deg) scale(1.06); }
 
-/* ---- Nav Links ---- */
+/* ---- Nav Links — Mac OS Dock style ---- */
 .nav-links {
   display: flex;
   align-items: center;
@@ -331,30 +331,41 @@ body {
   text-decoration: none;
   padding: 8px 16px;
   border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   letter-spacing: 0.01em;
 }
 
 .nav-link:hover {
   color: var(--color-text);
   background: var(--color-bg-alt);
+  transform: translateY(-1px);
+}
+
+.nav-link:active {
+  transform: scale(0.95);
 }
 
 .nav-link.active {
   color: var(--color-primary);
   font-weight: 600;
+  background: var(--color-primary-bg);
 }
 
 .nav-link.active::after {
   content: '';
   position: absolute;
-  bottom: 1px;
+  bottom: 2px;
   left: 50%;
   transform: translateX(-50%);
-  width: 16px;
-  height: 2px;
+  width: 18px;
+  height: 2.5px;
   background: var(--color-primary);
-  border-radius: 1px;
+  border-radius: 2px;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-link.active:hover::after {
+  width: 28px;
 }
 
 /* ---- Nav Actions ---- */
@@ -398,18 +409,16 @@ body {
 .mobile-menu-toggle svg { width: 22px; height: 22px; }
 
 /* ================================================================
-   Page Header — Clean minimal (base, overridden per-page)
+   Page Header — Left-aligned (Anti-Center Bias, overridden per-page)
    ================================================================ */
 .page-header {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 28px 0 16px;
-  text-align: center;
+  text-align: left;
   flex-shrink: 0;
 }
-
-/* Translate page overrides via translate.css: .translate-main > .page-header → left-align */
 
 .page-header h1 {
   font-size: 30px;
@@ -431,6 +440,124 @@ body {
   font-size: 14px;
   color: var(--color-text-secondary);
   font-weight: 400;
+}
+
+/* ================================================================
+   Shared Liquid Glass Panel — reusable glass surface
+   ================================================================ */
+.glass-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.glass-panel:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  border-color: rgba(13, 148, 136, 0.15);
+}
+
+.glass-panel:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+/* Shared Glass Card */
+.glass-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-base);
+  cursor: default;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.glass-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-4px);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.08);
+}
+
+/* ================================================================
+   Shared Perpetual Micro-Interactions
+   ================================================================ */
+
+/* Breathing dot — live status indicator */
+.breathing-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-success);
+  animation: breathe 2.2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.65); }
+}
+
+/* Shimmer sweep — loading skeleton */
+.shimmer-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-sweep::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(13, 148, 136, 0.06) 50%, transparent 100%);
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Float animation — for empty state icons */
+.float-icon {
+  animation: floatIcon 4s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+/* Blinking cursor */
+.blink-cursor {
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* ---- Kinetic Text ---- */

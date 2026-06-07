@@ -3,31 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>翻译AI SaaS - 专业简约多语言翻译工具</title>
-  <meta name="description" content="基于大语言模型的专业简约翻译 SaaS，支持 20+ 语言互译，快速精准，适合大众用户。">
-  <meta name="keywords" content="翻译, AI, SaaS, 多语言, 大语言模型">
-  <meta property="og:title" content="翻译AI SaaS - 专业简约多语言翻译工具">
-  <meta property="og:description" content="专业简约的 AI 翻译服务，支持多语言，快速精准。">
+  <title>翻译 - LeeQ AI 智能多语言翻译平台</title>
+  <meta name="description" content="LeeQ 翻译 - 基于大语言模型的专业翻译服务，支持 20+ 语言互译，快速精准，适合大众用户。">
+  <meta name="keywords" content="翻译, AI, SaaS, 多语言, 大语言模型, LeeQ">
+  <meta property="og:title" content="翻译 - LeeQ AI 智能多语言翻译平台">
+  <meta property="og:description" content="基于大语言模型的专业翻译服务，支持 20+ 语言互译，精准理解上下文语境">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="翻译AI SaaS">
-  <meta property="og:url" content="https://yourdomain.com/">
-  <meta property="og:image" content="https://yourdomain.com/og-image.png">
+  <meta property="og:site_name" content="LeeQ 翻译">
+  <meta property="og:url" content="https://lq-26k.pages.dev/">
+  <meta property="og:image" content="https://lq-26k.pages.dev/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="翻译AI SaaS - 专业简约多语言翻译工具">
-  <meta name="twitter:description" content="专业简约的 AI 翻译服务，支持多语言，快速精准。">
-  <meta name="twitter:image" content="https://yourdomain.com/og-image.png">
+  <meta name="twitter:title" content="翻译 - LeeQ AI 智能多语言翻译平台">
+  <meta name="twitter:description" content="基于大语言模型的专业翻译服务，支持 20+ 语言互译">
+  <meta name="twitter:image" content="https://lq-26k.pages.dev/og-image.png">
   <meta name="robots" content="index, follow">
-  <meta name="author" content="YourCompany">
-  <link rel="canonical" href="https://yourdomain.com/">
+  <meta name="author" content="LeeQ">
+  <link rel="canonical" href="https://lq-26k.pages.dev/">
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "翻译AI SaaS",
-      "url": "https://yourdomain.com/",
-      "description": "专业简约的 AI 翻译服务，支持多语言，快速精准。",
+      "name": "LeeQ 翻译",
+      "url": "https://lq-26k.pages.dev/",
+      "description": "基于大语言模型的专业翻译服务，支持 20+ 语言互译",
       "applicationCategory": "UtilityApplication",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" },
+      "author": { "@type": "Person", "name": "LeeQ" }
     }
   </script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300A86B'><path d='M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z'/></svg>">
@@ -37,49 +38,8 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/translate.css">
   <style>
-    /* Essential inline overrides only (rest in translate.css) */
     .is-hidden { display: none !important; }
     .hidden { display: none; }
-    .noscript-warning { padding: 20px; text-align: center; font-size: 16px; color: var(--color-text-secondary); }
-    .skip-link { position: absolute; left: -999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
-    .skip-link:focus { left: 0; width: auto; height: auto; background: var(--color-primary); color: var(--color-text-primary); padding: 8px; z-index: 1000; }
-    .announcement-bar { background: var(--color-accent); color: var(--color-text-primary); text-align: center; padding: 8px; }
-    .navbar { background: var(--color-surface); transition: box-shadow 0.3s; }
-    .navbar.scrolled { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .mobile-menu-toggle { background: none; border: none; cursor: pointer; }
-    .mobile-menu-toggle[aria-expanded="true"] + .nav-links { display: block; }
-    .nav-links { display: flex; gap: 1rem; }
-
-    /* === CRITICAL LAYOUT SAFETY NET (inline — always loads) === */
-    body { display: flex; flex-direction: column; min-height: 100vh; }
-    main.translate-main { flex: 1; max-width: 1280px; margin: 0 auto; padding: 0 40px; width: 100%; box-sizing: border-box; }
-    main > .page-header { align-items: flex-start; text-align: left; }
-    /* Grid panels — must render side-by-side */
-    .tw-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; }
-    .tw-panel { display: flex; flex-direction: column; border: 1px solid #d1d5db; border-radius: 20px; background: #f9fafb; min-height: 380px; overflow: hidden; }
-    .tw-panel-head { display: flex; align-items: center; gap: 8px; padding: 12px 20px; border-bottom: 1px solid #e5e7eb; }
-    .tw-panel-body { flex: 1; padding: 16px 20px; display: flex; flex-direction: column; min-height: 0; }
-    .tw-panel-foot { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; }
-    .tw-textarea { flex: 1; width: 100%; border: none; outline: none; font-size: 16px; line-height: 1.8; resize: none; min-height: 300px; padding: 4px 0; background: transparent; font-family: system-ui, sans-serif; }
-    .tw-result { flex: 1; font-size: 16px; line-height: 1.8; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
-    .tw-result.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #9ca3af; }
-    .tw-top-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 12px 0; border-bottom: 1px solid #d1d5db; }
-    .tw-lang-group { display: flex; align-items: center; gap: 6px; }
-    .tw-lang-select { padding: 8px 32px 8px 12px; border: 1px solid #d1d5db; border-radius: 12px; font-size: 14px; background: #fff; cursor: pointer; appearance: none; }
-    .tw-action-group { display: flex; align-items: center; gap: 6px; }
-    .tw-primary-btn { display: flex; align-items: center; gap: 6px; padding: 9px 22px; border: none; border-radius: 12px; background: linear-gradient(135deg,#0D9488,#14B8A6); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
-    .tw-primary-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-    .tw-swap-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid #d1d5db; border-radius: 50%; background: #fff; cursor: pointer; }
-    .tw-tool-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: none; border-radius: 12px; background: transparent; cursor: pointer; }
-    .tw-workspace { display: flex; flex-direction: column; gap: 1rem; width: 100%; }
-    .footer { text-align: center; padding: 16px 24px; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; margin-top: auto; flex-shrink: 0; }
-
-    @media (max-width: 768px) {
-      .nav-links { display: none; flex-direction: column; }
-      .tw-panels { grid-template-columns: 1fr; }
-      main.translate-main { padding: 0 16px; }
-      .tw-panel { min-height: 260px; }
-    }
   </style>
 </head>
 <body>
@@ -89,8 +49,8 @@
   </div>
 
   <noscript>
-    <div class="noscript-warning">
-      <p>翻译AI SaaS - 基于大语言模型的多语言翻译工具，支持 20+ 语言互译。</p>
+    <div style="padding:20px;text-align:center;font-size:16px;color:var(--color-text-secondary);">
+      <p>LeeQ 翻译 - 基于大语言模型的多语言翻译工具，支持 20+ 语言互译。</p>
       <p>您的浏览器未启用 JavaScript，请启用后获得完整功能。</p>
     </div>
   </noscript>
@@ -107,7 +67,7 @@
     <div class="navbar-inner">
       <a href="/" class="navbar-brand">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
-        <span id="siteName">翻译AI SaaS</span>
+        <span id="siteName">LeeQ</span>
       </a>
       <div class="nav-links" id="navLinks">
         <a href="/" class="nav-link active" aria-current="page">翻译</a>
@@ -126,13 +86,53 @@
   </nav>
 
   <main class="translate-main" id="translator">
-    <!-- Left-aligned header (Anti-Center Bias compliance) -->
-    <div class="page-header stagger-item">
-      <h1 class="page-header-title"><span class="highlight">智能翻译</span></h1>
-      <span class="subtitle">基于大语言模型的多语言翻译，精准、快速、专业</span>
+    <!-- ===== Hero Section: Split Screen (Anti-Center Bias) ===== -->
+    <section class="translate-hero stagger-item" data-delay="0">
+      <div class="translate-hero-content">
+        <div class="translate-hero-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span>AI 智能翻译引擎</span>
+        </div>
+        <h1 class="translate-hero-title">
+          <span class="highlight">智能翻译</span><br>跨越语言边界
+        </h1>
+        <p class="translate-hero-desc">基于大语言模型的专业翻译服务，支持 20+ 语言互译，精准理解上下文语境，让跨语言沟通流畅自然</p>
+        <div class="translate-hero-stats">
+          <div class="translate-hero-stat">
+            <span class="translate-hero-stat-num" data-target="20" data-suffix="+">0</span>
+            <span class="translate-hero-stat-label">支持语言</span>
+          </div>
+          <div class="translate-hero-stat">
+            <span class="translate-hero-stat-num" data-target="99" data-suffix="%">0</span>
+            <span class="translate-hero-stat-label">翻译准确率</span>
+          </div>
+          <div class="translate-hero-stat">
+            <span class="translate-hero-stat-num" data-target="500" data-suffix="ms">0</span>
+            <span class="translate-hero-stat-label">平均响应</span>
+          </div>
+        </div>
+      </div>
+      <div class="translate-hero-visual" aria-hidden="true">
+        <div class="translate-hero-orb"></div>
+        <div class="translate-hero-ring"></div>
+        <span class="translate-hero-float-text">20+ Languages</span>
+      </div>
+    </section>
+
+    <!-- ===== Language Quick Chips ===== -->
+    <div class="tw-lang-chips">
+      <span class="tw-chips-label">常用翻译</span>
+      <div class="tw-chips-group">
+        <button class="tw-chip" data-from="auto" data-to="en"><span>中 → EN</span></button>
+        <button class="tw-chip" data-from="en" data-to="zh"><span>EN → 中</span></button>
+        <button class="tw-chip" data-from="zh" data-to="ja"><span>中文 → 日本語</span></button>
+        <button class="tw-chip" data-from="zh" data-to="ko"><span>中文 → 한국어</span></button>
+        <button class="tw-chip" data-from="zh" data-to="fr"><span>中文 → Français</span></button>
+        <button class="tw-chip" data-from="zh" data-to="de"><span>中文 → Deutsch</span></button>
+      </div>
     </div>
 
-    <!-- Asymmetric translate workspace: 60/40 split -->
+    <!-- ===== Translate Workspace ===== -->
     <div class="tw-workspace stagger-item">
       <!-- Top bar: language + toolbar, integrated -->
       <div class="tw-top-bar">
@@ -163,6 +163,12 @@
             <span>翻译</span>
           </button>
         </div>
+      </div>
+
+      <!-- Live status indicator -->
+      <div class="tw-workspace-status">
+        <span class="breathing-dot"></span>
+        <span class="tw-workspace-status-text">AI 翻译引擎就绪</span>
       </div>
 
       <!-- Panels: asymmetric 2fr / 1fr -->
@@ -221,82 +227,44 @@
         </section>
       </div>
 
-      <!-- Stats + Language Shortcuts — compact row -->
-      <div class="tw-stats-row">
-        <div class="tw-stat" data-stat="langs">
-          <span class="tw-stat-num" data-target="20" data-suffix="+">0</span>
-          <span class="tw-stat-label">支持语言</span>
-        </div>
-        <div class="tw-stat" data-stat="accuracy">
-          <span class="tw-stat-num" data-target="99" data-suffix="%">0</span>
-          <span class="tw-stat-label">翻译准确率</span>
-        </div>
-        <div class="tw-stat" data-stat="speed">
-          <span class="tw-stat-num" data-target="500" data-suffix="ms+">0</span>
-          <span class="tw-stat-label">平均响应</span>
-        </div>
-      </div>
-
-      <div class="tw-lang-chips">
-        <span class="tw-chips-label">常用翻译</span>
-        <div class="tw-chips-group">
-          <button class="tw-chip" data-from="auto" data-to="en"><span>中 → EN</span></button>
-          <button class="tw-chip" data-from="en" data-to="zh"><span>EN → 中</span></button>
-          <button class="tw-chip" data-from="zh" data-to="ja"><span>中文 → 日本語</span></button>
-          <button class="tw-chip" data-from="zh" data-to="ko"><span>中文 → 한국어</span></button>
-          <button class="tw-chip" data-from="zh" data-to="fr"><span>中文 → Français</span></button>
-          <button class="tw-chip" data-from="zh" data-to="de"><span>中文 → Deutsch</span></button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bento Grid Capabilities (Section 9: Bento 2.0 Paradigm) -->
+    <!-- ===== Bento Grid: Asymmetric 2-Column (1.5fr / 1fr) ===== -->
     <section class="tw-bento stagger-item">
       <div class="tw-bento-head">
         <h2 class="tw-bento-title">核心能力</h2>
         <p class="tw-bento-desc">前沿 AI 翻译技术，让跨语言沟通零障碍</p>
       </div>
       <div class="tw-bento-grid">
-        <!-- Card 1: The Intelligent List (perpetual auto-sort simulation) -->
-        <div class="tw-bento-card tw-bento-wide" data-archetype="list">
+        <!-- Card 1: Large left (spans 2 rows) — Intelligent Marquee -->
+        <div class="tw-bento-card" data-archetype="list">
           <div class="tw-bento-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
           <h3 class="tw-bento-card-title">LLM 智能翻译</h3>
-          <p class="tw-bento-card-desc">基于大语言模型，理解上下文语境，翻译更自然流畅</p>
+          <p class="tw-bento-card-desc">基于大语言模型，深度理解上下文语境，翻译结果自然流畅，媲美人工翻译水准</p>
           <div class="tw-bento-marquee">
             <span>Hello World</span>
             <span>你好世界</span>
             <span>こんにちは世界</span>
             <span>안녕하세요 세계</span>
+            <span>Bonjour le monde</span>
+            <span>Hallo Welt</span>
           </div>
         </div>
 
-        <!-- Card 2: The Live Status (breathing indicator) -->
+        <!-- Card 2: Top-right — Live Status -->
         <div class="tw-bento-card" data-archetype="live">
           <div class="tw-bento-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
           <h3 class="tw-bento-card-title">智能语言检测</h3>
-          <p class="tw-bento-card-desc">自动识别源文本语言，无需手动选择</p>
+          <p class="tw-bento-card-desc">自动识别源文本语言，无需手动选择，支持 20+ 语言准确检测</p>
           <div class="tw-bento-status">
             <span class="tw-status-dot"></span>
             <span class="tw-status-text">实时检测中</span>
           </div>
         </div>
 
-        <!-- Card 3: The Command Input (typewriter) -->
-        <div class="tw-bento-card" data-archetype="cmd">
-          <div class="tw-bento-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="16" y1="8" x2="16" y2="16"/><line x1="8" y1="8" x2="8" y2="16"/></svg></div>
-          <h3 class="tw-bento-card-title">格式完美保留</h3>
-          <p class="tw-bento-card-desc">换行、标点、代码块等格式结构完整保留</p>
-          <div class="tw-bento-typewriter" aria-label="打字动画示例">
-            <span class="tw-type-text"></span>
-            <span class="tw-type-cursor"></span>
-          </div>
-        </div>
-
-        <!-- Card 4: The Wide Data Stream (infinite carousel) -->
+        <!-- Card 3: Bottom-right — Infinite Carousel -->
         <div class="tw-bento-card" data-archetype="stream">
           <div class="tw-bento-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
           <h3 class="tw-bento-card-title">隐私安全</h3>
-          <p class="tw-bento-card-desc">端到端加密传输，文本不留存</p>
+          <p class="tw-bento-card-desc">端到端加密传输，文本零留存，全方位保护您的数据隐私</p>
           <div class="tw-bento-stream">
             <div class="tw-stream-track">
               <span class="tw-stream-item">加密传输</span>
@@ -319,7 +287,7 @@
   <div id="toast" class="toast"></div>
 
   <footer class="footer" id="footerText">
-    Powered by 翻译AI SaaS · 由 您的团队 开发 · Cloudflare 加速
+    Powered by LeeQ 旗下产品 · 由 jie 开发 · Cloudflare 提供加速服务
   </footer>
 
   <script src="/js/utils.js"></script>
@@ -424,12 +392,12 @@
           }
         });
       },{threshold:0.3});
-      document.querySelectorAll('.tw-stat-num[data-target]').forEach(function(el){countObserver.observe(el);});
+      document.querySelectorAll('.translate-hero-stat-num[data-target]').forEach(function(el){countObserver.observe(el);});
     })();
 
     // Kinetic title text
     (function(){
-      var title=document.querySelector('.page-header h1');
+      var title=document.querySelector('.translate-hero-title');
       if(!title) return;
       var wrapper=document.createElement('span');
       wrapper.className='kinetic-text';

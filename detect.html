@@ -80,15 +80,15 @@
        ================================================================ -->
   <main class="detect-main" id="detector">
 
-    <!-- ===== 英雄区 ===== -->
-    <section class="hero-section reveal-item">
+    <!-- ===== 英雄区: Split Screen Left-Aligned ===== -->
+    <section class="hero-section reveal-item" data-delay="0">
       <div class="hero-content">
         <div class="hero-badge">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
           <span>AI 智能内容分析</span>
         </div>
         <h1 class="hero-title">
-          <span class="highlight">AIGC 内容</span>智能检测平台
+          <span class="highlight">AIGC 内容</span><br>智能检测平台
         </h1>
         <p class="hero-desc">基于大语言模型的多维内容分析引擎，精准识别AI生成内容、评估合规与质量、检测敏感信息，让内容安全可控</p>
         <div class="hero-stats">
@@ -96,22 +96,29 @@
             <span class="hero-stat-number" data-target="99.2" data-suffix="%">0</span>
             <span class="hero-stat-label">检测准确率</span>
           </div>
-          <div class="hero-stat-divider"></div>
           <div class="hero-stat">
             <span class="hero-stat-number" data-target="10" data-suffix="万+">0</span>
             <span class="hero-stat-label">累计检测</span>
           </div>
-          <div class="hero-stat-divider"></div>
           <div class="hero-stat">
             <span class="hero-stat-number" data-target="4" data-suffix="大维度">0</span>
             <span class="hero-stat-label">全面分析</span>
           </div>
         </div>
       </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-visual-orb"></div>
+        <div class="hero-visual-ring"></div>
+        <span class="hero-visual-float">AI Detection</span>
+      </div>
     </section>
 
-    <!-- ===== 功能特性 ===== -->
+    <!-- ===== 功能特性: Zig-Zag 2×2 Grid ===== -->
     <section class="features-section">
+      <div class="features-section-header">
+        <h2 class="features-section-title">核心检测能力</h2>
+        <p class="features-section-desc">四大维度全面分析，精准识别AI生成内容，保障内容安全合规</p>
+      </div>
       <div class="features-grid">
         <article class="feature-card reveal-item" data-delay="0">
           <div class="feature-icon" style="--feature-color: var(--color-primary);">
@@ -149,6 +156,12 @@
       <div class="tool-section-header">
         <h2 class="tool-section-title">开始内容检测</h2>
         <p class="tool-section-desc">选择检测类型，粘贴内容，一键分析</p>
+      </div>
+
+      <!-- 工作区状态指示器 -->
+      <div class="detect-status-bar">
+        <span class="detect-status-dot"></span>
+        <span class="detect-status-text">AI 检测引擎就绪</span>
       </div>
 
       <!-- 检测类型标签 -->
