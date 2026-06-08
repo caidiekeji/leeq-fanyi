@@ -372,6 +372,7 @@ body {
   scroll-behavior: smooth;
   display: flex;
   flex-direction: column;
+  padding: 20px 28px;
   background: #FFFFFF; /* 消息区白色背景 */
 }
 
@@ -673,12 +674,16 @@ body {
 
 /* ====== 消息气泡样式（ChatGPT/Claude 经典布局）====== */
 
-/* ====== 用户消息 — 右侧对齐 + 较窄 ====== */
+/* ====== 用户消息 — 右侧对齐 + 与输入框同宽 ====== */
 .chat-message.user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* 内容右对齐 */
   align-self: flex-end; /* 在flex列容器中靠右 */
-  max-width: 680px;
+  max-width: 720px;
+  width: fit-content;
   margin-left: auto;
-  margin-right: 24px;
+  margin-right: 0;
   margin-bottom: 20px;
   animation: msgFadeIn 0.25s ease-out;
 }
@@ -694,10 +699,10 @@ body {
   text-align: right; /* 文字右对齐 */
 }
 
-/* ====== AI 消息 — 居中 + 宽幅 ====== */
+/* ====== AI 消息 — 居中 + 与输入框同宽 ====== */
 .chat-message.assistant {
   display: block;
-  max-width: 780px; /* 与输入框同宽 */
+  max-width: 720px; /* 与输入框同宽 */
   margin: 0 auto 20px;
   animation: msgFadeIn 0.25s ease-out;
 }
@@ -1241,6 +1246,10 @@ body {
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  .chat-messages {
+    padding: 16px 16px;
+  }
+
   .chat-sidebar.open {
     transform: translateX(0);
   }
@@ -1291,10 +1300,14 @@ body {
 
   /* 消息气泡响应式 */
   .chat-message.user {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     align-self: flex-end;
     max-width: 88%;
+    width: fit-content;
     margin-left: auto;
-    margin-right: 12px;
+    margin-right: 0;
   }
   .chat-message.assistant {
     max-width: 92%;
@@ -1319,6 +1332,9 @@ body {
 
 /* 480px 及以下 - 移动端 */
 @media (max-width: 480px) {
+  .chat-messages {
+    padding: 12px 12px;
+  }
   .chat-welcome {
     padding: 16px 16px 32px;
   }
@@ -1372,10 +1388,14 @@ body {
     padding: 8px 12px;
   }
   .chat-message.user {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     align-self: flex-end;
     max-width: 92%;
+    width: fit-content;
     margin-left: auto;
-    margin-right: 8px;
+    margin-right: 0;
   }
   .chat-message.assistant {
     max-width: 96%;
