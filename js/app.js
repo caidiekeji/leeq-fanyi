@@ -129,7 +129,7 @@ function bindEvents() {
     }
     handleTranslate(forceRefresh);
   });
-  document.getElementById('swapBtn').addEventListener('click', handleSwap);
+  document.getElementById('swapLangBtn').addEventListener('click', handleSwap);
   document.getElementById('copyBtn').addEventListener('click', handleCopy);
   document.getElementById('clearBtn').addEventListener('click', handleClear);
   document.getElementById('themeBtn').addEventListener('click', toggleTheme);
@@ -157,7 +157,7 @@ function bindShortcuts() {
 }
 
 function bindDragDrop() {
-  const sourcePanel = document.querySelector('.ds-panel-source .ds-panel-body');
+  const sourcePanel = document.querySelector('.tw-panel-source .tw-panel-body');
   if (!sourcePanel) return;
   sourcePanel.addEventListener('dragover', e => {
     e.preventDefault();

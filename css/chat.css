@@ -1,5 +1,12 @@
 /* ====== Chat Page - 侧边栏 + 聊天区布局 ====== */
 
+/* ---- Local Design Tokens ---- */
+:root {
+  --tw-glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --tw-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+  --tw-diffusion: 0 20px 40px -15px rgba(0, 0, 0, 0.04);
+}
+
 /* 覆盖 body 样式，使用全屏布局 */
 body {
   overflow: hidden;
@@ -23,6 +30,17 @@ body {
   border-right: 1px solid var(--color-border);
   transition: all var(--transition-base);
   z-index: 10;
+  position: relative;
+}
+
+/* Liquid Glass inner border */
+.chat-sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: var(--tw-glass-inner);
 }
 
 /* 侧边栏折叠状态 */
@@ -384,16 +402,28 @@ body {
 .ds-input-box {
   width: 100%;
   background: var(--color-surface);
-  border: 1.5px solid #D1D5DB; /* 浅灰边框 */
+  border: 1.5px solid var(--color-border);
   border-radius: 16px;
   overflow: hidden;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
 }
 
-/* 聚焦状态：蓝色边框 + 轻微阴影（DeepSeek 风格） */
+/* Liquid Glass inner border */
+.ds-input-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: var(--tw-glass-inner);
+}
+
+/* 聚焦状态：品牌绿边框 + 轻微阴影 */
 .ds-input-box:focus-within {
-  border-color: #4F6EF7; /* DeepSeek 品牌蓝 */
-  box-shadow: 0 2px 12px rgba(79, 110, 247, 0.10);
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 12px rgba(13, 148, 136, 0.10);
 }
 
 /* 暗色模式适配 */
@@ -402,8 +432,8 @@ body {
 }
 
 [data-theme="dark"] .ds-input-box:focus-within {
-  border-color: #4F6EF7;
-  box-shadow: 0 2px 16px rgba(79, 110, 247, 0.18);
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 16px rgba(13, 148, 136, 0.18);
 }
 
 /* 输入文本域 */
@@ -453,14 +483,14 @@ body {
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #9CA3AF; /* 中灰色，类似 DeepSeek 的 muted 图标色 */
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .ds-tool-btn:hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: #374151;
+  background: var(--color-bg-alt);
+  color: var(--color-text);
 }
 
 [data-theme="dark"] .ds-tool-btn:hover {
@@ -473,20 +503,20 @@ body {
   height: 19px;
 }
 
-/* 搜索激活态：蓝色高亮 */
+/* 搜索激活态：品牌高亮 */
 .ds-tool-btn.search-active {
-  background: rgba(79, 110, 247, 0.08);
-  color: #4F6EF7;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
 }
 
 /* 搜索引擎下拉选择器 */
 .ds-select {
   height: 28px;
   padding: 0 22px 0 8px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: #F9FAFB;
-  color: #374151;
+  background: var(--color-bg);
+  color: var(--color-text);
   font-size: 12px;
   font-family: var(--font-sans);
   cursor: pointer;
@@ -494,7 +524,7 @@ body {
   appearance: none;
   -webkit-appearance: none;
   /* 下拉箭头 SVG */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23959BA3' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 6px center;
   background-size: 13px;
@@ -507,13 +537,13 @@ body {
 }
 
 .ds-select:focus {
-  border-color: #4F6EF7;
+  border-color: var(--color-primary);
 }
 
 /* 上传文件名提示 */
 .ds-filename {
   font-size: 12px;
-  color: #4F6EF7;
+  color: var(--color-primary);
   max-width: 130px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -544,15 +574,15 @@ body {
 }
 
 .ds-send-btn:not(:disabled) {
-  background: #4F6EF7; /* DeepSeek 蓝 */
+  background: var(--color-primary);
   color: #FFFFFF;
-  box-shadow: 0 1px 6px rgba(79, 110, 247, 0.25);
+  box-shadow: 0 1px 6px var(--color-primary-glow);
 }
 
 .ds-send-btn:not(:disabled):hover {
   transform: scale(1.07);
-  box-shadow: 0 2px 12px rgba(79, 110, 247, 0.35);
-  background: #3B5CE8;
+  box-shadow: 0 2px 12px var(--color-primary-glow);
+  background: var(--color-primary-dark);
 }
 
 .ds-send-btn:not(:disabled):active {
@@ -615,8 +645,8 @@ body {
 }
 
 .skill-item.selected {
-  background: rgba(79, 110, 247, 0.08);
-  color: #4F6EF7;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
 }
 
 .skill-item svg {
@@ -801,8 +831,8 @@ body {
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  background: rgba(79, 110, 247, 0.08);
-  color: #4F6EF7;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
   border-radius: var(--radius-sm);
 }
 
@@ -897,7 +927,7 @@ body {
   display: inline-block;
   width: 2px;
   height: 1.1em;
-  background-color: var(--color-primary, #4F6EF7);
+  background-color: var(--color-primary);
   margin-left: 1px;
   vertical-align: text-bottom;
   animation: blink-cursor 0.8s step-end infinite;
@@ -937,15 +967,15 @@ body {
 
 /* 引用块 */
 .chat-bubble blockquote {
-  border-left: 3px solid #4F6EF7; padding: 8px 14px; margin: 10px 0;
-  background: rgba(79,110,247,0.05); border-radius: 0 6px 6px 0;
+  border-left: 3px solid var(--color-primary); padding: 8px 14px; margin: 10px 0;
+  background: var(--color-primary-bg); border-radius: 0 6px 6px 0;
   color: var(--color-text-secondary); font-size: 0.93em;
 }
 
 /* 行内代码 */
 .chat-bubble code:not([class]) {
-  background: rgba(79,110,247,0.08);
-  color: #4F6EF7; padding: 2px 6px; border-radius: 4px;
+  background: var(--color-primary-bg);
+  color: var(--color-primary-dark); padding: 2px 6px; border-radius: 4px;
   font-size: 0.88em; font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
 }
 
@@ -967,7 +997,7 @@ body {
 .chat-bubble hr { border: none; border-top: 1px solid var(--color-border); margin: 10px 0; }
 
 /* 链接 */
-.chat-bubble a { color: #4F6EF7; text-decoration: none; }
+.chat-bubble a { color: var(--color-primary); text-decoration: none; }
 .chat-bubble a:hover { text-decoration: underline; }
 
 /* Mermaid 图表容器 */
@@ -1045,11 +1075,11 @@ body {
 }
 
 .source-item:hover {
-  background: rgba(79, 110, 247, 0.06);
-  border-color: #4F6EF7;
-  color: #4F6EF7;
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
   transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(79, 110, 247, 0.12);
+  box-shadow: 0 2px 6px var(--color-primary-glow);
 }
 
 .source-icon {
@@ -1142,7 +1172,7 @@ body {
 }
 
 .chat-message.assistant .chat-bubble a {
-  color: #4F6EF7;
+  color: var(--color-primary);
   text-decoration: none;
 }
 
@@ -1174,9 +1204,9 @@ body {
 }
 
 .copy-btn:hover {
-  background: rgba(79, 110, 247, 0.06);
-  border-color: #4F6EF7;
-  color: #4F6EF7;
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .copy-btn svg { width: 15px; height: 15px; }
