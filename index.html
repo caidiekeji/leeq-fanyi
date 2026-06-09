@@ -125,9 +125,9 @@
         <span class="tw-workspace-status-text">AI 翻译引擎就绪</span>
       </div>
 
-      <!-- Unified Panel: source + result in one container -->
+      <!-- Unified Panel: source + result in one container (left-right) -->
       <div class="tw-panel-unified">
-        <!-- Source area -->
+        <!-- Source area (left) -->
         <div class="tw-uni-source">
           <div class="tw-uni-head">
             <span class="tw-uni-label">源文本</span>
@@ -139,17 +139,16 @@
             </div>
           </div>
           <textarea id="sourceText" class="tw-textarea" placeholder="输入要翻译的文本..." maxlength="10000" aria-label="源文本输入"></textarea>
-        </div>
-
-        <!-- Divider with actions -->
-        <div class="tw-uni-divider">
-          <div class="tw-uni-divider-left">
+          <div class="tw-uni-foot">
+            <div class="tw-shortcuts">
+              <span><kbd>Ctrl+Enter</kbd> 翻译</span>
+              <span><kbd>Ctrl+D</kbd> 清空</span>
+            </div>
             <span id="sourceCount" class="tw-count">输入 0 / 5000</span>
-            <span class="tw-shortcuts"><kbd>Ctrl+Enter</kbd> 翻译 <kbd>Ctrl+D</kbd> 清空</span>
           </div>
         </div>
 
-        <!-- Result area -->
+        <!-- Result area (right) -->
         <div class="tw-uni-result">
           <div class="tw-uni-head">
             <span class="tw-uni-label">翻译结果</span>

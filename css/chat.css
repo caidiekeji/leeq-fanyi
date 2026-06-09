@@ -650,6 +650,9 @@ body {
   max-height: 240px;
   overflow-y: auto;
   padding-bottom: 4px;
+  /* 独立于输入框，宽度与输入框一致 */
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .ds-skill-list {
