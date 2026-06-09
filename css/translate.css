@@ -176,18 +176,9 @@
 .tw-primary-btn:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
 
 /* ================================================================
-   Panels — Liquid Glass Refraction
+   Unified Panel — Single container for source + result
    ================================================================ */
-.tw-panels {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-  min-height: 0;
-  flex: 1;
-  width: 100%;
-}
-
-.tw-panel {
+.tw-panel-unified {
   display: flex !important;
   flex-direction: column !important;
   border: 1px solid var(--color-border);
@@ -195,12 +186,13 @@
   background: var(--color-surface);
   overflow: hidden;
   transition: all var(--transition-base);
-  min-height: 420px;
+  min-height: 480px;
+  flex: 1;
+  width: 100%;
   position: relative;
 }
 
-/* Liquid Glass refraction: inner border + subtle shadow */
-.tw-panel::before {
+.tw-panel-unified::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -211,12 +203,21 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.tw-panel:hover {
+.tw-panel-unified:hover {
   box-shadow: var(--tw-glass-shadow);
   border-color: rgba(13, 148, 136, 0.15);
 }
 
-.tw-panel-head {
+/* ---- Source area ---- */
+.tw-uni-source {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.tw-uni-head {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -227,7 +228,7 @@
   z-index: 2;
 }
 
-.tw-panel-label {
+.tw-uni-label {
   font-size: 0.68rem;
   font-weight: 700;
   color: var(--color-text-muted);
@@ -235,7 +236,7 @@
   letter-spacing: 0.1em;
 }
 
-.tw-panel-badge {
+.tw-uni-badge {
   display: inline-flex;
   padding: 3px 10px;
   border-radius: 999px;
@@ -245,6 +246,73 @@
   color: var(--color-primary-dark);
   margin-left: auto;
   letter-spacing: 0.02em;
+}
+
+/* ---- Divider between source and result ---- */
+.tw-uni-divider {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  border-top: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
+  background: var(--color-bg-alt);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.tw-uni-divider-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tw-uni-divider .tw-shortcuts {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.tw-uni-divider .tw-shortcuts span {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ---- Result area ---- */
+.tw-uni-result {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 200px;
+  position: relative;
+  z-index: 2;
+}
+
+.tw-uni-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px;
+  min-height: 0;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.tw-uni-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-top: 1px solid var(--color-border-light);
+  flex-shrink: 0;
+  background: var(--color-bg-alt);
+  position: relative;
+  z-index: 2;
 }
 
 .tw-result-acts {
@@ -270,16 +338,6 @@
 .tw-icon-btn:hover { color: var(--color-primary); background: var(--color-primary-bg); }
 .tw-icon-btn:active { transform: scale(0.92); }
 .tw-icon-btn svg { width: 16px; height: 16px; }
-
-.tw-panel-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px 24px;
-  min-height: 0;
-  position: relative;
-  z-index: 2;
-}
 
 .tw-textarea {
   flex: 1;
@@ -354,6 +412,7 @@
   gap: 14px;
   z-index: 3;
   background: var(--color-surface);
+  border-radius: 0 0 var(--tw-radius-panel) var(--tw-radius-panel);
 }
 
 .tw-skel-line {
@@ -376,8 +435,8 @@
   100% { transform: translateX(100%); }
 }
 
-/* ---- Processing overlay — gradient pulse on result panel ---- */
-.tw-panel-result.processing::after {
+/* ---- Processing overlay — gradient pulse on result area ---- */
+.tw-uni-result.processing::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -391,18 +450,6 @@
 @keyframes tw-processPulse {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 0.8; }
-}
-
-.tw-panel-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 24px;
-  border-top: 1px solid var(--color-border-light);
-  flex-shrink: 0;
-  background: var(--color-bg-alt);
-  position: relative;
-  z-index: 2;
 }
 
 .tw-shortcuts {
@@ -443,12 +490,8 @@
 /* ================================================================
    Entry Animations
    ================================================================ */
-.tw-panel-source {
+.tw-panel-unified {
   animation: tw-panelSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
-  opacity: 0;
-}
-.tw-panel-result {
-  animation: tw-panelSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
   opacity: 0;
 }
 
@@ -467,11 +510,11 @@
   .tw-lang-group { justify-content: center; }
   .tw-action-group { justify-content: center; }
 
-  .tw-panels { grid-template-columns: 1fr; }
-  .tw-panel { min-height: 300px; }
-  .tw-textarea { min-height: 200px; }
+  .tw-panel-unified { min-height: 400px; }
+  .tw-textarea { min-height: 160px; }
+  .tw-uni-result { min-height: 160px; }
 
-  .tw-shortcuts { display: none; }
+  .tw-uni-divider .tw-shortcuts { display: none; }
 }
 
 /* ================================================================
@@ -485,10 +528,11 @@
   .tw-primary-btn { padding: 8px 18px; font-size: 0.8rem; }
   .tw-tool-btn { width: 34px; height: 34px; }
 
-  .tw-panel-head { padding: 12px 16px; }
-  .tw-panel-body { padding: 14px 16px; }
-  .tw-panel-foot { padding: 10px 16px; }
-  .tw-textarea { font-size: 0.9rem; min-height: 160px; }
+  .tw-uni-head { padding: 12px 16px; }
+  .tw-uni-body { padding: 14px 16px; }
+  .tw-uni-foot { padding: 10px 16px; }
+  .tw-uni-divider { padding: 6px 16px; }
+  .tw-textarea { font-size: 0.9rem; min-height: 140px; }
   .tw-result { font-size: 0.9rem; }
 }
 
@@ -507,8 +551,8 @@
    ================================================================ */
 @media (prefers-reduced-motion: reduce) {
   .tw-empty-icon svg,
-  .tw-panel-result.processing::after { animation: none; }
+  .tw-uni-result.processing::after { animation: none; }
 
-  .tw-panel-source, .tw-panel-result { opacity: 1; transform: none; animation: none; }
+  .tw-panel-unified { opacity: 1; transform: none; animation: none; }
   .tw-skel-line::after { animation: none; background: var(--color-bg-alt); }
 }

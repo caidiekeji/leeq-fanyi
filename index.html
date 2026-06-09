@@ -102,8 +102,8 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
           </button>
           <select id="targetLang" class="tw-lang-select" aria-label="目标语言">
-            <option value="en" selected>English</option>
-            <option value="zh">中文</option>
+            <option value="zh" selected>中文</option>
+            <option value="en">English</option>
             <option value="ja">日本語</option>
             <option value="ko">한국어</option>
           </select>
@@ -125,28 +125,34 @@
         <span class="tw-workspace-status-text">AI 翻译引擎就绪</span>
       </div>
 
-      <!-- Panels: asymmetric 2fr / 1fr -->
-      <div class="tw-panels">
-        <section class="tw-panel tw-panel-source">
-          <div class="tw-panel-head">
-            <span class="tw-panel-label">源文本</span>
-            <span class="tw-panel-badge" id="sourceBadge">自动检测</span>
-          </div>
-          <div class="tw-panel-body">
-            <textarea id="sourceText" class="tw-textarea" placeholder="输入要翻译的文本..." maxlength="10000" aria-label="源文本输入"></textarea>
-          </div>
-          <div class="tw-panel-foot">
-            <div class="tw-shortcuts">
-              <span><kbd>Ctrl+Enter</kbd> 翻译</span>
-              <span><kbd>Ctrl+D</kbd> 清空</span>
+      <!-- Unified Panel: source + result in one container -->
+      <div class="tw-panel-unified">
+        <!-- Source area -->
+        <div class="tw-uni-source">
+          <div class="tw-uni-head">
+            <span class="tw-uni-label">源文本</span>
+            <span class="tw-uni-badge" id="sourceBadge">自动检测</span>
+            <div class="tw-result-acts">
+              <button class="tw-icon-btn" id="clearBtn" title="清空" aria-label="清空" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
-            <span id="sourceCount" class="tw-count">输入 0 / 5000</span>
           </div>
-        </section>
+          <textarea id="sourceText" class="tw-textarea" placeholder="输入要翻译的文本..." maxlength="10000" aria-label="源文本输入"></textarea>
+        </div>
 
-        <section class="tw-panel tw-panel-result">
-          <div class="tw-panel-head">
-            <span class="tw-panel-label">翻译结果</span>
+        <!-- Divider with actions -->
+        <div class="tw-uni-divider">
+          <div class="tw-uni-divider-left">
+            <span id="sourceCount" class="tw-count">输入 0 / 5000</span>
+            <span class="tw-shortcuts"><kbd>Ctrl+Enter</kbd> 翻译 <kbd>Ctrl+D</kbd> 清空</span>
+          </div>
+        </div>
+
+        <!-- Result area -->
+        <div class="tw-uni-result">
+          <div class="tw-uni-head">
+            <span class="tw-uni-label">翻译结果</span>
             <div class="tw-result-acts">
               <button class="tw-icon-btn" id="copyBtn" title="复制" aria-label="复制" type="button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -154,12 +160,9 @@
               <button class="tw-icon-btn" id="exportBtn" title="导出" aria-label="导出" type="button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               </button>
-              <button class="tw-icon-btn" id="clearBtn" title="清空" aria-label="清空" type="button">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
             </div>
           </div>
-          <div class="tw-panel-body">
+          <div class="tw-uni-body">
             <div id="resultText" class="tw-result empty">
               <div class="tw-empty-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l4.5-12z"/></svg>
@@ -175,10 +178,10 @@
               <div class="tw-skel-line" style="width:45%"></div>
             </div>
           </div>
-          <div class="tw-panel-foot">
+          <div class="tw-uni-foot">
             <span id="resultCount" class="tw-count">输出 0</span>
           </div>
-        </section>
+        </div>
       </div>
 
   </main>
