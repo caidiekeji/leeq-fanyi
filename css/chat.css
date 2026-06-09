@@ -372,7 +372,7 @@ body {
   scroll-behavior: smooth;
   display: flex;
   flex-direction: column;
-  padding: 20px 28px;
+  padding: 16px 24px; /* 与底部输入框对齐 */
   background: #FFFFFF; /* 消息区白色背景 */
 }
 
@@ -1247,7 +1247,7 @@ body {
   }
 
   .chat-messages {
-    padding: 16px 16px;
+    padding: 12px 14px; /* 与底部输入框 768px 断点对齐 */
   }
 
   .chat-sidebar.open {
@@ -1333,7 +1333,7 @@ body {
 /* 480px 及以下 - 移动端 */
 @media (max-width: 480px) {
   .chat-messages {
-    padding: 12px 12px;
+    padding: 10px 12px; /* 与底部输入框 480px 断点对齐 */
   }
   .chat-welcome {
     padding: 16px 16px 32px;

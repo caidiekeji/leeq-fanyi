@@ -579,9 +579,7 @@ async function handleSend() {
 
   // 添加用户消息（先中断可能正在运行的打字机）
   stopTypewriter();
-  const displayContent = chatState.searchMode
-    ? `[${chatState.searchEngine}搜索] ${text}`
-    : userContent;
+  const displayContent = userContent;
 
   // 构建消息元数据（含文件信息，用于历史恢复时渲染文件卡片）
   const msgMeta = { role: 'user', content: displayContent };
@@ -598,6 +596,7 @@ async function handleSend() {
     els.messages.appendChild(fileCard);
   }
   renderMessage('user', displayContent);
+  scrollToBottom();
 
   // 清空输入框
   els.inputLarge.value = '';
