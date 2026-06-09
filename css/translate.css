@@ -42,7 +42,7 @@
 .tw-top-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 0.75rem;
   padding: 1rem 0;
@@ -98,12 +98,19 @@
 .tw-lang-select:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-bg); }
 .tw-lang-select option { background: var(--color-surface); color: var(--color-text); }
 
+/* Compact lang select for in-header usage */
+.tw-lang-select-sm {
+  padding: 6px 28px 6px 10px;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+}
+
 .tw-swap-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   border: 1px solid var(--color-border);
   border-radius: 50%;
   background: var(--color-surface);
@@ -111,6 +118,7 @@
   cursor: pointer;
   transition: all var(--transition-spring);
   box-shadow: var(--shadow-xs);
+  flex-shrink: 0;
 }
 .tw-swap-btn:hover {
   color: var(--color-primary);
@@ -119,7 +127,7 @@
   background: var(--color-primary-bg);
 }
 .tw-swap-btn:active { transform: rotate(180deg) scale(0.9); }
-.tw-swap-btn svg { width: 16px; height: 16px; }
+.tw-swap-btn svg { width: 14px; height: 14px; }
 
 .tw-action-group {
   display: flex;
@@ -475,7 +483,6 @@
   .translate-main { padding: 0 20px 40px; }
 
   .tw-top-bar { flex-direction: column; align-items: stretch; }
-  .tw-lang-group { justify-content: center; }
   .tw-action-group { justify-content: center; }
 
   .tw-panel-unified { flex-direction: column !important; min-height: 400px; }
@@ -510,8 +517,7 @@
 @media (max-width: 360px) {
   .translate-main { padding: 0 10px 16px; }
 
-  .tw-lang-group { flex-wrap: wrap; justify-content: center; }
-  .tw-lang-select { min-width: 80px; font-size: 0.75rem; }
+  .tw-lang-select-sm { min-width: 72px; font-size: 0.75rem; }
 }
 
 /* ================================================================
