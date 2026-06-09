@@ -94,6 +94,7 @@ function populateLangSelectors() {
   const srcSel = document.getElementById('sourceLang');
   const tgtSel = document.getElementById('targetLang');
   srcSel.innerHTML = '<option value="auto">自动检测</option>';
+  tgtSel.innerHTML = '';
   Object.entries(LANG_MAP).forEach(([code, { name }]) => {
     srcSel.innerHTML += `<option value="${code}">${name}</option>`;
     tgtSel.innerHTML += `<option value="${code}">${name}</option>`;
