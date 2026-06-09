@@ -242,6 +242,31 @@
 
   <div id="toast" class="toast"></div>
 
+  <!-- 本地技能创建弹窗 -->
+  <div class="skill-create-overlay" id="skillCreateOverlay">
+    <div class="skill-create-modal">
+      <div class="skill-create-header">
+        <h3 class="skill-create-title" id="skillCreateTitle">创建自定义技能</h3>
+        <button class="skill-create-close" id="skillCreateClose" title="关闭" aria-label="关闭">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="skill-create-body">
+        <label class="skill-create-label">技能名称 <span class="required">*</span></label>
+        <input class="skill-create-input" id="skillCreateName" type="text" placeholder="例如：翻译助手、代码审查、写作助手" maxlength="30">
+        <label class="skill-create-label">技能描述（可选）</label>
+        <input class="skill-create-input" id="skillCreateDesc" type="text" placeholder="简短描述该技能的功能" maxlength="100">
+        <label class="skill-create-label">系统提示词 <span class="required">*</span></label>
+        <textarea class="skill-create-textarea" id="skillCreatePrompt" placeholder="输入该技能的 System Prompt，将作为系统提示词发送给 AI 模型...&#10;&#10;示例：你是一位专业的翻译助手，请将用户的内容翻译成目标语言。" rows="6" maxlength="2000"></textarea>
+        <p class="skill-create-hint">提示词将在选择此技能后附加到对话中，影响 AI 的回复风格和行为。</p>
+      </div>
+      <div class="skill-create-footer">
+        <button class="skill-create-btn skill-create-btn-cancel" id="skillCreateCancel">取消</button>
+        <button class="skill-create-btn skill-create-btn-save" id="skillCreateSave">保存技能</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Markdown 渲染库 -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- 代码高亮 -->

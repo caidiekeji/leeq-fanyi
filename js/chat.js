@@ -16,7 +16,10 @@ const chatState = {
   uploadedFileContent: null, // 上传的文件内容
   uploadedFileName: null, // 上传的文件名
   uploadedFileSize: null, // 上传的文件大小（格式化后）
-  typewriterTimer: null   // 打字机定时器引用（用于中断）
+  typewriterTimer: null,  // 打字机定时器引用（用于中断）
+  currentConvId: null,    // 当前会话 ID
+  conversations: [],       // 所有会话列表
+  localSkills: []          // 用户自定义技能（localStorage）
 };
 
 // DOM 元素引用
@@ -54,7 +57,15 @@ const els = {
   uploadBtn2: document.getElementById('uploadBtn2'),
   uploadFilename2: document.getElementById('uploadFilename2'),
   // 移动端汉堡菜单
-  mobileMenuBtn: document.getElementById('mobileMenuBtn')
+  mobileMenuBtn: document.getElementById('mobileMenuBtn'),
+  // 技能创建弹窗
+  skillCreateOverlay: document.getElementById('skillCreateOverlay'),
+  skillCreateName: document.getElementById('skillCreateName'),
+  skillCreateDesc: document.getElementById('skillCreateDesc'),
+  skillCreatePrompt: document.getElementById('skillCreatePrompt'),
+  skillCreateSave: document.getElementById('skillCreateSave'),
+  skillCreateCancel: document.getElementById('skillCreateCancel'),
+  skillCreateClose: document.getElementById('skillCreateClose')
 };
 
 /**
@@ -62,7 +73,8 @@ const els = {
  */
 function initChat() {
   applyTheme(chatState.theme);
-  loadChatHistory();
+  loadConversations();
+  loadLocalSkills();
   loadSkills();
   loadSearchEngines();
   bindEvents();
@@ -94,22 +106,255 @@ function applyTheme(theme) {
 }
 
 /**
- * 加载聊天历史
+ * 加载所有会话（多会话系统）
  */
-function loadChatHistory() {
-  const saved = loadLocal('chatHistory', []);
-  if (saved && saved.length > 0) {
-    chatState.messages = saved;
-    renderAllMessages();
-    switchToMessageMode();
+function loadConversations() {
+  const saved = loadLocal('chatConversations', null);
+  if (saved && Array.isArray(saved) && saved.length > 0) {
+    chatState.conversations = saved;
+    // 恢复最近一次的会话（最后一个）
+    const lastConv = saved[saved.length - 1];
+    chatState.currentConvId = lastConv.id;
+    chatState.messages = lastConv.messages || [];
+    if (chatState.messages.length > 0) {
+      renderAllMessages();
+      switchToMessageMode();
+    }
+  } else {
+    chatState.conversations = [];
+    chatState.currentConvId = null;
   }
+  renderHistoryList();
 }
 
 /**
- * 保存聊天历史
+ * 保存所有会话到 localStorage
+ */
+function saveConversations() {
+  // 更新当前会话的消息
+  if (chatState.currentConvId) {
+    const idx = chatState.conversations.findIndex(c => c.id === chatState.currentConvId);
+    if (idx !== -1) {
+      chatState.conversations[idx].messages = [...chatState.messages];
+      chatState.conversations[idx].updatedAt = Date.now();
+    }
+  }
+  saveLocal('chatConversations', chatState.conversations);
+}
+
+/**
+ * 兼容旧接口：保存聊天历史
  */
 function saveChatHistory() {
-  saveLocal('chatHistory', chatState.messages);
+  saveConversations();
+}
+
+/**
+ * 渲染侧边栏历史记录列表
+ */
+function renderHistoryList() {
+  if (!els.historyList) return;
+
+  if (chatState.conversations.length === 0) {
+    els.historyList.innerHTML = '<div class="sidebar-empty-hint">暂无历史记录</div>';
+    return;
+  }
+
+  // 按更新时间倒序排列（最新的在前）
+  const sorted = [...chatState.conversations].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+  els.historyList.innerHTML = sorted.map(conv => {
+    const isActive = conv.id === chatState.currentConvId;
+    const timeLabel = formatTimeAgo(conv.updatedAt || conv.createdAt);
+    return `
+      <button class="history-item${isActive ? ' history-item-active' : ''}" data-conv-id="${conv.id}">
+        <span class="history-item-title">${escapeHtml(conv.title || '新对话')}</span>
+        <span class="history-item-time">${timeLabel}</span>
+        <button class="history-item-delete" data-conv-id="${conv.id}" title="删除此对话" aria-label="删除对话">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        </button>
+      </button>
+    `;
+  }).join('');
+
+  // 绑定点击事件：切换会话
+  els.historyList.querySelectorAll('.history-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      // 如果点击的是删除按钮，不触发切换
+      if (e.target.closest('.history-item-delete')) return;
+      const convId = item.dataset.convId;
+      switchConversation(convId);
+    });
+  });
+
+  // 绑定删除事件
+  els.historyList.querySelectorAll('.history-item-delete').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const convId = btn.dataset.convId;
+      deleteConversation(convId);
+    });
+  });
+}
+
+/**
+ * 切换到指定会话
+ */
+function switchConversation(convId) {
+  stopTypewriter();
+  const conv = chatState.conversations.find(c => c.id === convId);
+  if (!conv) return;
+
+  chatState.currentConvId = convId;
+  chatState.messages = conv.messages || [];
+  chatState.searchMode = false;
+  chatState.activeSkill = null;
+  chatState.uploadedFileContent = null;
+  chatState.uploadedFileName = null;
+  chatState.uploadedFileSize = null;
+
+  els.searchModeBtn.classList.remove('search-active');
+  if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
+  renderSkillPanel();
+
+  if (chatState.messages.length > 0) {
+    renderAllMessages();
+    switchToMessageMode();
+  } else {
+    switchToWelcomeMode();
+  }
+  updatePlaceholder();
+  renderHistoryList(); // 高亮当前项
+  if (window.innerWidth <= 768) closeMobileSidebar();
+}
+
+/**
+ * 删除指定会话
+ */
+function deleteConversation(convId) {
+  const idx = chatState.conversations.findIndex(c => c.id === convId);
+  if (idx === -1) return;
+
+  chatState.conversations.splice(idx, 1);
+
+  // 如果删除的是当前会话，切换到最近的或新建
+  if (chatState.currentConvId === convId) {
+    if (chatState.conversations.length > 0) {
+      const sorted = [...chatState.conversations].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+      switchConversation(sorted[0].id);
+    } else {
+      chatState.currentConvId = null;
+      chatState.messages = [];
+      switchToWelcomeMode();
+    }
+  }
+
+  saveConversations();
+  renderHistoryList();
+  showToast('对话已删除', 'info');
+}
+
+/**
+ * 从消息内容生成会话标题
+ */
+function generateTitle(content, role) {
+  if (role === 'user') {
+    return content.replace(/\[.*?搜索\]\s*/, '').slice(0, 30) || '新对话';
+  }
+  return content.slice(0, 30) || '新对话';
+}
+
+/**
+ * 格式化时间为相对时间
+ */
+function formatTimeAgo(timestamp) {
+  if (!timestamp) return '';
+  const diff = Date.now() - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (minutes < 1) return '刚刚';
+  if (minutes < 60) return minutes + '分钟前';
+  if (hours < 24) return hours + '小时前';
+  if (days < 30) return days + '天前';
+  return new Date(timestamp).toLocaleDateString('zh-CN');
+}
+
+/**
+ * 加载本地自定义技能（localStorage）
+ */
+function loadLocalSkills() {
+  chatState.localSkills = loadLocal('localSkills', []);
+}
+
+/**
+ * 保存本地自定义技能
+ */
+function saveLocalSkills() {
+  saveLocal('localSkills', chatState.localSkills);
+}
+
+/**
+ * 获取合并后的技能列表（后台技能 + 本地技能）
+ */
+function getMergedSkills() {
+  // 后台技能标记 source: 'remote'，本地技能标记 source: 'local'
+  const remote = chatState.skills.map(s => ({ ...s, _source: 'remote' }));
+  const local = chatState.localSkills.map(s => ({ ...s, _source: 'local' }));
+  return [...remote, ...local];
+}
+
+/**
+ * 打开技能创建弹窗
+ */
+function openSkillCreateModal() {
+  els.skillCreateName.value = '';
+  els.skillCreateDesc.value = '';
+  els.skillCreatePrompt.value = '';
+  els.skillCreateOverlay.classList.add('active');
+}
+
+/**
+ * 关闭技能创建弹窗
+ */
+function closeSkillCreateModal() {
+  els.skillCreateOverlay.classList.remove('active');
+}
+
+/**
+ * 保存本地技能
+ */
+function handleSaveLocalSkill() {
+  const name = els.skillCreateName.value.trim();
+  const description = els.skillCreateDesc.value.trim();
+  const prompt = els.skillCreatePrompt.value.trim();
+
+  if (!name) {
+    showToast('请输入技能名称', 'error');
+    els.skillCreateName.focus();
+    return;
+  }
+  if (!prompt) {
+    showToast('请输入系统提示词', 'error');
+    els.skillCreatePrompt.focus();
+    return;
+  }
+
+  // 检查重名
+  const exists = chatState.localSkills.find(s => s.name === name);
+  if (exists) {
+    showToast('已存在同名技能，请更换名称', 'error');
+    els.skillCreateName.focus();
+    return;
+  }
+
+  const newSkill = { id: 'local_' + Date.now(), name, description, prompt };
+  chatState.localSkills.push(newSkill);
+  saveLocalSkills();
+
+  closeSkillCreateModal();
+  renderSkillPanel(); // 刷新技能选择面板
+  showToast(`技能「${name}」已创建`, 'success');
 }
 
 /**
@@ -169,35 +414,51 @@ async function loadSearchEngines() {
  */
 function renderSkillPanel() {
   if (!els.skillPanelList) return;
-  if (chatState.skills.length === 0) {
-    els.skillPanelList.innerHTML = '<div class="ds-skill-empty">暂无可用技能，请在管理后台添加</div>';
+  if (chatState.skills.length === 0 && chatState.localSkills.length === 0) {
+    els.skillPanelList.innerHTML = '<div class="ds-skill-empty">暂无可用技能，点击左侧「创建技能」自定义</div>';
     return;
   }
-  els.skillPanelList.innerHTML = chatState.skills.map(skill => `
+  els.skillPanelList.innerHTML = getMergedSkills().map(skill => `
     <button class="skill-item${chatState.activeSkill?.name === skill.name ? ' selected' : ''}" data-skill-name="${skill.name}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span class="skill-item-name">${skill.name}</span>
-      ${skill.description ? `<span class="skill-item-desc">${skill.description}</span>` : ''}
+      <svg viewBox="0 0 24 24 fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="skill-item-name">${escapeHtml(skill.name)}</span>
+      ${skill.description ? `<span class="skill-item-desc">${escapeHtml(skill.description)}</span>` : ''}
+      ${skill._source === 'local' ? `<button class="skill-item-delete" data-skill-delete="${skill.name}" title="删除本地技能"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
     </button>
   `).join('');
 
   // 绑定技能点击事件
+  const allSkills = getMergedSkills();
   els.skillPanelList.querySelectorAll('.skill-item').forEach(item => {
-    item.addEventListener('click', () => {
+    item.addEventListener('click', (e) => {
+      if (e.target.closest('.skill-item-delete')) return;
       const skillName = item.dataset.skillName;
-      const skill = chatState.skills.find(s => s.name === skillName);
+      const skill = allSkills.find(s => s.name === skillName);
       if (skill) {
         if (chatState.activeSkill?.name === skill.name) {
-          // 取消选择
           chatState.activeSkill = null;
         } else {
-          // 选择技能
-          chatState.activeSkill = skill;
+          chatState.activeSkill = { name: skill.name, prompt: skill.prompt, description: skill.description };
         }
         renderSkillPanel();
         updatePlaceholder();
         showToast(chatState.activeSkill ? `已选择技能: ${skill.name}` : '已取消技能选择', 'info');
       }
+    });
+  });
+
+  // 绑定删除按钮（仅本地技能）
+  els.skillPanelList.querySelectorAll('.skill-item-delete').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const skillName = btn.dataset.skillDelete;
+      if (!confirm(`确定要删除本地技能「${skillName}」吗？`)) return;
+      chatState.localSkills = chatState.localSkills.filter(s => s.name !== skillName);
+      saveLocalSkills();
+      if (chatState.activeSkill?.name === skillName) chatState.activeSkill = null;
+      renderSkillPanel();
+      updatePlaceholder();
+      showToast(`技能「${skillName}」已删除`, 'info');
     });
   });
 }
@@ -259,30 +520,29 @@ function bindEvents() {
   }
 
   // --- 技能面板（欢迎区和底部区同步） ---
-  els.skillBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (els.skillPanel.style.getPropertyValue('display') === 'none' || els.skillPanel.style.display === 'none') {
-      els.skillPanel.style.setProperty('display', 'block');
+  function toggleSkillPanel() {
+    const isHidden = els.skillPanel.classList.contains('is-hidden');
+    if (isHidden) {
+      els.skillPanel.style.removeProperty('display');
       els.skillPanel.classList.remove('is-hidden');
     } else {
       els.skillPanel.style.setProperty('display', 'none');
       els.skillPanel.classList.add('is-hidden');
     }
+  }
+
+  els.skillBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleSkillPanel();
   });
   if (els.skillBtn2) {
     els.skillBtn2.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (els.skillPanel.style.getPropertyValue('display') === 'none' || els.skillPanel.style.display === 'none') {
-        els.skillPanel.style.setProperty('display', 'block');
-        els.skillPanel.classList.remove('is-hidden');
-      } else {
-        els.skillPanel.style.setProperty('display', 'none');
-        els.skillPanel.classList.add('is-hidden');
-      }
+      toggleSkillPanel();
     });
   }
   document.addEventListener('click', (e) => {
-    if (!els.skillPanel.contains(e.target) && e.target !== els.skillBtn && e.target !== els.skillBtn2) {
+    if (!els.skillPanel.classList.contains('is-hidden') && !els.skillPanel.contains(e.target) && e.target !== els.skillBtn && e.target !== els.skillBtn2) {
       els.skillPanel.style.setProperty('display', 'none');
       els.skillPanel.classList.add('is-hidden');
     }
@@ -298,7 +558,24 @@ function bindEvents() {
   els.newChatBtn.addEventListener('click', handleNewChat);
   els.clearBtn.addEventListener('click', handleClear);
   els.createSkillBtn.addEventListener('click', () => {
-    showToast('请在管理后台「技能管理」中添加技能', 'info');
+    openSkillCreateModal();
+  });
+
+  // 技能创建弹窗事件
+  els.skillCreateClose.addEventListener('click', closeSkillCreateModal);
+  els.skillCreateCancel.addEventListener('click', closeSkillCreateModal);
+  els.skillCreateSave.addEventListener('click', handleSaveLocalSkill);
+  // 点击遮罩关闭
+  if (els.skillCreateOverlay) {
+    els.skillCreateOverlay.addEventListener('click', (e) => {
+      if (e.target === els.skillCreateOverlay) closeSkillCreateModal();
+    });
+  }
+  // ESC 关闭
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && els.skillCreateOverlay.classList.contains('active')) {
+      closeSkillCreateModal();
+    }
   });
 
   // --- 主题切换 ---
@@ -368,7 +645,8 @@ function toggleSearchMode() {
     if (els.searchModeBtn2) els.searchModeBtn2.classList.add('search-active');
     // 不再显示下拉框，直接使用后台配置的默认引擎
     chatState.activeSkill = null;
-    els.skillPanel.style.display = 'none';
+    els.skillPanel.style.setProperty('display', 'none');
+    els.skillPanel.classList.add('is-hidden');
     renderSkillPanel();
   } else {
     els.searchModeBtn.classList.remove('search-active');
@@ -418,11 +696,25 @@ function closeMobileSidebar() {
 }
 
 /**
- * 新建对话
+ * 新建对话（保存当前会话，创建空白新会话）
  */
 function handleNewChat() {
-  // 中断正在运行的打字机效果
   stopTypewriter();
+  // 先保存当前会话（如果有消息）
+  if (chatState.currentConvId && chatState.messages.length > 0) {
+    saveConversations();
+  }
+  // 创建新会话
+  const newId = 'conv_' + Date.now();
+  const newConv = {
+    id: newId,
+    title: '新对话',
+    messages: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  };
+  chatState.conversations.push(newConv);
+  chatState.currentConvId = newId;
   chatState.messages = [];
   chatState.searchMode = false;
   chatState.activeSkill = null;
@@ -435,20 +727,22 @@ function handleNewChat() {
   els.uploadFilename.style.setProperty('display', 'none');
   els.uploadFilename.textContent = '';
   if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
-  saveChatHistory();
+  saveConversations();
   switchToWelcomeMode();
   updatePlaceholder();
+  renderHistoryList();
   showToast('已开始新对话', 'info');
   if (window.innerWidth <= 768) closeMobileSidebar();
 }
 
 /**
- * 清空历史
+ * 清空所有历史
  */
 function handleClear() {
-  if (chatState.messages.length === 0) return;
-  // 中断正在运行的打字机效果
+  if (chatState.conversations.length === 0 && chatState.messages.length === 0) return;
   stopTypewriter();
+  chatState.conversations = [];
+  chatState.currentConvId = null;
   chatState.messages = [];
   chatState.searchMode = false;
   chatState.activeSkill = null;
@@ -461,10 +755,11 @@ function handleClear() {
   els.uploadFilename.style.setProperty('display', 'none');
   els.uploadFilename.textContent = '';
   if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
-  saveChatHistory();
+  saveConversations();
   switchToWelcomeMode();
   updatePlaceholder();
-  showToast('对话已清空', 'info');
+  renderHistoryList();
+  showToast('所有历史已清空', 'info');
 }
 
 /**
@@ -559,6 +854,19 @@ async function handleSend() {
     switchToMessageMode();
   }
 
+  // 首次发送消息时，确保有当前会话
+  if (!chatState.currentConvId) {
+    const newId = 'conv_' + Date.now();
+    chatState.currentConvId = newId;
+    chatState.conversations.push({
+      id: newId,
+      title: generateTitle(text, 'user'),
+      messages: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    });
+  }
+
   // 构建用户消息内容
   let userContent = text;
 
@@ -589,6 +897,7 @@ async function handleSend() {
   }
   chatState.messages.push(msgMeta);
   saveChatHistory();
+  renderHistoryList(); // 更新侧边栏标题
 
   // 渲染用户消息（有文件时先渲染卡片）
   if (chatState.uploadedFileContent) {

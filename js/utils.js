@@ -131,6 +131,13 @@ function truncate(str, len = 60) {
   return str.length > len ? str.slice(0, len) + '...' : str;
 }
 
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // ====== IndexedDB 封装 ======
 const DB_NAME = 'leeq_translator';
 const DB_VERSION = 1;

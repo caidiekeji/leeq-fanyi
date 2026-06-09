@@ -278,6 +278,52 @@ body {
   white-space: nowrap;
 }
 
+.history-item-time {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.history-item-active {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.history-item-active .history-item-time {
+  color: var(--color-primary);
+  opacity: 0.8;
+}
+
+/* 历史记录删除按钮 */
+.history-item-delete {
+  display: none; /* 默认隐藏，hover 时显示 */
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: all var(--transition-fast);
+  opacity: 0;
+}
+
+.history-item:hover .history-item-delete {
+  display: flex;
+  opacity: 1;
+}
+
+.history-item-delete:hover {
+  background: rgba(239, 68, 68, 0.10);
+  color: #ef4444;
+}
+
 /* ----- 侧边栏底部：用户信息 ----- */
 .sidebar-footer {
   border-top: 1px solid var(--color-border);
@@ -648,6 +694,34 @@ body {
 .skill-item.selected {
   background: var(--color-primary-bg);
   color: var(--color-primary);
+}
+
+/* 技能项内删除按钮（仅本地技能显示） */
+.skill-item-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 0;
+  opacity: 0;
+  transition: all 0.15s ease;
+}
+
+.skill-item:hover .skill-item-delete {
+  opacity: 1;
+}
+
+.skill-item-delete:hover {
+  background: rgba(239, 68, 68, 0.10);
+  color: #ef4444;
 }
 
 .skill-item svg {
@@ -1187,10 +1261,10 @@ body {
   text-decoration: underline;
 }
 
-/* ====== 复制按钮（气泡外右侧）====== */
+/* ====== 复制按钮（气泡外左下角）====== */
 .copy-wrapper {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   margin-top: 8px;
   width: 100%;
 }
@@ -1229,6 +1303,217 @@ body {
   margin-top: 10px; padding: 8px 12px; border-radius: 6px;
   background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2);
   color: #b45309; font-size: 12px; line-height: 1.5;
+}
+
+/* ====== 本地技能创建弹窗 ====== */
+.skill-create-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.40);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  animation: overlayFadeIn 0.2s ease-out;
+}
+
+.skill-create-overlay.active {
+  display: flex;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.skill-create-modal {
+  width: 480px;
+  max-width: 92vw;
+  background: var(--color-surface);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.20), 0 8px 24px rgba(0, 0, 0, 0.10);
+  animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.skill-create-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.skill-create-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.skill-create-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.skill-create-close:hover {
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+}
+
+.skill-create-close svg { width: 16px; height: 16px; }
+
+.skill-create-body {
+  padding: 18px 22px;
+}
+
+.skill-create-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+  margin-top: 14px;
+}
+
+.skill-create-label:first-child {
+  margin-top: 0;
+}
+
+.skill-create-label .required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.skill-create-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  background: #FFFFFF;
+  color: var(--color-text);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.skill-create-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.skill-create-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.skill-create-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  background: #FFFFFF;
+  color: var(--color-text);
+  font-size: 13.5px;
+  line-height: 1.65;
+  font-family: var(--font-sans);
+  outline: none;
+  resize: vertical;
+  min-height: 120px;
+  max-height: 280px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.skill-create-textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.skill-create-textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.45;
+}
+
+.skill-create-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.skill-create-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px 18px;
+  border-top: 1px solid var(--color-border);
+}
+
+.skill-create-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 20px;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.skill-create-btn-cancel {
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.skill-create-btn-cancel:hover {
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+}
+
+.skill-create-btn-save {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border-color: var(--color-primary);
+  box-shadow: 0 1px 6px var(--color-primary-glow);
+}
+
+.skill-create-btn-save:hover {
+  background: var(--color-primary-dark);
+  box-shadow: 0 2px 12px var(--color-primary-glow);
+  transform: translateY(-1px);
+}
+
+/* 暗色模式适配 */
+[data-theme="dark"] .skill-create-modal {
+  background: var(--color-surface);
+}
+[data-theme="dark"] .skill-create-input,
+[data-theme="dark"] .skill-create-textarea {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #E5E7EB;
 }
 
 /* 移动端汉堡菜单按钮 - 桌面端隐藏 */
