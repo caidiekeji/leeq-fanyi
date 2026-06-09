@@ -16,7 +16,8 @@ const chatState = {
   uploadedFileContent: null, // 上传的文件内容
   uploadedFileName: null, // 上传的文件名
   uploadedFileSize: null, // 上传的文件大小（格式化后）
-  typewriterTimer: null,  // 打字机定时器引用（用于中断）
+  typewriterTimer: null,   // 打字机定时器引用（用于中断）
+  typewriterAborted: false, // 用户主动停止打字机的标志
   currentConvId: null,    // 当前会话 ID
   conversations: [],       // 所有会话列表
   localSkills: []          // 用户自定义技能（localStorage）
@@ -33,6 +34,9 @@ const els = {
   inputBottom: document.getElementById('chatInputBottomEl'),
   inputBottomArea: document.getElementById('chatInputBottom'),
   sendBtnSm: document.getElementById('sendBtnBottom'),
+  // 停止按钮
+  stopBtn: document.getElementById('stopBtn'),
+  stopBtnBottom: document.getElementById('stopBtnBottom'),
   clearBtn: document.getElementById('clearChatBtn'),
   newChatBtn: document.getElementById('newChatBtn'),
   createSkillBtn: document.getElementById('createSkillBtn'),
@@ -92,6 +96,13 @@ function initChat() {
       // 抑制默认的错误渲染（炸弹图标），改为抛出异常让我们自行处理
       suppressErrorRendering: true
     });
+  }
+
+  // 检查是否有待恢复的请求（页面离开时未完成的对话）
+  const pending = restorePendingState();
+  if (pending) {
+    // 延迟执行恢复，确保 DOM 和事件绑定完成
+    setTimeout(() => executeRestore(pending), 300);
   }
 }
 
@@ -356,7 +367,114 @@ function handleSaveLocalSkill() {
 
   closeSkillCreateModal();
   renderSkillPanel(); // 刷新技能选择面板
-  showToast(`技能「${name}」已创建`, 'success');
+  showToast(`技能「${name}」已创建`, 'success`);
+}
+
+// ====== 后台继续生成：待处理状态管理 ======
+
+const PENDING_KEY = 'chat:pending';
+
+/**
+ * 保存待处理状态（发送请求前调用）
+ */
+function savePendingState(rawText, displayContent, searchMode, searchEngine, activeSkill) {
+  try {
+    sessionStorage.setItem(PENDING_KEY, JSON.stringify({
+      rawText,
+      displayContent,
+      searchMode,
+      searchEngine,
+      activeSkill: activeSkill ? { name: activeSkill.name, prompt: activeSkill.prompt } : null,
+      timestamp: Date.now(),
+      convId: chatState.currentConvId
+    }));
+  } catch (e) {}
+}
+
+/**
+ * 清除待处理状态（请求完成后调用）
+ */
+function clearPendingState() {
+  try { sessionStorage.removeItem(PENDING_KEY); } catch (e) {}
+}
+
+/**
+ * 恢复待处理状态（页面加载时调用）
+ */
+function restorePendingState() {
+  try {
+    const data = sessionStorage.getItem(PENDING_KEY);
+    if (!data) return false;
+    const pending = JSON.parse(data);
+    // 超过 5 分钟的过期请求不恢复
+    if (Date.now() - pending.timestamp > 5 * 60 * 1000) {
+      clearPendingState();
+      return false;
+    }
+    return pending;
+  } catch (e) {
+    clearPendingState();
+    return false;
+  }
+}
+
+/**
+ * 执行恢复：重新发送上次未完成的请求
+ */
+async function executeRestore(pending) {
+  if (pending.convId && pending.convId !== chatState.currentConvId) {
+    clearPendingState();
+    return;
+  }
+
+  showToast('恢复上次的对话...', 'info');
+
+  // 恢复搜索模式和技能状态
+  if (pending.searchMode) {
+    chatState.searchMode = true;
+    chatState.searchEngine = pending.searchEngine || 'bing';
+    els.searchModeBtn.classList.add('search-active');
+    if (els.searchModeBtn2) els.searchModeBtn2.classList.add('search-active');
+  }
+  if (pending.activeSkill) {
+    chatState.activeSkill = pending.activeSkill;
+    renderSkillPanel();
+  }
+
+  // 渲染用户消息
+  els.inputLarge.value = '';
+  els.inputBottom.value = '';
+  renderMessage('user', pending.displayContent);
+  scrollToBottom();
+
+  // 发送请求
+  chatState.typewriterAborted = false;
+  chatState.isSending = true;
+  updateSendButtons();
+  showLoading(true);
+
+  try {
+    let reply;
+    if (pending.searchMode) {
+      const searchPayload = { query: pending.rawText, engine: pending.searchEngine };
+      if (pending.activeSkill?.prompt) searchPayload.skillPrompt = pending.activeSkill.prompt;
+      reply = await sendSearchRequest(searchPayload);
+      chatState.searchMode = false;
+      els.searchModeBtn.classList.remove('search-active');
+      if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
+      updatePlaceholder();
+    } else {
+      reply = await sendChatRequest(pending.displayContent);
+    }
+    await typewriterEffect(reply, 18);
+  } catch (err) {
+    showToast('恢复失败: ' + err.message, 'error');
+  } finally {
+    chatState.isSending = false;
+    showLoading(false);
+    updateSendButtons();
+    clearPendingState();
+  }
 }
 
 /**
@@ -423,9 +541,8 @@ function renderSkillPanel() {
   } else {
     html = allSkills.map(skill => `
       <button class="skill-item${chatState.activeSkill?.name === skill.name ? ' selected' : ''}" data-skill-name="${skill.name}">
-        <svg viewBox="0 0 24 24 fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         <span class="skill-item-name">${escapeHtml(skill.name)}</span>
-        ${skill.description ? `<span class="skill-item-desc">${escapeHtml(skill.description)}</span>` : ''}
         ${skill._source === 'local' ? `<button class="skill-item-delete" data-skill-delete="${skill.name}" title="删除本地技能"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
       </button>
     `).join('');
@@ -492,6 +609,15 @@ function bindEvents() {
   // --- 发送按钮 ---
   els.sendBtnLg.addEventListener('click', () => handleSend());
   els.sendBtnSm.addEventListener('click', () => handleSend());
+
+  // --- 停止按钮 ---
+  const handleStop = () => {
+    chatState.typewriterAborted = true;
+    stopTypewriter();
+    showToast('已停止回答', 'info');
+  };
+  if (els.stopBtn) els.stopBtn.addEventListener('click', handleStop);
+  if (els.stopBtnBottom) els.stopBtnBottom.addEventListener('click', handleStop);
 
   // --- 居中输入框 ---
   els.inputLarge.addEventListener('keydown', (e) => {
@@ -632,9 +758,22 @@ function getActiveInput() {
  */
 function updateSendButtons() {
   const text = getActiveInput().value.trim();
-  const disabled = !text || chatState.isSending;
-  els.sendBtnLg.disabled = disabled;
-  els.sendBtnSm.disabled = disabled;
+  if (chatState.isSending) {
+    // 回答中：隐藏发送按钮，显示停止按钮
+    els.sendBtnLg.style.display = 'none';
+    els.sendBtnSm.style.display = 'none';
+    els.stopBtn.style.removeProperty('display');
+    els.stopBtnBottom.style.removeProperty('display');
+  } else {
+    // 空闲中：显示发送按钮，隐藏停止按钮
+    const disabled = !text;
+    els.sendBtnLg.disabled = disabled;
+    els.sendBtnSm.disabled = disabled;
+    els.sendBtnLg.style.removeProperty('display');
+    els.sendBtnSm.style.removeProperty('display');
+    els.stopBtn.style.setProperty('display', 'none');
+    els.stopBtnBottom.style.setProperty('display', 'none');
+  }
 }
 
 /**
@@ -928,9 +1067,13 @@ async function handleSend() {
   updateSendButtons();
 
   // 发送请求
+  chatState.typewriterAborted = false;
   chatState.isSending = true;
   updateSendButtons();
   showLoading(true);
+
+  // 保存待处理状态（用于页面离开后恢复）
+  savePendingState(text, userContent, chatState.searchMode, chatState.searchEngine, chatState.activeSkill);
 
   try {
     let reply;
@@ -973,6 +1116,7 @@ async function handleSend() {
     chatState.isSending = false;
     showLoading(false);
     updateSendButtons();
+    clearPendingState(); // 请求完成，清除待处理状态
   }
 }
 
@@ -1099,6 +1243,16 @@ function typewriterEffect(replyData, speed = 18) {
 
   return new Promise((resolve) => {
     chatState.typewriterTimer = setInterval(() => {
+      // ====== 用户主动停止 ======
+      if (chatState.typewriterAborted) {
+        clearInterval(chatState.typewriterTimer);
+        chatState.typewriterTimer = null;
+        chatState.typewriterAborted = false;
+        finishRender(fullText.substring(0, charIndex), true);
+        resolve();
+        return;
+      }
+
       if (charIndex < fullText.length) {
         charIndex++;
 
@@ -1121,79 +1275,90 @@ function typewriterEffect(replyData, speed = 18) {
         // ====== 打字完成：最终渲染 ======
         clearInterval(chatState.typewriterTimer);
         chatState.typewriterTimer = null;
-        bubbleEl.classList.remove('chat-bubble-typing');
-
-        // 最终完整 Markdown 渲染
-        let htmlContent = '';
-        if (typeof window.marked !== 'undefined') {
-          try {
-            htmlContent = window.marked.parse(fullText);
-          } catch (e) {
-            htmlContent = escapeHtml(fullText).replace(/\n/g, '<br>');
-          }
-        } else {
-          htmlContent = escapeHtml(fullText).replace(/\n/g, '<br>');
-        }
-        bubbleEl.innerHTML = htmlContent;
-
-        // 渲染代码高亮（如果有 highlight.js）
-        if (typeof hljs !== 'undefined') {
-          bubbleEl.querySelectorAll('pre code').forEach(block => {
-            hljs.highlightElement(block);
-          });
-        }
-
-        // 渲染 Mermaid 图表（使用 Promise 链，避免 setInterval 回调中的 await）
-        if (typeof mermaid !== 'undefined') {
-          const mermaidBlocks = bubbleEl.querySelectorAll('.language-mermaid');
-          const renderPromises = [];
-          mermaidBlocks.forEach((el) => {
-            const code = el.textContent.trim();
-            const p = mermaid.parse(code).then(() => {
-              el.outerHTML = `<div class="mermaid">${code}</div>`;
-            }).catch((parseErr) => {
-              console.group('Mermaid 渲染失败');
-              console.warn('错误信息:', parseErr.message);
-              console.warn('原始代码:\n', code);
-              console.groupEnd();
-              el.outerHTML = `<pre><code class="language-mermaid">${escapeHtml(code)}</code></pre>`;
-            });
-            renderPromises.push(p);
-          });
-          // 所有验证完成后统一渲染
-          Promise.all(renderPromises).then(() => {
-            if (bubbleEl.querySelector('.mermaid')) {
-              mermaid.init(undefined, bubbleEl).catch((e) => {
-                console.warn('Mermaid init 异常:', e.message);
-              });
-            }
-          });
-        }
-
-        // ====== 添加引用源区域（logo + 跳转链接）======
-        if (sources.length > 0 && pipeline === 'real-search') {
-          const sourceFooter = buildSourceFooter(sources, sourceCount, engineName);
-          bubbleEl.appendChild(sourceFooter);
-        }
-
-        // 降级模式提示
-        if (pipeline === 'ai-fallback') {
-          const warnEl = document.createElement('div');
-          warnEl.className = 'ai-fallback-hint';
-          warnEl.textContent = '无法连接到真实搜索引擎，以上答案由 AI 基于知识库生成';
-          bubbleEl.appendChild(warnEl);
-        }
-
-        // ====== 添加复制按钮（气泡外）======
-        const copyBtn = buildCopyButton(fullText);
-        msgEl.appendChild(copyBtn);
-
-        // 保存到历史记录
-        chatState.messages.push({ role: 'assistant', content: fullText });
-        saveChatHistory();
+        finishRender(fullText, false);
         resolve();
       }
     }, speed);
+
+    /**
+     * 完成渲染（正常完成或用户中断共用）
+     * @param {string} renderText - 要渲染的文本（完整或部分）
+     * @param {boolean} isAborted - 是否被用户中断
+     */
+    function finishRender(renderText, isAborted) {
+      bubbleEl.classList.remove('chat-bubble-typing');
+
+      // Markdown 渲染
+      let htmlContent = '';
+      if (typeof window.marked !== 'undefined') {
+        try {
+          htmlContent = window.marked.parse(renderText);
+        } catch (e) {
+          htmlContent = escapeHtml(renderText).replace(/\n/g, '<br>');
+        }
+      } else {
+        htmlContent = escapeHtml(renderText).replace(/\n/g, '<br>');
+      }
+      bubbleEl.innerHTML = htmlContent;
+
+      // 代码高亮
+      if (typeof hljs !== 'undefined') {
+        bubbleEl.querySelectorAll('pre code').forEach(block => {
+          hljs.highlightElement(block);
+        });
+      }
+
+      // Mermaid 图表
+      if (typeof mermaid !== 'undefined') {
+        const mermaidBlocks = bubbleEl.querySelectorAll('.language-mermaid');
+        const renderPromises = [];
+        mermaidBlocks.forEach((el) => {
+          const code = el.textContent.trim();
+          const p = mermaid.parse(code).then(() => {
+            el.outerHTML = `<div class="mermaid">${code}</div>`;
+          }).catch(() => {
+            el.outerHTML = `<pre><code class="language-mermaid">${escapeHtml(code)}</code></pre>`;
+          });
+          renderPromises.push(p);
+        });
+        Promise.all(renderPromises).then(() => {
+          if (bubbleEl.querySelector('.mermaid')) {
+            mermaid.init(undefined, bubbleEl).catch(() => {});
+          }
+        });
+      }
+
+      // 引用源区域
+      if (sources.length > 0 && pipeline === 'real-search') {
+        const sourceFooter = buildSourceFooter(sources, sourceCount, engineName);
+        bubbleEl.appendChild(sourceFooter);
+      }
+
+      // 降级模式提示
+      if (pipeline === 'ai-fallback') {
+        const warnEl = document.createElement('div');
+        warnEl.className = 'ai-fallback-hint';
+        warnEl.textContent = '无法连接到真实搜索引擎，以上答案由 AI 基于知识库生成';
+        bubbleEl.appendChild(warnEl);
+      }
+
+      // 中断提示
+      if (isAborted && renderText.length < fullText.length) {
+        const abortHint = document.createElement('div');
+        abortHint.className = 'ai-fallback-hint';
+        abortHint.style.cssText = 'background:rgba(59,130,246,0.06);border-color:rgba(59,130,246,0.2);color:#2563eb;';
+        abortHint.textContent = '回答已停止（显示部分内容）';
+        bubbleEl.appendChild(abortHint);
+      }
+
+      // 复制按钮
+      const copyBtn = buildCopyButton(renderText);
+      msgEl.appendChild(copyBtn);
+
+      // 保存到历史记录
+      chatState.messages.push({ role: 'assistant', content: renderText });
+      saveChatHistory();
+    }
   });
 }
 

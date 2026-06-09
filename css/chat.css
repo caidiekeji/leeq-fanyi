@@ -645,6 +645,37 @@ body {
   height: 17px;
 }
 
+/* 停止按钮：与发送按钮同位置、同尺寸 */
+.ds-stop-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: #EF4444;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.ds-stop-btn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 2px 12px rgba(239, 68, 68, 0.35);
+  background: #DC2626;
+}
+
+.ds-stop-btn:active {
+  transform: scale(0.95);
+}
+
+.ds-stop-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
 /* ========== 技能选择面板（DeepSeek 风格）========== */
 .ds-skill-panel {
   max-height: 240px;
