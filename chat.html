@@ -151,6 +151,12 @@
           <div class="welcome-content">
             <!-- DeepSeek 风格输入框 -->
             <div class="ds-input-box">
+              <!-- 技能选择面板（在输入框内、textarea 上方） -->
+              <div class="ds-skill-panel is-hidden" id="skillPanel">
+                <div class="ds-skill-list" id="skillPanelList">
+                  <div class="ds-skill-empty">暂无可用技能，点击左侧「创建技能」自定义</div>
+                </div>
+              </div>
               <textarea id="chatInput" class="ds-textarea" placeholder="输入你的问题..." rows="4" maxlength="5000"></textarea>
               <div class="ds-toolbar">
                 <div class="ds-toolbar-left">
@@ -186,13 +192,6 @@
           </div>
         </div>
 
-        <!-- 技能选择面板（独立于输入框，两个输入区共用） -->
-        <div class="ds-skill-panel is-hidden" id="skillPanel">
-          <div class="ds-skill-list" id="skillPanelList">
-            <div class="ds-skill-empty">暂无可用技能，点击左侧「创建技能」自定义</div>
-          </div>
-        </div>
-
         <!-- 加载指示器 -->
       <div class="chat-loading is-hidden" id="chatLoading">
           <div class="chat-loading-dots">
@@ -206,6 +205,12 @@
       <div class="chat-input-bottom is-hidden" id="chatInputBottom">
         <div class="ds-bottom-wrapper">
           <div class="ds-input-box">
+            <!-- 技能选择面板（底部输入框内、textarea 上方） -->
+            <div class="ds-skill-panel is-hidden" id="skillPanel2">
+              <div class="ds-skill-list" id="skillPanelList2">
+                <div class="ds-skill-empty">暂无可用技能，点击左侧「创建技能」自定义</div>
+              </div>
+            </div>
             <textarea id="chatInputBottomEl" class="ds-textarea" placeholder="输入你的问题... (Enter 发送)" rows="1" maxlength="5000"></textarea>
             <div class="ds-toolbar">
               <div class="ds-toolbar-left">

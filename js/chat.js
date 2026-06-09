@@ -54,6 +54,8 @@ const els = {
   searchModeBtn2: document.getElementById('searchModeBtn2'),
   searchEngineSelect2: document.getElementById('searchEngineSelect2'),
   skillBtn2: document.getElementById('skillBtn2'),
+  skillPanel2: document.getElementById('skillPanel2'),
+  skillPanelList2: document.getElementById('skillPanelList2'),
   uploadBtn2: document.getElementById('uploadBtn2'),
   uploadFilename2: document.getElementById('uploadFilename2'),
   // 移动端汉堡菜单
@@ -414,53 +416,60 @@ async function loadSearchEngines() {
  */
 function renderSkillPanel() {
   if (!els.skillPanelList) return;
-  if (chatState.skills.length === 0 && chatState.localSkills.length === 0) {
-    els.skillPanelList.innerHTML = '<div class="ds-skill-empty">暂无可用技能，点击左侧「创建技能」自定义</div>';
-    return;
-  }
-  els.skillPanelList.innerHTML = getMergedSkills().map(skill => `
-    <button class="skill-item${chatState.activeSkill?.name === skill.name ? ' selected' : ''}" data-skill-name="${skill.name}">
-      <svg viewBox="0 0 24 24 fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span class="skill-item-name">${escapeHtml(skill.name)}</span>
-      ${skill.description ? `<span class="skill-item-desc">${escapeHtml(skill.description)}</span>` : ''}
-      ${skill._source === 'local' ? `<button class="skill-item-delete" data-skill-delete="${skill.name}" title="删除本地技能"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
-    </button>
-  `).join('');
-
-  // 绑定技能点击事件
   const allSkills = getMergedSkills();
-  els.skillPanelList.querySelectorAll('.skill-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-      if (e.target.closest('.skill-item-delete')) return;
-      const skillName = item.dataset.skillName;
-      const skill = allSkills.find(s => s.name === skillName);
-      if (skill) {
-        if (chatState.activeSkill?.name === skill.name) {
-          chatState.activeSkill = null;
-        } else {
-          chatState.activeSkill = { name: skill.name, prompt: skill.prompt, description: skill.description };
+  let html = '';
+  if (allSkills.length === 0) {
+    html = '<div class="ds-skill-empty">暂无可用技能，点击左侧「创建技能」自定义</div>';
+  } else {
+    html = allSkills.map(skill => `
+      <button class="skill-item${chatState.activeSkill?.name === skill.name ? ' selected' : ''}" data-skill-name="${skill.name}">
+        <svg viewBox="0 0 24 24 fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span class="skill-item-name">${escapeHtml(skill.name)}</span>
+        ${skill.description ? `<span class="skill-item-desc">${escapeHtml(skill.description)}</span>` : ''}
+        ${skill._source === 'local' ? `<button class="skill-item-delete" data-skill-delete="${skill.name}" title="删除本地技能"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
+      </button>
+    `).join('');
+  }
+  // 同步渲染到两个面板
+  els.skillPanelList.innerHTML = html;
+  if (els.skillPanelList2) els.skillPanelList2.innerHTML = html;
+
+  // 绑定技能点击事件（两个面板都要绑）
+  const bindEvents = (listEl) => {
+    listEl.querySelectorAll('.skill-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.skill-item-delete')) return;
+        const skillName = item.dataset.skillName;
+        const skill = allSkills.find(s => s.name === skillName);
+        if (skill) {
+          if (chatState.activeSkill?.name === skill.name) {
+            chatState.activeSkill = null;
+          } else {
+            chatState.activeSkill = { name: skill.name, prompt: skill.prompt, description: skill.description };
+          }
+          renderSkillPanel();
+          updatePlaceholder();
+          showToast(chatState.activeSkill ? `已选择技能: ${skill.name}` : '已取消技能选择', 'info');
         }
+      });
+    });
+    // 绑定删除按钮（仅本地技能）
+    listEl.querySelectorAll('.skill-item-delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const skillName = btn.dataset.skillDelete;
+        if (!confirm(`确定要删除本地技能「${skillName}」吗？`)) return;
+        chatState.localSkills = chatState.localSkills.filter(s => s.name !== skillName);
+        saveLocalSkills();
+        if (chatState.activeSkill?.name === skillName) chatState.activeSkill = null;
         renderSkillPanel();
         updatePlaceholder();
-        showToast(chatState.activeSkill ? `已选择技能: ${skill.name}` : '已取消技能选择', 'info');
-      }
+        showToast(`技能「${skillName}」已删除`, 'info');
+      });
     });
-  });
-
-  // 绑定删除按钮（仅本地技能）
-  els.skillPanelList.querySelectorAll('.skill-item-delete').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const skillName = btn.dataset.skillDelete;
-      if (!confirm(`确定要删除本地技能「${skillName}」吗？`)) return;
-      chatState.localSkills = chatState.localSkills.filter(s => s.name !== skillName);
-      saveLocalSkills();
-      if (chatState.activeSkill?.name === skillName) chatState.activeSkill = null;
-      renderSkillPanel();
-      updatePlaceholder();
-      showToast(`技能「${skillName}」已删除`, 'info');
-    });
-  });
+  };
+  bindEvents(els.skillPanelList);
+  if (els.skillPanelList2) bindEvents(els.skillPanelList2);
 }
 
 /**
@@ -525,9 +534,11 @@ function bindEvents() {
     if (isHidden) {
       els.skillPanel.style.removeProperty('display');
       els.skillPanel.classList.remove('is-hidden');
+      if (els.skillPanel2) { els.skillPanel2.style.removeProperty('display'); els.skillPanel2.classList.remove('is-hidden'); }
     } else {
       els.skillPanel.style.setProperty('display', 'none');
       els.skillPanel.classList.add('is-hidden');
+      if (els.skillPanel2) { els.skillPanel2.style.setProperty('display', 'none'); els.skillPanel2.classList.add('is-hidden'); }
     }
   }
 
@@ -542,9 +553,10 @@ function bindEvents() {
     });
   }
   document.addEventListener('click', (e) => {
-    if (!els.skillPanel.classList.contains('is-hidden') && !els.skillPanel.contains(e.target) && e.target !== els.skillBtn && e.target !== els.skillBtn2) {
+    if (!els.skillPanel.classList.contains('is-hidden') && !els.skillPanel.contains(e.target) && !els.skillPanel2?.contains(e.target) && e.target !== els.skillBtn && e.target !== els.skillBtn2) {
       els.skillPanel.style.setProperty('display', 'none');
       els.skillPanel.classList.add('is-hidden');
+      if (els.skillPanel2) { els.skillPanel2.style.setProperty('display', 'none'); els.skillPanel2.classList.add('is-hidden'); }
     }
   });
 
@@ -647,6 +659,7 @@ function toggleSearchMode() {
     chatState.activeSkill = null;
     els.skillPanel.style.setProperty('display', 'none');
     els.skillPanel.classList.add('is-hidden');
+    if (els.skillPanel2) { els.skillPanel2.style.setProperty('display', 'none'); els.skillPanel2.classList.add('is-hidden'); }
     renderSkillPanel();
   } else {
     els.searchModeBtn.classList.remove('search-active');
