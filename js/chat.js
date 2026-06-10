@@ -611,9 +611,13 @@ function bindEvents() {
   els.sendBtnSm.addEventListener('click', () => handleSend());
 
   // --- 停止按钮 ---
+  // NOTE: 不能在这里调用 stopTypewriter()，因为 stopTypewriter() 会直接 clearInterval，
+  // 导致 typewriterEffect 的 Promise 永不 resolve，进而使 handleSend 的 finally 块
+  // 无法执行，chatState.isSending 永远为 true，整个聊天功能永久卡死。
+  // 正确做法：只设置 typewriterAborted 标志，让 typewriterEffect 内部的 interval
+  // 回调检测到该标志后自行完成清理（finishRender + resolve）。
   const handleStop = () => {
     chatState.typewriterAborted = true;
-    stopTypewriter();
     showToast('已停止回答', 'info');
   };
   if (els.stopBtn) els.stopBtn.addEventListener('click', handleStop);
@@ -1022,15 +1026,10 @@ async function handleSend() {
   // 构建用户消息内容
   let userContent = text;
 
-  // 如果有上传文件，先渲染文件卡片到消息区（独立于气泡）
+  // 如果有上传文件，保存文件信息到消息元数据（用于历史恢复），并清除文件名显示
   if (chatState.uploadedFileContent) {
-    const fileCard = buildFileCard(chatState.uploadedFileName, chatState.uploadedFileSize || '');
-    els.messages.appendChild(fileCard);
-
-    // 用户消息只显示问题文本，不含文件内容（文件已通过卡片展示）
     userContent = text;
-
-    // 清除文件名显示（保留内容供API调用）
+    // 清除文件名显示元素（保留内容供 API 调用）
     els.uploadFilename.classList.add('is-hidden');
     els.uploadFilename.style.setProperty('display', 'none');
     els.uploadFilename.textContent = '';
@@ -1051,7 +1050,7 @@ async function handleSend() {
   saveChatHistory();
   renderHistoryList(); // 更新侧边栏标题
 
-  // 渲染用户消息（有文件时先渲染卡片）
+  // 渲染文件卡片（仅一次）
   if (chatState.uploadedFileContent) {
     const fileCard = buildFileCard(chatState.uploadedFileName, chatState.uploadedFileSize || '');
     els.messages.appendChild(fileCard);
@@ -1075,6 +1074,11 @@ async function handleSend() {
   // 保存待处理状态（用于页面离开后恢复）
   savePendingState(text, userContent, chatState.searchMode, chatState.searchEngine, chatState.activeSkill);
 
+  // 保存文件上下文（用于发送后清除）
+  const fileContext = chatState.uploadedFileContent
+    ? `【参考文件: ${chatState.uploadedFileName}】\n${chatState.uploadedFileContent}`
+    : '';
+
   try {
     let reply;
     if (chatState.searchMode) {
@@ -1083,17 +1087,8 @@ async function handleSend() {
         query: text,
         engine: chatState.searchEngine
       };
-      // 如果有上传文件，附加文件内容供 LLM 提纯时参考
-      if (chatState.uploadedFileContent) {
-        searchPayload.fileContext = `【参考文件: ${chatState.uploadedFileName}】\n${chatState.uploadedFileContent}`;
-        // 清空上传状态（与普通聊天一致）
-        chatState.uploadedFileContent = null;
-  chatState.uploadedFileName = null;
-  chatState.uploadedFileSize = null;
-  els.uploadFilename.classList.add('is-hidden');
-  els.uploadFilename.style.setProperty('display', 'none');
-  els.uploadFilename.textContent = '';
-  if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
+      if (fileContext) {
+        searchPayload.fileContext = fileContext;
       }
       // 如果有激活的技能，传递技能提示词（搜索模式下也生效）
       if (chatState.activeSkill?.prompt) {
@@ -1106,8 +1101,20 @@ async function handleSend() {
       if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
       updatePlaceholder();
     } else {
-      reply = await sendChatRequest(userContent);
+      reply = await sendChatRequest(userContent, fileContext);
     }
+
+    // 清除上传文件状态（搜索模式和聊天模式共用）
+    if (chatState.uploadedFileContent) {
+      chatState.uploadedFileContent = null;
+      chatState.uploadedFileName = null;
+      chatState.uploadedFileSize = null;
+      els.uploadFilename.classList.add('is-hidden');
+      els.uploadFilename.style.setProperty('display', 'none');
+      els.uploadFilename.textContent = '';
+      if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
+    }
+
     // 使用打字机效果显示 AI 回复（逐字显示）
     await typewriterEffect(reply, 18);
   } catch (err) {
@@ -1123,7 +1130,7 @@ async function handleSend() {
 /**
  * 发送聊天请求
  */
-async function sendChatRequest(userContent) {
+async function sendChatRequest(userContent, fileContext = '') {
   const requestMessages = [];
 
   // 如果有激活的技能，添加技能提示词
@@ -1134,7 +1141,18 @@ async function sendChatRequest(userContent) {
     });
   }
 
-  requestMessages.push(...chatState.messages.map(({ role, content }) => ({ role, content })));
+  // 构建消息列表（含用户上传文件内容作为上下文）
+  const msgs = chatState.messages.map(({ role, content }) => ({ role, content }));
+
+  // 如果有上传文件，将文件内容附加到最后一条用户消息中
+  if (fileContext && msgs.length > 0) {
+    const lastUserIdx = msgs.map((m, i) => ({ m, i })).filter(x => x.m.role === 'user').pop();
+    if (lastUserIdx) {
+      msgs[lastUserIdx.i].content += '\n\n【用户上传的文件内容】\n' + fileContext;
+    }
+  }
+
+  requestMessages.push(...msgs);
 
   const data = await api('/api/chat', {
     method: 'POST',

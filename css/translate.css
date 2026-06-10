@@ -323,7 +323,7 @@
 .tw-textarea {
   flex: 1;
   width: 100%;
-  padding: 4px 0;
+  padding: 16px 20px;
   background: transparent;
   border: none;
   outline: none !important;
@@ -333,6 +333,7 @@
   font-family: var(--font-sans);
   resize: none;
   min-height: 320px;
+  box-sizing: border-box;
 }
 .tw-textarea:focus { outline: none !important; }
 .tw-textarea::placeholder { color: var(--color-text-muted); }
