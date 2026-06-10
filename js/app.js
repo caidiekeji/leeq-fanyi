@@ -20,15 +20,6 @@ async function initApp() {
   bindShortcuts();
   bindDragDrop();
   updateTranslateBtn();
-  bindNavbarScroll();
-}
-
-function bindNavbarScroll() {
-  const navbar = document.querySelector('.navbar');
-  if (!navbar) return;
-  window.addEventListener('scroll', function () {
-    navbar.classList.toggle('scrolled', window.scrollY > 0);
-  }, { passive: true });
 }
 
 function loadSharedContent() {
@@ -197,7 +188,8 @@ function updateCharCount(panel) {
   const text = document.getElementById(panel === 'source' ? 'sourceText' : 'resultText');
   const count = document.getElementById(panel === 'source' ? 'sourceCount' : 'resultCount');
   const len = (text.value || text.textContent || '').length;
-  count.textContent = `输入 ${len} / ${state.maxCharLimit}`;
+  const label = panel === 'source' ? '输入' : '输出';
+  count.textContent = `${label} ${len} / ${state.maxCharLimit}`;
   count.classList.toggle('over', len > state.maxCharLimit);
 }
 
@@ -239,6 +231,7 @@ async function handleTranslate(forceRefresh = false) {
     }
     const latency = Date.now() - startTime;
     setState('success');
+    saveHistory(text, result.translatedText, state.sourceLang, state.targetLang);
     if (result.fromCache) {
       document.getElementById('resultCount').textContent += ' · 缓存';
     }
@@ -277,8 +270,13 @@ function handleSwap() {
   const tmpSrcLang = srcLang.value === 'auto' ? state.targetLang : srcLang.value;
 
   srcText.value = '';
-  resText.classList.add('empty');
-  resText.innerHTML = EMPTY_RESULT;
+  if (tmpText) {
+    resText.classList.remove('empty');
+    resText.textContent = tmpText;
+  } else {
+    resText.classList.add('empty');
+    resText.innerHTML = EMPTY_RESULT;
+  }
   srcLang.value = state.targetLang;
   tgtLang.value = tmpSrcLang;
   state.sourceLang = state.targetLang;
@@ -289,11 +287,14 @@ function handleSwap() {
     if (state.realtimeMode) debouncedTranslate();
   }
   updateCharCount('source');
+  updateCharCount('result');
   updateTranslateBtn();
 }
 
 async function handleCopy() {
-  const text = document.getElementById('resultText').textContent;
+  const resultEl = document.getElementById('resultText');
+  if (resultEl.classList.contains('empty')) return;
+  const text = resultEl.textContent;
   if (!text) return;
   try {
     await navigator.clipboard.writeText(text);
@@ -310,6 +311,7 @@ function handleClear() {
   resText.innerHTML = EMPTY_RESULT;
   document.getElementById('sourceLang').querySelector('option[value="auto"]').textContent = '自动检测';
   updateCharCount('source');
+  document.getElementById('resultCount').textContent = '输出 0';
   updateTranslateBtn();
 }
 
@@ -329,6 +331,7 @@ function toggleRealtimeMode() {
     const text = document.getElementById('sourceText').value.trim();
     if (text) debouncedTranslate();
   } else {
+    debouncedTranslate.cancel();
     showToast('实时翻译已关闭', 'info');
   }
 }

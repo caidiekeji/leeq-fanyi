@@ -96,6 +96,7 @@ async function api(path, options = {}) {
 
 function showToast(message, type = 'info') {
   const toast = document.getElementById('toast');
+  if (!toast) return;
   toast.textContent = message;
   toast.className = `toast ${type} show`;
   setTimeout(() => { toast.className = 'toast'; }, 2500);
@@ -114,10 +115,12 @@ function loadLocal(key, fallback) {
 
 function debounce(fn, delay = 500) {
   let timer;
-  return function(...args) {
+  const debounced = function(...args) {
     clearTimeout(timer);
     timer = setTimeout(() => fn.apply(this, args), delay);
   };
+  debounced.cancel = () => clearTimeout(timer);
+  return debounced;
 }
 
 function formatDate(ts) {

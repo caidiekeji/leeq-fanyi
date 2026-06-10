@@ -125,7 +125,7 @@
               </button>
             </div>
           </div>
-          <textarea id="sourceText" class="tw-textarea" placeholder="输入要翻译的文本..." maxlength="10000" aria-label="源文本输入"></textarea>
+          <textarea id="sourceText" class="tw-textarea" placeholder="输入要翻译的文本..." maxlength="5000" aria-label="源文本输入"></textarea>
           <div class="tw-uni-foot">
             <div class="tw-shortcuts">
               <span><kbd>Ctrl+Enter</kbd> 翻译</span>
@@ -163,19 +163,13 @@
               <p class="tw-empty-text">输入文本并点击「翻译」</p>
               <p class="tw-empty-hint">支持 20+ 语言互译，自动检测源语言</p>
             </div>
-            <!-- Skeleton loader (shown during translation) -->
-            <div id="resultSkeleton" class="tw-skeleton is-hidden">
-              <div class="tw-skel-line" style="width:92%"></div>
-              <div class="tw-skel-line" style="width:78%"></div>
-              <div class="tw-skel-line" style="width:85%"></div>
-              <div class="tw-skel-line" style="width:45%"></div>
-            </div>
           </div>
           <div class="tw-uni-foot">
             <span id="resultCount" class="tw-count">输出 0</span>
           </div>
         </div>
       </div>
+    </div>
 
   </main>
 
@@ -204,20 +198,6 @@
           }
         });
       }
-    })();
-
-    // Swap language button
-    (function(){
-      var swapBtn=document.getElementById('swapLangBtn');
-      if(!swapBtn) return;
-      swapBtn.addEventListener('click',function(){
-        var src=document.getElementById('sourceLang');
-        var tgt=document.getElementById('targetLang');
-        if(!src||!tgt) return;
-        var tmp=src.value; src.value=tgt.value; tgt.value=tmp;
-        src.dispatchEvent(new Event('change'));
-        tgt.dispatchEvent(new Event('change'));
-      });
     })();
 
     // Navbar scroll shadow

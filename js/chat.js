@@ -226,7 +226,7 @@ function switchConversation(convId) {
   chatState.uploadedFileName = null;
   chatState.uploadedFileSize = null;
 
-  els.searchModeBtn.classList.remove('search-active');
+  if (els.searchModeBtn) els.searchModeBtn.classList.remove('search-active');
   if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
   renderSkillPanel();
 
@@ -321,9 +321,10 @@ function getMergedSkills() {
  * 打开技能创建弹窗
  */
 function openSkillCreateModal() {
-  els.skillCreateName.value = '';
-  els.skillCreateDesc.value = '';
-  els.skillCreatePrompt.value = '';
+  if (!els.skillCreateOverlay) return;
+  if (els.skillCreateName) els.skillCreateName.value = '';
+  if (els.skillCreateDesc) els.skillCreateDesc.value = '';
+  if (els.skillCreatePrompt) els.skillCreatePrompt.value = '';
   els.skillCreateOverlay.classList.add('active');
 }
 
@@ -331,25 +332,25 @@ function openSkillCreateModal() {
  * 关闭技能创建弹窗
  */
 function closeSkillCreateModal() {
-  els.skillCreateOverlay.classList.remove('active');
+  if (els.skillCreateOverlay) els.skillCreateOverlay.classList.remove('active');
 }
 
 /**
  * 保存本地技能
  */
 function handleSaveLocalSkill() {
-  const name = els.skillCreateName.value.trim();
-  const description = els.skillCreateDesc.value.trim();
-  const prompt = els.skillCreatePrompt.value.trim();
+  const name = els.skillCreateName?.value?.trim() || '';
+  const description = els.skillCreateDesc?.value?.trim() || '';
+  const prompt = els.skillCreatePrompt?.value?.trim() || '';
 
   if (!name) {
     showToast('请输入技能名称', 'error');
-    els.skillCreateName.focus();
+    els.skillCreateName?.focus();
     return;
   }
   if (!prompt) {
     showToast('请输入系统提示词', 'error');
-    els.skillCreatePrompt.focus();
+    els.skillCreatePrompt?.focus();
     return;
   }
 
@@ -357,7 +358,7 @@ function handleSaveLocalSkill() {
   const exists = chatState.localSkills.find(s => s.name === name);
   if (exists) {
     showToast('已存在同名技能，请更换名称', 'error');
-    els.skillCreateName.focus();
+    els.skillCreateName?.focus();
     return;
   }
 
@@ -367,7 +368,7 @@ function handleSaveLocalSkill() {
 
   closeSkillCreateModal();
   renderSkillPanel(); // 刷新技能选择面板
-  showToast(`技能「${name}」已创建`, 'success`);
+  showToast(`技能「${name}」已创建`, 'success');
 }
 
 // ====== 后台继续生成：待处理状态管理 ======
@@ -433,7 +434,7 @@ async function executeRestore(pending) {
   if (pending.searchMode) {
     chatState.searchMode = true;
     chatState.searchEngine = pending.searchEngine || 'bing';
-    els.searchModeBtn.classList.add('search-active');
+    if (els.searchModeBtn) els.searchModeBtn.classList.add('search-active');
     if (els.searchModeBtn2) els.searchModeBtn2.classList.add('search-active');
   }
   if (pending.activeSkill) {
@@ -460,7 +461,7 @@ async function executeRestore(pending) {
       if (pending.activeSkill?.prompt) searchPayload.skillPrompt = pending.activeSkill.prompt;
       reply = await sendSearchRequest(searchPayload);
       chatState.searchMode = false;
-      els.searchModeBtn.classList.remove('search-active');
+      if (els.searchModeBtn) els.searchModeBtn.classList.remove('search-active');
       if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
       updatePlaceholder();
     } else {
@@ -598,8 +599,8 @@ function updatePlaceholder() {
     : chatState.searchMode
       ? `联网搜索 - 输入搜索关键词...`
       : '输入你的问题...';
-  els.inputLarge.placeholder = placeholder;
-  els.inputBottom.placeholder = placeholder + ' (Enter 发送)';
+  if (els.inputLarge) els.inputLarge.placeholder = placeholder;
+  if (els.inputBottom) els.inputBottom.placeholder = placeholder + ' (Enter 发送)';
 }
 
 /**
@@ -607,8 +608,8 @@ function updatePlaceholder() {
  */
 function bindEvents() {
   // --- 发送按钮 ---
-  els.sendBtnLg.addEventListener('click', () => handleSend());
-  els.sendBtnSm.addEventListener('click', () => handleSend());
+  if (els.sendBtnLg) els.sendBtnLg.addEventListener('click', () => handleSend());
+  if (els.sendBtnSm) els.sendBtnSm.addEventListener('click', () => handleSend());
 
   // --- 停止按钮 ---
   // NOTE: 不能在这里调用 stopTypewriter()，因为 stopTypewriter() 会直接 clearInterval，
@@ -624,42 +625,49 @@ function bindEvents() {
   if (els.stopBtnBottom) els.stopBtnBottom.addEventListener('click', handleStop);
 
   // --- 居中输入框 ---
-  els.inputLarge.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
-  });
-  els.inputLarge.addEventListener('input', () => {
-    updateSendButtons();
-    autoResizeInput(els.inputLarge, 220);
-    updateCharCount();
-  });
+  if (els.inputLarge) {
+    els.inputLarge.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+    });
+    els.inputLarge.addEventListener('input', () => {
+      updateSendButtons();
+      autoResizeInput(els.inputLarge, 220);
+      updateCharCount();
+    });
+  }
 
   // --- 底部输入框 ---
-  els.inputBottom.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
-  });
-  els.inputBottom.addEventListener('input', () => {
-    updateSendButtons();
-    autoResizeInput(els.inputBottom, 120);
-  });
+  if (els.inputBottom) {
+    els.inputBottom.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+    });
+    els.inputBottom.addEventListener('input', () => {
+      updateSendButtons();
+      autoResizeInput(els.inputBottom, 120);
+    });
+  }
 
   // --- 搜索模式切换（欢迎区和底部区同步） ---
-  els.searchModeBtn.addEventListener('click', toggleSearchMode);
+  if (els.searchModeBtn) els.searchModeBtn.addEventListener('click', toggleSearchMode);
   if (els.searchModeBtn2) els.searchModeBtn2.addEventListener('click', toggleSearchMode);
-  els.searchEngineSelect.addEventListener('change', (e) => {
-    chatState.searchEngine = e.target.value;
-    if (els.searchEngineSelect2) els.searchEngineSelect2.value = e.target.value;
-    updatePlaceholder();
-  });
+  if (els.searchEngineSelect) {
+    els.searchEngineSelect.addEventListener('change', (e) => {
+      chatState.searchEngine = e.target.value;
+      if (els.searchEngineSelect2) els.searchEngineSelect2.value = e.target.value;
+      updatePlaceholder();
+    });
+  }
   if (els.searchEngineSelect2) {
     els.searchEngineSelect2.addEventListener('change', (e) => {
       chatState.searchEngine = e.target.value;
-      els.searchEngineSelect.value = e.target.value;
+      if (els.searchEngineSelect) els.searchEngineSelect.value = e.target.value;
       updatePlaceholder();
     });
   }
 
   // --- 技能面板（欢迎区和底部区同步） ---
   function toggleSkillPanel() {
+    if (!els.skillPanel) return;
     const isHidden = els.skillPanel.classList.contains('is-hidden');
     if (isHidden) {
       els.skillPanel.style.removeProperty('display');
@@ -672,10 +680,12 @@ function bindEvents() {
     }
   }
 
-  els.skillBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleSkillPanel();
-  });
+  if (els.skillBtn) {
+    els.skillBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleSkillPanel();
+    });
+  }
   if (els.skillBtn2) {
     els.skillBtn2.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -683,7 +693,7 @@ function bindEvents() {
     });
   }
   document.addEventListener('click', (e) => {
-    if (!els.skillPanel.classList.contains('is-hidden') && !els.skillPanel.contains(e.target) && !els.skillPanel2?.contains(e.target) && e.target !== els.skillBtn && e.target !== els.skillBtn2) {
+    if (els.skillPanel && !els.skillPanel.classList.contains('is-hidden') && !els.skillPanel.contains(e.target) && !els.skillPanel2?.contains(e.target) && e.target !== els.skillBtn && e.target !== els.skillBtn2) {
       els.skillPanel.style.setProperty('display', 'none');
       els.skillPanel.classList.add('is-hidden');
       if (els.skillPanel2) { els.skillPanel2.style.setProperty('display', 'none'); els.skillPanel2.classList.add('is-hidden'); }
@@ -691,22 +701,22 @@ function bindEvents() {
   });
 
   // --- 文件上传（欢迎区和底部区同步） ---
-  els.uploadBtn.addEventListener('click', () => els.fileInput.click());
-  if (els.uploadBtn2) els.uploadBtn2.addEventListener('click', () => els.fileInput.click());
-  els.fileInput.addEventListener('change', handleFileUpload);
+  if (els.uploadBtn) els.uploadBtn.addEventListener('click', () => { if (els.fileInput) els.fileInput.click(); });
+  if (els.uploadBtn2) els.uploadBtn2.addEventListener('click', () => { if (els.fileInput) els.fileInput.click(); });
+  if (els.fileInput) els.fileInput.addEventListener('change', handleFileUpload);
 
   // --- 侧边栏操作 ---
-  els.sidebarToggle.addEventListener('click', toggleSidebar);
-  els.newChatBtn.addEventListener('click', handleNewChat);
-  els.clearBtn.addEventListener('click', handleClear);
-  els.createSkillBtn.addEventListener('click', () => {
+  if (els.sidebarToggle) els.sidebarToggle.addEventListener('click', toggleSidebar);
+  if (els.newChatBtn) els.newChatBtn.addEventListener('click', handleNewChat);
+  if (els.clearBtn) els.clearBtn.addEventListener('click', handleClear);
+  if (els.createSkillBtn) els.createSkillBtn.addEventListener('click', () => {
     openSkillCreateModal();
   });
 
   // 技能创建弹窗事件
-  els.skillCreateClose.addEventListener('click', closeSkillCreateModal);
-  els.skillCreateCancel.addEventListener('click', closeSkillCreateModal);
-  els.skillCreateSave.addEventListener('click', handleSaveLocalSkill);
+  if (els.skillCreateClose) els.skillCreateClose.addEventListener('click', closeSkillCreateModal);
+  if (els.skillCreateCancel) els.skillCreateCancel.addEventListener('click', closeSkillCreateModal);
+  if (els.skillCreateSave) els.skillCreateSave.addEventListener('click', handleSaveLocalSkill);
   // 点击遮罩关闭
   if (els.skillCreateOverlay) {
     els.skillCreateOverlay.addEventListener('click', (e) => {
@@ -715,13 +725,13 @@ function bindEvents() {
   }
   // ESC 关闭
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && els.skillCreateOverlay.classList.contains('active')) {
+    if (e.key === 'Escape' && els.skillCreateOverlay?.classList.contains('active')) {
       closeSkillCreateModal();
     }
   });
 
   // --- 主题切换 ---
-  els.themeBtn.addEventListener('click', toggleTheme);
+  if (els.themeBtn) els.themeBtn.addEventListener('click', toggleTheme);
 
   // --- 移动端汉堡菜单 ---
   if (els.mobileMenuBtn) {
@@ -735,7 +745,7 @@ function bindEvents() {
   document.addEventListener('click', (e) => {
     if (window.innerWidth <= 768) {
       const overlay = document.querySelector('.mobile-overlay');
-      if (overlay?.classList.contains('show') && !els.sidebar.contains(e.target)) {
+      if (overlay?.classList.contains('show') && els.sidebar && !els.sidebar.contains(e.target)) {
         closeMobileSidebar();
       }
     }
@@ -761,22 +771,21 @@ function getActiveInput() {
  * 更新发送按钮状态
  */
 function updateSendButtons() {
-  const text = getActiveInput().value.trim();
+  const activeInput = getActiveInput();
+  const text = activeInput ? activeInput.value.trim() : '';
   if (chatState.isSending) {
     // 回答中：隐藏发送按钮，显示停止按钮
-    els.sendBtnLg.style.display = 'none';
-    els.sendBtnSm.style.display = 'none';
-    els.stopBtn.style.removeProperty('display');
-    els.stopBtnBottom.style.removeProperty('display');
+    if (els.sendBtnLg) els.sendBtnLg.style.display = 'none';
+    if (els.sendBtnSm) els.sendBtnSm.style.display = 'none';
+    if (els.stopBtn) els.stopBtn.style.removeProperty('display');
+    if (els.stopBtnBottom) els.stopBtnBottom.style.removeProperty('display');
   } else {
     // 空闲中：显示发送按钮，隐藏停止按钮
     const disabled = !text;
-    els.sendBtnLg.disabled = disabled;
-    els.sendBtnSm.disabled = disabled;
-    els.sendBtnLg.style.removeProperty('display');
-    els.sendBtnSm.style.removeProperty('display');
-    els.stopBtn.style.setProperty('display', 'none');
-    els.stopBtnBottom.style.setProperty('display', 'none');
+    if (els.sendBtnLg) { els.sendBtnLg.disabled = disabled; els.sendBtnLg.style.removeProperty('display'); }
+    if (els.sendBtnSm) { els.sendBtnSm.disabled = disabled; els.sendBtnSm.style.removeProperty('display'); }
+    if (els.stopBtn) els.stopBtn.style.setProperty('display', 'none');
+    if (els.stopBtnBottom) els.stopBtnBottom.style.setProperty('display', 'none');
   }
 }
 
@@ -796,16 +805,18 @@ function updateCharCount() {
 function toggleSearchMode() {
   chatState.searchMode = !chatState.searchMode;
   if (chatState.searchMode) {
-    els.searchModeBtn.classList.add('search-active');
+    if (els.searchModeBtn) els.searchModeBtn.classList.add('search-active');
     if (els.searchModeBtn2) els.searchModeBtn2.classList.add('search-active');
     // 不再显示下拉框，直接使用后台配置的默认引擎
     chatState.activeSkill = null;
-    els.skillPanel.style.setProperty('display', 'none');
-    els.skillPanel.classList.add('is-hidden');
+    if (els.skillPanel) {
+      els.skillPanel.style.setProperty('display', 'none');
+      els.skillPanel.classList.add('is-hidden');
+    }
     if (els.skillPanel2) { els.skillPanel2.style.setProperty('display', 'none'); els.skillPanel2.classList.add('is-hidden'); }
     renderSkillPanel();
   } else {
-    els.searchModeBtn.classList.remove('search-active');
+    if (els.searchModeBtn) els.searchModeBtn.classList.remove('search-active');
     if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
   }
   updatePlaceholder();
@@ -824,13 +835,14 @@ function toggleTheme() {
  * 折叠/展开侧边栏
  */
 function toggleSidebar() {
-  els.sidebar.classList.toggle('collapsed');
+  if (els.sidebar) els.sidebar.classList.toggle('collapsed');
 }
 
 /**
  * 移动端打开侧边栏
  */
 function openMobileSidebar() {
+  if (!els.sidebar) return;
   els.sidebar.classList.add('open');
   let overlay = document.querySelector('.mobile-overlay');
   if (!overlay) {
@@ -846,7 +858,7 @@ function openMobileSidebar() {
  * 移动端关闭侧边栏
  */
 function closeMobileSidebar() {
-  els.sidebar.classList.remove('open');
+  if (els.sidebar) els.sidebar.classList.remove('open');
   const overlay = document.querySelector('.mobile-overlay');
   if (overlay) overlay.classList.remove('show');
 }
@@ -877,11 +889,9 @@ function handleNewChat() {
   chatState.uploadedFileContent = null;
   chatState.uploadedFileName = null;
   chatState.uploadedFileSize = null;
-  els.searchModeBtn.classList.remove('search-active');
+  if (els.searchModeBtn) els.searchModeBtn.classList.remove('search-active');
   if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
-  els.uploadFilename.classList.add('is-hidden');
-  els.uploadFilename.style.setProperty('display', 'none');
-  els.uploadFilename.textContent = '';
+  if (els.uploadFilename) { els.uploadFilename.classList.add('is-hidden'); els.uploadFilename.style.setProperty('display', 'none'); els.uploadFilename.textContent = ''; }
   if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
   saveConversations();
   switchToWelcomeMode();
@@ -905,12 +915,18 @@ function handleClear() {
   chatState.uploadedFileContent = null;
   chatState.uploadedFileName = null;
   chatState.uploadedFileSize = null;
-  els.searchModeBtn.classList.remove('search-active');
+  if (els.searchModeBtn) els.searchModeBtn.classList.remove('search-active');
   if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
-  els.uploadFilename.classList.add('is-hidden');
-  els.uploadFilename.style.setProperty('display', 'none');
-  els.uploadFilename.textContent = '';
-  if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
+  if (els.uploadFilename) { 
+    els.uploadFilename.classList.add('is-hidden');
+    els.uploadFilename.style.setProperty('display', 'none');
+    els.uploadFilename.textContent = '';
+  }
+  if (els.uploadFilename2) { 
+    els.uploadFilename2.classList.add('is-hidden'); 
+    els.uploadFilename2.style.setProperty('display', 'none'); 
+    els.uploadFilename2.textContent = ''; 
+  }
   saveConversations();
   switchToWelcomeMode();
   updatePlaceholder();
@@ -923,15 +939,25 @@ function handleClear() {
  */
 function switchToWelcomeMode() {
   chatState.hasMessages = false;
-  els.welcome.classList.remove('is-hidden');
-  els.welcome.style.setProperty('display', '');
-  els.inputBottomArea.classList.add('is-hidden');
-  els.inputBottomArea.style.setProperty('display', 'none');
-  els.messages.querySelectorAll('.chat-message').forEach(el => el.remove());
-  els.inputLarge.value = '';
-  els.inputBottom.value = '';
-  els.inputLarge.style.height = 'auto';
-  els.inputBottom.style.height = 'auto';
+  if (els.welcome) {
+    els.welcome.classList.remove('is-hidden');
+    els.welcome.style.setProperty('display', '');
+  }
+  if (els.inputBottomArea) {
+    els.inputBottomArea.classList.add('is-hidden');
+    els.inputBottomArea.style.setProperty('display', 'none');
+  }
+  if (els.messages) {
+    els.messages.querySelectorAll('.chat-message').forEach(el => el.remove());
+  }
+  if (els.inputLarge) {
+    els.inputLarge.value = '';
+    els.inputLarge.style.height = 'auto';
+  }
+  if (els.inputBottom) {
+    els.inputBottom.value = '';
+    els.inputBottom.style.height = 'auto';
+  }
   updateSendButtons();
 }
 
@@ -940,10 +966,14 @@ function switchToWelcomeMode() {
  */
 function switchToMessageMode() {
   chatState.hasMessages = true;
-  els.welcome.classList.add('is-hidden');
-  els.welcome.style.setProperty('display', 'none');
-  els.inputBottomArea.classList.remove('is-hidden');
-  els.inputBottomArea.style.setProperty('display', '');
+  if (els.welcome) {
+    els.welcome.classList.add('is-hidden');
+    els.welcome.style.setProperty('display', 'none');
+  }
+  if (els.inputBottomArea) {
+    els.inputBottomArea.classList.remove('is-hidden');
+    els.inputBottomArea.style.setProperty('display', '');
+  }
   updateSendButtons();
 }
 
@@ -982,10 +1012,16 @@ async function handleFileUpload(e) {
     chatState.uploadedFileContent = text;
     chatState.uploadedFileName = file.name;
     chatState.uploadedFileSize = formatFileSize(file.size);
-    els.uploadFilename.textContent = file.name;
-    els.uploadFilename.classList.remove('is-hidden');
-    els.uploadFilename.style.setProperty('display', '');
-    if (els.uploadFilename2) { els.uploadFilename2.textContent = file.name; els.uploadFilename2.classList.remove('is-hidden'); els.uploadFilename2.style.setProperty('display', ''); }
+    if (els.uploadFilename) {
+      els.uploadFilename.textContent = file.name;
+      els.uploadFilename.classList.remove('is-hidden');
+      els.uploadFilename.style.setProperty('display', '');
+    }
+    if (els.uploadFilename2) { 
+      els.uploadFilename2.textContent = file.name; 
+      els.uploadFilename2.classList.remove('is-hidden'); 
+      els.uploadFilename2.style.setProperty('display', ''); 
+    }
     showToast(`已加载文件: ${file.name} (${text.length} 字符)`, 'success');
   } catch (err) {
     showToast('文件读取失败: ' + err.message, 'error');
@@ -1030,10 +1066,16 @@ async function handleSend() {
   if (chatState.uploadedFileContent) {
     userContent = text;
     // 清除文件名显示元素（保留内容供 API 调用）
-    els.uploadFilename.classList.add('is-hidden');
-    els.uploadFilename.style.setProperty('display', 'none');
-    els.uploadFilename.textContent = '';
-    if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
+    if (els.uploadFilename) {
+      els.uploadFilename.classList.add('is-hidden');
+      els.uploadFilename.style.setProperty('display', 'none');
+      els.uploadFilename.textContent = '';
+    }
+    if (els.uploadFilename2) { 
+      els.uploadFilename2.classList.add('is-hidden'); 
+      els.uploadFilename2.style.setProperty('display', 'none'); 
+      els.uploadFilename2.textContent = ''; 
+    }
   }
 
   // 添加用户消息（先中断可能正在运行的打字机）
@@ -1097,7 +1139,7 @@ async function handleSend() {
       reply = await sendSearchRequest(searchPayload);
       // 搜索完成后关闭搜索模式
       chatState.searchMode = false;
-      els.searchModeBtn.classList.remove('search-active');
+      if (els.searchModeBtn) els.searchModeBtn.classList.remove('search-active');
       if (els.searchModeBtn2) els.searchModeBtn2.classList.remove('search-active');
       updatePlaceholder();
     } else {
@@ -1109,10 +1151,16 @@ async function handleSend() {
       chatState.uploadedFileContent = null;
       chatState.uploadedFileName = null;
       chatState.uploadedFileSize = null;
-      els.uploadFilename.classList.add('is-hidden');
-      els.uploadFilename.style.setProperty('display', 'none');
-      els.uploadFilename.textContent = '';
-      if (els.uploadFilename2) { els.uploadFilename2.classList.add('is-hidden'); els.uploadFilename2.style.setProperty('display', 'none'); els.uploadFilename2.textContent = ''; }
+      if (els.uploadFilename) {
+        els.uploadFilename.classList.add('is-hidden');
+        els.uploadFilename.style.setProperty('display', 'none');
+        els.uploadFilename.textContent = '';
+      }
+      if (els.uploadFilename2) { 
+        els.uploadFilename2.classList.add('is-hidden'); 
+        els.uploadFilename2.style.setProperty('display', 'none'); 
+        els.uploadFilename2.textContent = ''; 
+      }
     }
 
     // 使用打字机效果显示 AI 回复（逐字显示）
@@ -1222,7 +1270,7 @@ function typewriterEffect(replyData, speed = 18) {
   bubbleEl.innerHTML = '<span class="typewriter-cursor"></span>';
 
   msgEl.appendChild(bubbleEl);
-  els.messages.insertBefore(msgEl, els.loading);
+  if (els.messages) els.messages.insertBefore(msgEl, els.loading);
   scrollToBottom();
 
   // 中断已有打字机
@@ -1580,6 +1628,7 @@ function addMessage(role, content) {
  * 渲染所有消息
  */
 function renderAllMessages() {
+  if (!els.messages) return;
   els.messages.querySelectorAll('.chat-message').forEach(el => el.remove());
   // 移除文件卡片（非 .chat-message 元素）
   els.messages.querySelectorAll('.chat-file-card').forEach(el => el.remove());
@@ -1666,13 +1715,14 @@ function renderMessage(role, content) {
     msgEl.appendChild(copyBtn);
   }
 
-  els.messages.insertBefore(msgEl, els.loading);
+  if (els.messages) els.messages.insertBefore(msgEl, els.loading);
 }
 
 /**
  * 显示/隐藏加载指示器
  */
 function showLoading(show) {
+  if (!els.loading) return;
   if (show) {
     els.loading.classList.remove('is-hidden');
     els.loading.style.setProperty('display', 'flex');
@@ -1686,6 +1736,7 @@ function showLoading(show) {
  * 滚动到底部
  */
 function scrollToBottom() {
+  if (!els.messages) return;
   requestAnimationFrame(() => {
     els.messages.scrollTop = els.messages.scrollHeight;
   });
@@ -1695,10 +1746,10 @@ function scrollToBottom() {
  * Toast 提示
  */
 function showToast(message, type = 'info') {
-  const toast = els.toast;
-  toast.textContent = message;
-  toast.className = `toast ${type} show`;
-  setTimeout(() => { toast.className = 'toast'; }, 2500);
+  if (!els.toast) return;
+  els.toast.textContent = message;
+  els.toast.className = `toast ${type} show`;
+  setTimeout(() => { els.toast.className = 'toast'; }, 2500);
 }
 
 // 页面加载完成后初始化
